@@ -1,0 +1,45 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/post/list.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>{{ title }}</h2>
+
+    <p><a href="/admin/post/new">新規作成</a></p>
+
+    {% if posts %}
+        <table>
+            <thead>
+                <tr>
+                    <th>title</th>
+                    <th>slug</th>
+                    <th>status</th>
+                    <th>author</th>
+                    <th>published_at</th>
+                    <th>actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                    <tr>
+                        <td>
+                            <a href="/post/{{ post.slug }}" target="_blank">{{ post.title }}</a>
+                        </td>
+                        <td>{{ post.slug }}</td>
+                        <td>{{ post.status }}</td>
+                        <td>{{ post.author_display_name }}</td>
+                        <td>{{ post.published_at_display }}</td>
+                        <td>
+                            <a href="/admin/post/edit/{{ post._id }}">編集</a>
+                            /
+                            <a href="/admin/post/delete/{{ post._id }}">削除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>投稿はありません。</p>
+    {% endif %}
+</section>
+{% endblock %}

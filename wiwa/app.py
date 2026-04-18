@@ -1,0 +1,116 @@
+# パスとファイル名: wiwa/app.py
+import traceback
+
+from wiwa.core.auth import Auth
+from wiwa.core.dispatcher import Dispatcher
+from wiwa.core.request import Request
+from wiwa.core.resolver import Resolver
+from wiwa.core.response import internal_server_error, not_found
+from wiwa.extensions.loader import ExtensionLoader
+from wiwa.services.access_control_service import check_access
+from wiwa.services.access_log_service import save_access_log
+from wiwa.services.static_files_service import serve_static
+
+resolver = Resolver()
+auth = Auth()
+dispatcher = Dispatcher()
+extension_loader = ExtensionLoader()
+extension_routes = extension_loader.load_routes()
+
+
+def make_start_response(start_response, status_holder: dict):
+    def custom_start_response(status, headers, exc_info=None):
+        try:
+            status_holder["status_code"] = int(status.split(" ", 1)[0])
+        except (ValueError, IndexError):
+            status_holder["status_code"] = 500
+        return start_response(status, headers, exc_info)
+
+    return custom_start_response
+
+
+def finish_response(response, environ, start_response, request, status_holder: dict):
+    result = response(environ, start_response)
+    save_access_log(request, status_holder["status_code"])
+    return result
+
+
+def resolve_extension_route(path: str, method: str) -> dict | None:
+    normalized_method = method.upper()
+
+    for route in extension_routes:
+        if route.get("url") != path:
+            continue
+
+        if (route.get("method") or "").upper() != normalized_method:
+            continue
+
+        resolved = dict(route)
+        resolved.setdefault("params", {})
+        resolved.setdefault("auth_required", False)
+        resolved.setdefault("roles", [])
+        return resolved
+
+    return None
+
+
+def application(environ, start_response):
+    request = Request(environ)
+    request.user = auth.get_current_user(request)
+
+    status_holder = {"status_code": 500}
+    wrapped_start_response = make_start_response(start_response, status_holder)
+
+    print(
+        f'{request.remote_addr} "{request.user_agent}" "{request.method} {request.path}"',
+        flush=True
+    )
+
+    try:
+        if request.path.startswith("/static/"):
+            response = serve_static(request)
+            return response(environ, wrapped_start_response)
+
+        resolved = resolve_extension_route(request.path, request.method)
+
+        if resolved is None:
+            resolved = resolver.resolve(request.path, request.method)
+
+        if resolved is None:
+            return finish_response(
+                not_found(),
+                environ,
+                wrapped_start_response,
+                request,
+                status_holder,
+            )
+
+        access_response = check_access(request, resolved)
+        if access_response is not None:
+            return finish_response(
+                access_response,
+                environ,
+                wrapped_start_response,
+                request,
+                status_holder,
+            )
+
+        response = dispatcher.dispatch(resolved, request)
+        return finish_response(
+            response,
+            environ,
+            wrapped_start_response,
+            request,
+            status_holder,
+        )
+
+    except Exception:
+        error_text = traceback.format_exc()
+        print(error_text, flush=True)
+        return finish_response(
+            internal_server_error(error_text),
+            environ,
+            wrapped_start_response,
+            request,
+            status_holder,
+        )

@@ -1,0 +1,26 @@
+[
+  {
+    "key": "site_name",
+    "value": "Kazun"
+  },
+  {
+    "key": "theme",
+    "value": "default"
+  },
+  {
+    "key": "default_lang",
+    "value": "ja"
+  },
+  {
+    "key": "company_name",
+    "value": "Kazun Inc."
+  },
+  {
+    "key": "company_address",
+    "value": "Sapporo"
+  },
+  {
+    "key": "company_tel",
+    "value": "000-0000-0000"
+  }
+]

@@ -1,0 +1,36 @@
+<!-- パスとファイル名: wiwa/templates/html/index.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+        <section class="hero">
+            <h2 class="hero__title">WIWAへようこそ</h2>
+            <p class="hero__text">Write Python, that's it.</p>
+            <p class="hero__text">Pythonが書ければ、そのまま拡張できるCMSです。</p>
+        </section>
+
+        <section class="latest-posts">
+            <h2 class="latest-posts__title">最新の投稿</h2>
+
+            {% if posts %}
+            <ul class="post-list">
+                {% for post in posts %}
+                <li class="post-list__item">
+                    <a href="/post/{{ post.slug }}" class="post-list__link">
+                        <article class="post-card">
+                            <h3 class="post-card__title">{{ post.title }}</h3>
+                            <p class="post-card__meta">
+                                <span class="post-card__date">{{ post.published_at_display }}</span>
+                                <span class="post-card__author">{{ post.author_display_name }}</span>
+                            </p>
+                        </article>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <p class="latest-posts__more"><a href="/post" class="latest-posts__more-link">一覧を見る</a></p>
+            {% else %}
+            <p class="latest-posts__status">まだ投稿がありません。</p>
+            {% endif %}
+        </section>
+{% endblock %}

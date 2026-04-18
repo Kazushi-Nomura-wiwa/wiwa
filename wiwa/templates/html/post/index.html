@@ -1,0 +1,29 @@
+<!-- パスとファイル名: wiwa/templates/html/post/index.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+    <section class="post-index">
+        <h2 class="post-index__title">{{ title }}</h2>
+
+        {% if posts %}
+            <ul class="post-list">
+                {% for post in posts %}
+                <li class="post-list__item">
+                    <a href="/post/{{ post.slug }}" class="post-list__link">
+                        <article class="post-card">
+                            <h3 class="post-card__title">{{ post.title }}</h3>
+                            <p class="post-card__meta">
+                                <span class="post-card__date">{{ post.published_at_display }}</span>
+                                <span class="post-card__author">{{ post.author_display_name }}</span>
+                            </p>
+                        </article>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% include "partials/pagination.html" %}
+        {% else %}
+            <p>公開中の記事はありません。</p>
+        {% endif %}
+    </section>
+{% endblock %}

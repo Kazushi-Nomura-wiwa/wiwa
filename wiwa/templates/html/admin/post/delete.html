@@ -1,0 +1,23 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/post/delete.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>{{ title }}</h2>
+
+    <p>以下の投稿を削除しますか？</p>
+
+    <ul>
+        <li><strong>title:</strong> {{ post.title }}</li>
+        <li><strong>slug:</strong> {{ post.slug }}</li>
+        <li><strong>status:</strong> {{ post.status }}</li>
+    </ul>
+
+    <form action="/admin/post/delete/{{ post._id }}" method="post" onsubmit="return confirm('本当に削除しますか？この操作は取り消せません。');">
+        <button type="submit">削除する</button>
+    </form>
+
+    <p><a href="/admin/post/list">一覧に戻る</a></p>
+    <p><a href="/admin/post/edit/{{ post._id }}">編集に戻る</a></p>
+</section>
+{% endblock %}

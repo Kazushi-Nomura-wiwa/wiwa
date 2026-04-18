@@ -1,0 +1,37 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/users/list.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>ユーザー一覧</h2>
+
+    <p><a href="/admin/users/new">新規ユーザー追加</a></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>username</th>
+                <th>display_name</th>
+                <th>email</th>
+                <th>role</th>
+                <th>is_active</th>
+                <th>編集</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in users %}
+            <tr>
+                <td>{{ row.username }}</td>
+                <td>{{ row.display_name or "" }}</td>
+                <td>{{ row.email or "" }}</td>
+                <td>{{ row.role }}</td>
+                <td>{{ row.is_active }}</td>
+                <td>
+                    <a href="/admin/users/edit/{{ row._id }}">編集</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

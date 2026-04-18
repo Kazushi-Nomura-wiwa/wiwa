@@ -1,0 +1,20 @@
+<!-- パスとファイル名: wiwa/templates/html/post/slug.html -->
+{% extends "layouts/base.html" %}
+{% block content %}
+    <article class="post">
+        <h1 class="post__title">{{ post.title }}</h1>
+
+        {% if post.published_at %}
+            <p class="post__date">{{ post.published_at_display }}</p>
+        {% endif %}
+
+        {% if post.author_display_name %}
+            <p class="post__author">投稿者: {{ post.author_display_name }}</p>
+        {% endif %}
+            <div class="post__body">
+                {{ post.body }}
+            </div>
+    </article>
+
+    <p class="posts__back"><a href="/post" class="posts__back-link">/Post に戻る</a></p>
+{% endblock %}

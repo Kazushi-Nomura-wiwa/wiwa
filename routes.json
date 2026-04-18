@@ -1,0 +1,7 @@
+[
+  {
+    "path": "/admin/entry/list",
+    "method": "GET",
+    "auth_required": true
+  }
+]

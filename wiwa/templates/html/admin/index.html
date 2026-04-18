@@ -1,0 +1,9 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/index.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+            <section>
+                <h2>管理画面</h2>
+                <p>ようこそ、{{ current_user.display_name or current_user.username }}さん</p>
+            </section>
+{% endblock %}

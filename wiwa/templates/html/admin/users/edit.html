@@ -1,0 +1,105 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/users/edit.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>ユーザー編集</h2>
+
+    <p><a href="/admin/users">ユーザー一覧に戻る</a></p>
+
+    <form method="post" action="/admin/users/update">
+        <input type="hidden" name="user_id" value="{{ user._id }}">
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>username</th>
+                    <td>
+                        <input
+                            type="text"
+                            name="username"
+                            value="{{ user.username or '' }}"
+                            required
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <th>display_name</th>
+                    <td>
+                        <input
+                            type="text"
+                            name="display_name"
+                            value="{{ user.display_name or '' }}"
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <th>email</th>
+                    <td>
+                        <input
+                            type="email"
+                            name="email"
+                            value="{{ user.email or '' }}"
+                            required
+                        >
+                    </td>
+                </tr>
+                <tr>
+                    <th>role</th>
+                    <td>
+                        {% if is_last_active_admin %}
+                            <input type="hidden" name="role" value="admin">
+                            <select disabled>
+                                <option value="admin" selected>admin</option>
+                            </select>
+                        {% else %}
+                            <select name="role">
+                                {% for role_name in allowed_roles %}
+                                    <option value="{{ role_name }}" {% if user.role == role_name %}selected{% endif %}>
+                                        {{ role_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>is_active</th>
+                    <td>
+                        {% if is_last_active_admin %}
+                            <input type="hidden" name="is_active" value="1">
+                            <label>
+                                <input type="checkbox" checked disabled>
+                                有効
+                            </label>
+                        {% else %}
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="is_active"
+                                    value="1"
+                                    {% if user.is_active %}checked{% endif %}
+                                >
+                                有効
+                            </label>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>
+            <button type="submit">更新する</button>
+        </p>
+    </form>
+
+    {% if not is_last_active_admin %}
+    <hr>
+
+    <form method="post" action="/admin/users/delete" onsubmit="return confirm('このユーザーを削除しますか？');">
+        <input type="hidden" name="user_id" value="{{ user._id }}">
+        <button type="submit">削除する</button>
+    </form>
+    {% endif %}
+</section>
+{% endblock %}

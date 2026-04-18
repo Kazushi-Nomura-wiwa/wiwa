@@ -1,0 +1,23 @@
+<!-- パスとファイル名: wiwa/templates/html/partials/admin_header.html -->
+    <header class="site-header">
+        <h1 class="site-header__title"><a href="/" class="site-header__link">WIWA</a></h1>
+
+        <nav class="global-nav">
+            <ul class="global-nav__list">
+                <li class="global-nav__item"><a href="/post" class="global-nav__link">Post</a></li>
+                {% if current_user %}
+                <li class="global-nav__item"><a href="/admin" class="global-nav__link">Admin</a></li>
+                <li class="global-nav__item"><a href="/auth/logout" class="global-nav__link">Logout</a></li>
+                {% else %}
+                <li class="global-nav__item"><a href="/auth/login" class="global-nav__link">Login</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        <nav class="admin-nav">
+            <ul class="admin-nav__list">
+                <li class="admin-nav__item"><a href="/admin" class="admin-nav__link">管理トップ</a></li>
+                <li class="admin-nav__item"><a href="/admin/post/list" class="admin-nav__link">Post一覧</a></li>
+                <li class="admin-nav__item"><a href="/admin/users/list" class="admin-nav__link">ユーザー一覧</a></li>
+            </ul>
+        </nav>
+    </header>

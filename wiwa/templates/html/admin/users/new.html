@@ -1,0 +1,39 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/users/new.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>ユーザー追加</h2>
+    <form method="post" action="/admin/users/new">
+        <table>
+            <tr>
+                <th>username</th>
+                <td><input name="username" type="text" required value="{{ form_data.username }}"></td>
+            </tr>
+            <tr>
+                <th>display_name</th>
+                <td><input name="display_name" type="text" value="{{ form_data.display_name }}"></td>
+            </tr>
+            <tr>
+                <th>email</th>
+                <td><input name="email" type="email" required value="{{ form_data.email }}"></td>
+            </tr>
+            <tr>
+                <th>password</th>
+                <td><input name="password" type="password" required></td>
+            </tr>
+            <tr>
+                <th>role</th>
+                <td>
+                    <select name="role">
+                        <option value="author" {% if form_data.role == "author" %}selected{% endif %}>author</option>
+                        <option value="editor" {% if form_data.role == "editor" %}selected{% endif %}>editor</option>
+                        <option value="admin" {% if form_data.role == "admin" %}selected{% endif %}>admin</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" class="button submit">作成</button>
+    </form>
+</section>
+{% endblock %}

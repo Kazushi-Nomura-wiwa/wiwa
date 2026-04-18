@@ -1,0 +1,78 @@
+<nav class="pagination" aria-label="ページ送り">
+    <ul class="pagination__list">
+
+        {# 先頭へ #}
+        {% if page > 1 %}
+            <li class="pagination__item">
+                <a href="/post?page=1" class="pagination__link pagination__link--first">先頭へ</a>
+            </li>
+        {% endif %}
+
+        {# 前へ #}
+        {% if page > 1 %}
+            <li class="pagination__item">
+                <a href="/post?page={{ page - 1 }}" class="pagination__link pagination__link--prev">前へ</a>
+            </li>
+        {% endif %}
+
+        {% set start = page - 2 %}
+        {% set end = page + 2 %}
+
+        {% if start < 1 %}
+            {% set start = 1 %}
+        {% endif %}
+        {% if end > total_pages %}
+            {% set end = total_pages %}
+        {% endif %}
+
+        {# 先頭ページ #}
+        {% if start > 1 %}
+            <li class="pagination__item">
+                <a href="/post?page=1" class="pagination__link">1</a>
+            </li>
+            {% if start > 2 %}
+                <li class="pagination__item">
+                    <span class="pagination__ellipsis">…</span>
+                </li>
+            {% endif %}
+        {% endif %}
+
+        {# 中央ページ #}
+        {% for p in range(start, end + 1) %}
+            <li class="pagination__item">
+                {% if p == page %}
+                    <span class="pagination__link pagination__link--current">{{ p }}</span>
+                {% else %}
+                    <a href="/post?page={{ p }}" class="pagination__link">{{ p }}</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+
+        {# 末尾ページ #}
+        {% if end < total_pages %}
+            {% if end < total_pages - 1 %}
+                <li class="pagination__item">
+                    <span class="pagination__ellipsis">…</span>
+                </li>
+            {% endif %}
+            <li class="pagination__item">
+                <a href="/post?page={{ total_pages }}" class="pagination__link">{{ total_pages }}</a>
+            </li>
+        {% endif %}
+
+        {# 次へ #}
+        {% if page < total_pages %}
+            <li class="pagination__item">
+                <a href="/post?page={{ page + 1 }}" class="pagination__link pagination__link--next">次へ</a>
+            </li>
+        {% endif %}
+
+        {# 末尾へ #}
+        {% if page < total_pages %}
+            <li class="pagination__item">
+                <a href="/post?page={{ total_pages }}" class="pagination__link pagination__link--last">末尾へ</a>
+            </li>
+        {% endif %}
+
+    </ul>
+</nav>

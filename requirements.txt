@@ -1,0 +1,8 @@
+# パスとファイル名: requirements.txt
+
+python-dotenv
+pymongo
+jJinja2
+tzdata
+bcrypt
+werkzeug

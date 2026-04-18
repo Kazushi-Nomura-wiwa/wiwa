@@ -1,0 +1,72 @@
+# パスとファイル名: wiwa/core/auth.py
+from wiwa.db.sessions_repository import SessionsRepository
+from wiwa.db.users_repository import UsersRepository
+
+
+SESSION_COOKIE_NAME = "session_id"
+
+
+class Auth:
+    def __init__(self):
+        self.sessions_repository = SessionsRepository()
+        self.users_repository = UsersRepository()
+
+    def get_session_id(self, request) -> str | None:
+        return request.cookies.get(SESSION_COOKIE_NAME)
+
+    def get_session(self, request):
+        session_id = self.get_session_id(request)
+        if not session_id:
+            return None
+
+        return self.sessions_repository.find_by_session_id(session_id)
+
+    def get_current_user(self, request):
+        session = self.get_session(request)
+        if not session:
+            return None
+
+        username = session.get("username")
+        if not username:
+            return None
+
+        user = self.users_repository.find_by_username(username)
+        if not user:
+            return None
+
+        if not user.get("is_active", True):
+            return None
+
+        return user
+
+    def is_authenticated(self, request) -> bool:
+        return self.get_current_user(request) is not None
+
+    def has_role(self, request, allowed_roles: list[str]) -> bool:
+        user = self.get_current_user(request)
+        if not user:
+            return False
+
+        if not allowed_roles:
+            return True
+
+        user_role = user.get("role")
+        if not user_role:
+            return False
+
+        return user_role in allowed_roles
+
+
+_auth = Auth()
+
+
+def get_current_user(request):
+    return _auth.get_current_user(request)
+
+
+def is_authenticated(request) -> bool:
+    return _auth.is_authenticated(request)
+
+
+def has_role(request, allowed_roles: list[str]) -> bool:
+    return _auth.has_role(request, allowed_roles)

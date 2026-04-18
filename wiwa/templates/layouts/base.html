@@ -1,0 +1,17 @@
+<!-- パスとファイル名: wiwa/templates/html/layouts/base.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% include "partials/head.html" %}
+</head>
+<body>
+    {% include "partials/header.html" %}
+    {% if error_message %}
+    <p class="error">{{ error_message }}</p>
+    {% endif %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    {% include "partials/footer.html" %}
+</body>
+</html>

@@ -1,0 +1,18 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 2rem;
+}
+
+header,
+footer {
+    padding: 1rem 0;
+}
+
+main {
+    padding: 2rem 0;
+}
+
+a {
+    margin-right: 1rem;
+}

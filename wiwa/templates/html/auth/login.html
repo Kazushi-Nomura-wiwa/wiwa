@@ -1,0 +1,25 @@
+<!-- パスとファイル名: wiwa/templates/html/login/index.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section>
+    <h1>ログイン</h1>
+
+
+    <form method="post" action="/auth/login">
+        <div>
+            <label for="username">ユーザー名</label><br>
+            <input type="text" id="username" name="username" value="{{ username }}">
+        </div>
+
+        <div style="margin-top: 1rem;">
+            <label for="password">パスワード</label><br>
+            <input type="password" id="password" name="password">
+        </div>
+
+        <div style="margin-top: 1rem;">
+            <button type="submit">ログイン</button>
+        </div>
+    </form>
+</section>
+{% endblock %}
