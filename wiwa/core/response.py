@@ -43,6 +43,18 @@ class Response:
         cookie[key]["max-age"] = "0"
         self.headers.append(("Set-Cookie", cookie.output(header="").strip()))
 
+    def has_cookie(self, key: str) -> bool:
+        prefix = f"{key}="
+
+        for header_name, header_value in self.headers:
+            if header_name.lower() != "set-cookie":
+                continue
+
+            if header_value.startswith(prefix):
+                return True
+
+        return False
+
     def __call__(self, environ, start_response):
         body = self.body
         if isinstance(body, str):

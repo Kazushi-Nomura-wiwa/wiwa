@@ -1,7 +1,7 @@
 # パスとファイル名: wiwa/app.py
 import traceback
 
-from wiwa.core.auth import Auth
+from wiwa.core.auth import Auth, SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.dispatcher import Dispatcher
 from wiwa.core.request import Request
 from wiwa.core.resolver import Resolver
@@ -29,7 +29,29 @@ def make_start_response(start_response, status_holder: dict):
     return custom_start_response
 
 
+def refresh_session_cookie(response, request) -> None:
+    if not getattr(request, "session_cookie_needs_refresh", False):
+        return
+
+    if not getattr(request, "session_id", None):
+        return
+
+    if response.has_cookie(SESSION_COOKIE_NAME):
+        return
+
+    response.set_cookie(
+        key=SESSION_COOKIE_NAME,
+        value=request.session_id,
+        path="/",
+        http_only=True,
+        secure=False,
+        same_site="Lax",
+        max_age=60 * 60 * 24 * SESSION_EXPIRES_DAYS,
+    )
+
+
 def finish_response(response, environ, start_response, request, status_holder: dict):
+    refresh_session_cookie(response, request)
     result = response(environ, start_response)
     save_access_log(request, status_holder["status_code"])
     return result

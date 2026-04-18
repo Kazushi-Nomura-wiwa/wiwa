@@ -42,6 +42,22 @@ class SessionsRepository:
 
         return session
 
+    def touch(self, session_id: str, expires_days: int = 7) -> None:
+        if not session_id:
+            return
+
+        now = datetime.now(UTC)
+        expires_at = now + timedelta(days=expires_days)
+
+        self.collection.update_one(
+            {"session_id": session_id},
+            {
+                "$set": {
+                    "expires_at": expires_at,
+                }
+            }
+        )
+
     def delete(self, session_id: str) -> None:
         if not session_id:
             return

@@ -4,6 +4,7 @@ from wiwa.db.users_repository import UsersRepository
 
 
 SESSION_COOKIE_NAME = "session_id"
+SESSION_EXPIRES_DAYS = 7
 
 
 class Auth:
@@ -19,24 +20,51 @@ class Auth:
         if not session_id:
             return None
 
-        return self.sessions_repository.find_by_session_id(session_id)
+        session = self.sessions_repository.find_by_session_id(session_id)
+        if not session:
+            return None
+
+        request.session_id = session_id
+
+        if not getattr(request, "_session_touched", False):
+            self.sessions_repository.touch(
+                session_id=session_id,
+                expires_days=SESSION_EXPIRES_DAYS,
+            )
+            request._session_touched = True
+            request.session_cookie_needs_refresh = True
+
+        return session
 
     def get_current_user(self, request):
+        if getattr(request, "_current_user_loaded", False):
+            return request.user
+
         session = self.get_session(request)
         if not session:
+            request.user = None
+            request._current_user_loaded = True
             return None
 
         username = session.get("username")
         if not username:
+            request.user = None
+            request._current_user_loaded = True
             return None
 
         user = self.users_repository.find_by_username(username)
         if not user:
+            request.user = None
+            request._current_user_loaded = True
             return None
 
         if not user.get("is_active", True):
+            request.user = None
+            request._current_user_loaded = True
             return None
 
+        request.user = user
+        request._current_user_loaded = True
         return user
 
     def is_authenticated(self, request) -> bool:

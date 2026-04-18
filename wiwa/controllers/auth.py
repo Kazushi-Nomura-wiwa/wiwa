@@ -1,5 +1,5 @@
 # パスとファイル名: wiwa/controllers/auth.py
-from wiwa.core.auth import SESSION_COOKIE_NAME
+from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response
 from wiwa.services.login_service import LoginService
@@ -52,7 +52,7 @@ def _login_submit(request):
         http_only=True,
         secure=False,
         same_site="Lax",
-        max_age=60 * 60 * 24 * 7,
+        max_age=60 * 60 * 24 * SESSION_EXPIRES_DAYS,
     )
     return response
 
