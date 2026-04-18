@@ -1,21 +1,22 @@
 # パスとファイル名: wiwa/app.py
 import traceback
 
-from wiwa.core.auth import Auth, SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
+from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.dispatcher import Dispatcher
 from wiwa.core.request import Request
 from wiwa.core.resolver import Resolver
 from wiwa.core.response import internal_server_error, not_found
+from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.extensions.loader import ExtensionLoader
 from wiwa.services.access_control_service import check_access
 from wiwa.services.access_log_service import save_access_log
 from wiwa.services.static_files_service import serve_static
 
 resolver = Resolver()
-auth = Auth()
 dispatcher = Dispatcher()
 extension_loader = ExtensionLoader()
 extension_routes = extension_loader.load_routes()
+sessions_repository = SessionsRepository()
 
 
 def make_start_response(start_response, status_holder: dict):
@@ -30,18 +31,25 @@ def make_start_response(start_response, status_holder: dict):
 
 
 def refresh_session_cookie(response, request) -> None:
-    if not getattr(request, "session_cookie_needs_refresh", False):
+    session_id = request.cookies.get(SESSION_COOKIE_NAME)
+    if not session_id:
         return
 
-    if not getattr(request, "session_id", None):
+    session = sessions_repository.find_by_session_id(session_id)
+    if not session:
         return
+
+    sessions_repository.touch(
+        session_id=session_id,
+        expires_days=SESSION_EXPIRES_DAYS,
+    )
 
     if response.has_cookie(SESSION_COOKIE_NAME):
         return
 
     response.set_cookie(
         key=SESSION_COOKIE_NAME,
-        value=request.session_id,
+        value=session_id,
         path="/",
         http_only=True,
         secure=False,
@@ -78,7 +86,6 @@ def resolve_extension_route(path: str, method: str) -> dict | None:
 
 def application(environ, start_response):
     request = Request(environ)
-    request.user = auth.get_current_user(request)
 
     status_holder = {"status_code": 500}
     wrapped_start_response = make_start_response(start_response, status_holder)
