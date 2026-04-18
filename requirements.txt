@@ -2,7 +2,7 @@
 
 python-dotenv
 pymongo
-jJinja2
+Jinja2
 tzdata
 bcrypt
 werkzeug
