@@ -5,6 +5,7 @@
     --white-color: rgba(255 255 255 / 100%);
     --text-color: rgba(51 51 51 / 100%);
     --ash-color: rgba(100 100 100 / 100%);
+    --light-ash-color: rgba(200 200 200 / 100%);
     --green-color: rgba(173 216 74 / 100%);
 
     /* --- テキスト --- */
@@ -18,8 +19,6 @@
 body {
     margin: 0;
 }
-
-/* 見出しや段落の余白を明示管理 */
 h1, h2, h3, h4, h5, h6,
 p,
 ul, ol {
@@ -32,7 +31,6 @@ ul, ol {
     list-style: none;
 }
 
-/* 画像の余計な隙間防止 */
 img {
     max-width: 100%;
     display: block;
@@ -74,16 +72,35 @@ address{
 }
 
 /* スマホ版 */
-
-.site-header__link img{
+.site-header__title{
+    margin: 1rem;
     width: 8rem;
-    height: auto;
 }
 .global-nav{
-    background-color: var(--text-color);
+    background-color: var(--ash-color);
     border-top: 0.25rem solid var(--green-color);
 }
+
+.global-nav__list{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.global-nav__item{
+    padding: 0.75rem 1rem;
+    border-right:1px solid var(--light-ash-color);
+}
+
 .global-nav__link{
     color: var(--white-color) !important;
     text-decoration: none !important;
+}
+
+.site-header__link {
+    display: block;
+    width: 8rem;
+}
+
+.site-header__link img{
+    width: 8rem;
 }
