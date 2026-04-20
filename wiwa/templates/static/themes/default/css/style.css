@@ -1,18 +1,75 @@
-body {
-    font-family: sans-serif;
-    margin: 0;
-    padding: 2rem;
+@charset "utf-8";
+
+:root{
+    /* ---------- カスタムプロパティ(カラー設定ほか) ---------- */
+    --white-color: rgba(255 255 255 / 100%);
+    --text-color: rgba(51 51 51 / 100%);
+    --border-color: rgba(100 100 100 / 100%);
+    --green-color: rgba(173 216 74 / 100%);
+
+    /* --- テキスト --- */
+    --regular: 400;
+    --semibold: 600;
+    --bold: 700;
+    --exbold: 900;
 }
 
-header,
-footer {
-    padding: 1rem 0;
+/* 共通 */
+html{
+    font-size: 16px;
+    scroll-behavior: smooth;
+    background-color: var(--white-color);
+    color: var(--text-color);
+    font-family: "Noto Sans JP", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
 }
 
-main {
-    padding: 2rem 0;
+a,
+a:link,
+a:visited{
+    color: var(--text-color);
+    text-decoration-line: underline;
+    text-decoration-color: var(--green-color);
+    text-decoration-thickness: 0.125rem;
+    transition: text-decoration-color 0.25s;
 }
 
-a {
-    margin-right: 1rem;
+a:hover{
+    text-decoration-color: transparent;
+}
+
+ul{
+    padding: 0;
+}
+
+ul li{
+    list-style: none;
+}
+
+h2,
+h3{
+    font-weight: normal;
+}
+
+p{
+    margin-bottom: 1rem;
+    font-weight: normal;
+}
+
+address{
+    font-style: normal;
+}
+
+/* スマホ版 */
+.site-header__link{
+    display: block;
+    width: 160px;
+    height: 40px;
+    font-size: 0;
+    background-image: url('/static/themes/default/img/wiwa_logo.svg');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: left center;
 }
