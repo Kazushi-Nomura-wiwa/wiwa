@@ -1,4 +1,4 @@
-# パスとファイル名: scripts/create_admin.py
+# パスとファイル名: script/create_admin.py
 import getpass
 import sys
 from pathlib import Path
@@ -16,7 +16,7 @@ from wiwa.db.users_repository import UsersRepository
 def main():
     repo = UsersRepository()
 
-    print("WIWA 管理者ユーザー作成")
+    print("WiWA 管理者ユーザー作成")
     print("----------------------")
 
     username = input("username: ").strip()

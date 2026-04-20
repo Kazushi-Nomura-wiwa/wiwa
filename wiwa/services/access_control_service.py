@@ -8,11 +8,9 @@ from wiwa.core.response import forbidden, redirect
 def check_access(request: Request, route: dict):
     user = get_current_user(request)
 
-    # 認証チェック
     if route.get("auth_required") and user is None:
         return redirect(LOGIN_URL)
 
-    # 権限チェック
     allowed_roles = route.get("roles", [])
     if allowed_roles:
         if user is None:

@@ -24,21 +24,36 @@ class LoginService:
         password = password or ""
 
         if not username:
-            return LoginResult(ok=False, message="ユーザー名を入力してください。")
+            return LoginResult(
+                ok=False,
+                message="ユーザー名を入力してください。",
+            )
 
         if not password:
-            return LoginResult(ok=False, message="パスワードを入力してください。")
+            return LoginResult(
+                ok=False,
+                message="パスワードを入力してください。",
+            )
 
         user = self.users_repo.find_by_username(username)
         if not user:
-            return LoginResult(ok=False, message="ユーザー名またはパスワードが違います。")
+            return LoginResult(
+                ok=False,
+                message="ユーザー名またはパスワードが違います。",
+            )
 
         if not user.get("is_active", True):
-            return LoginResult(ok=False, message="このユーザーは無効化されています。")
+            return LoginResult(
+                ok=False,
+                message="このユーザーは無効化されています。",
+            )
 
         stored_hash = user.get("password_hash", "")
         if not verify_password(password, stored_hash):
-            return LoginResult(ok=False, message="ユーザー名またはパスワードが違います。")
+            return LoginResult(
+                ok=False,
+                message="ユーザー名またはパスワードが違います。",
+            )
 
         if needs_rehash(stored_hash):
             new_password_hash = hash_password(password)
