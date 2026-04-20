@@ -1,7 +1,7 @@
 # パスとファイル名: wiwa/services/login_service.py
 from dataclasses import dataclass
 
-from wiwa.core.password import verify_password
+from wiwa.core.password import hash_password, needs_rehash, verify_password
 from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.db.users_repository import UsersRepository
 
@@ -36,8 +36,14 @@ class LoginService:
         if not user.get("is_active", True):
             return LoginResult(ok=False, message="このユーザーは無効化されています。")
 
-        if not verify_password(password, user.get("password_hash", "")):
+        stored_hash = user.get("password_hash", "")
+        if not verify_password(password, stored_hash):
             return LoginResult(ok=False, message="ユーザー名またはパスワードが違います。")
+
+        if needs_rehash(stored_hash):
+            new_password_hash = hash_password(password)
+            self.users_repo.update_password(user["_id"], new_password_hash)
+            user["password_hash"] = new_password_hash
 
         session_id = self.sessions_repo.create(username=username)
         self.users_repo.update_last_login(user["_id"])
