@@ -16,15 +16,15 @@ from wiwa.db.users_repository import UsersRepository
 def main():
     repo = UsersRepository()
 
-    print("Kazun 管理者ユーザー作成")
+    print("WIWA 管理者ユーザー作成")
     print("----------------------")
 
     username = input("username: ").strip()
     email = input("email: ").strip().lower()
     display_name = input("display_name: ").strip()
 
-    password = getpass.getpass("password: ")
-    password_confirm = getpass.getpass("password(confirm): ")
+    password = getpass.getpass("password: ").strip()
+    password_confirm = getpass.getpass("password(confirm): ").strip()
 
     if password != password_confirm:
         print("エラー: パスワードが一致しません。")

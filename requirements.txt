@@ -1,8 +1,7 @@
 # パスとファイル名: requirements.txt
-
 python-dotenv
 pymongo
 Jinja2
 tzdata
-bcrypt
 werkzeug
+argon2-cffi
