@@ -26,7 +26,7 @@ def _apply_pepper(password: str) -> str:
 
 
 def hash_password(password: str) -> str:
-    password = (password or "").strip()
+    password = password or ""
     if not password:
         raise ValueError("password が空です。")
 
@@ -35,7 +35,7 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(password: str, stored_hash: str) -> bool:
-    password = (password or "").strip()
+    password = password or ""
     stored_hash = (stored_hash or "").strip()
 
     if not password or not stored_hash:
