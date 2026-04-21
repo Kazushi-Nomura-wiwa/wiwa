@@ -2,31 +2,28 @@
 from urllib.parse import unquote
 
 from wiwa.core.renderer import TemplateRenderer
-from wiwa.core.response import Response, not_found
-from wiwa.db.post_repository import PostRepository
-from wiwa.services.auth_service import get_current_user
+from wiwa.core.response import html, not_found
+from wiwa.services.post_service import PostService
+
+renderer = TemplateRenderer()
+post_service = PostService()
 
 
 def name(request, route=None, name: str = ""):
-    renderer = TemplateRenderer()
-    post_repo = PostRepository()
-
-    tag_name = unquote(name)
+    tag_name = unquote(name).strip()
     if not tag_name:
         return not_found()
 
-    posts = post_repo.get_posts_by_tag(tag_name)
-    total_count = post_repo.count_posts_by_tag(tag_name)
-    current_user = get_current_user(request)
+    posts = post_service.list_posts_by_tag(tag_name)
 
     body = renderer.render(
-        "tag/name.html",
+        route["template"],
         {
             "title": f"タグ: {tag_name}",
             "tag_name": tag_name,
             "posts": posts,
-            "total_count": total_count,
-            "current_user": current_user,
+            "total_count": len(posts),
         },
+        request=request,
     )
-    return Response(body=body)
+    return html(body)
