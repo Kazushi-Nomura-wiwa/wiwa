@@ -1,7 +1,7 @@
 # パスとファイル名: wiwa/controllers/auth.py
 from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.renderer import TemplateRenderer
-from wiwa.core.response import Response
+from wiwa.core.response import html, redirect
 from wiwa.db.users_repository import UsersRepository
 from wiwa.services.login_service import LoginService
 
@@ -22,7 +22,7 @@ def login(request, route=None, **kwargs):
         },
         request=request,
     )
-    return Response(body=body)
+    return html(body)
 
 
 def _login_submit(request):
@@ -40,7 +40,7 @@ def _login_submit(request):
             },
             request=request,
         )
-        return Response(body=body)
+        return html(body)
 
     user = users_repository.find_by_username(username)
 
@@ -48,11 +48,7 @@ def _login_submit(request):
     if user and user.get("role") == "admin":
         location = "/admin"
 
-    response = Response(
-        body="",
-        status="302 Found",
-        headers=[("Location", location)],
-    )
+    response = redirect(location)
     response.set_cookie(
         key=SESSION_COOKIE_NAME,
         value=result.session_id,
@@ -70,11 +66,7 @@ def logout(request, route=None, **kwargs):
     if session_id:
         login_service.logout(session_id)
 
-    response = Response(
-        body="",
-        status="302 Found",
-        headers=[("Location", "/auth/login")],
-    )
+    response = redirect("/auth/login")
     response.delete_cookie(
         key=SESSION_COOKIE_NAME,
         path="/",

@@ -29,8 +29,10 @@ def index(request, route=None):
         )
         post["published_at_display"] = to_localtime_string(post.get("published_at"))
 
+    template_name = (route or {}).get("template", "html/index.html")
+
     body = renderer.render(
-        (route or {}).get("template", "html/index.html"),
+        template_name,
         {
             "title": "Home",
             "posts": posts,

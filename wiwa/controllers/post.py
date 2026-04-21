@@ -43,9 +43,10 @@ def index(request, route=None):
         post["published_at_display"] = to_localtime_string(post.get("published_at"))
 
     total_pages = (total + per_page - 1) // per_page if total > 0 else 1
+    template_name = (route or {}).get("template", "html/post/index.html")
 
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "Post",
             "posts": posts,
@@ -75,9 +76,10 @@ def slug(request, route=None, slug=None):
 
     post["author_display_name"] = author_display_name
     post["published_at_display"] = to_localtime_string(post.get("published_at"))
+    template_name = (route or {}).get("template", "html/post/slug.html")
 
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": post.get("title", ""),
             "post": post,
