@@ -1,7 +1,8 @@
 # パスとファイル名: wiwa/services/login_service.py
 from dataclasses import dataclass
 
-from werkzeug.security import check_password_hash
+from argon2 import PasswordHasher
+from argon2.exceptions import InvalidHash, VerifyMismatchError
 
 from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.db.users_repository import UsersRepository
@@ -18,6 +19,7 @@ class LoginService:
     def __init__(self):
         self.users_repository = UsersRepository()
         self.sessions_repository = SessionsRepository()
+        self.password_hasher = PasswordHasher()
 
     def login(self, username: str, password: str) -> LoginResult:
         username = (username or "").strip()
@@ -42,8 +44,16 @@ class LoginService:
                 message="このアカウントは無効です。",
             )
 
-        password_hash = user.get("password", "")
-        if not password_hash or not check_password_hash(password_hash, password):
+        password_hash = user.get("password_hash", "") or ""
+        if not password_hash:
+            return LoginResult(
+                ok=False,
+                message="ユーザー名またはパスワードが違います。",
+            )
+
+        try:
+            self.password_hasher.verify(password_hash, password)
+        except (VerifyMismatchError, InvalidHash):
             return LoginResult(
                 ok=False,
                 message="ユーザー名またはパスワードが違います。",
