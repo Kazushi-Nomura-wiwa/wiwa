@@ -1,77 +1,44 @@
-# パスとファイル名: wiwa/services/login_service.py
-from dataclasses import dataclass
-
-from wiwa.core.password import hash_password, needs_rehash, verify_password
+# パスとファイル名: wiwa/services/access_control_service.py
+from wiwa.config import LOGIN_URL
+from wiwa.core.auth import authorize_path, get_current_user
+from wiwa.core.request import Request
+from wiwa.core.response import forbidden, redirect
 from wiwa.db.sessions_repository import SessionsRepository
-from wiwa.db.users_repository import UsersRepository
+
+sessions_repository = SessionsRepository()
 
 
-@dataclass
-class LoginResult:
-    ok: bool
-    message: str = ""
-    user: dict | None = None
-    session_id: str | None = None
+def check_access(request: Request, route: dict):
+    path_access = authorize_path(request)
+    if path_access == "login_required":
+        return redirect(LOGIN_URL)
 
+    if path_access == "forbidden":
+        return forbidden()
 
-class LoginService:
-    def __init__(self):
-        self.users_repo = UsersRepository()
-        self.sessions_repo = SessionsRepository()
+    user = get_current_user(request)
 
-    def login(self, username: str, password: str) -> LoginResult:
-        username = (username or "").strip()
-        password = password or ""
+    session_id = request.cookies.get("session_id", "")
+    if session_id:
+        session = sessions_repository.find_by_session_id(session_id)
+        if session:
+            if user is None:
+                user = {}
 
-        if not username:
-            return LoginResult(
-                ok=False,
-                message="ユーザー名を入力してください。",
-            )
+            user["csrf_token"] = session.get("csrf_token", "")
+            request.user = user
+    else:
+        request.user = user
 
-        if not password:
-            return LoginResult(
-                ok=False,
-                message="パスワードを入力してください。",
-            )
+    if route.get("auth_required") and user is None:
+        return redirect(LOGIN_URL)
 
-        user = self.users_repo.find_by_username(username)
-        if not user:
-            return LoginResult(
-                ok=False,
-                message="ユーザー名またはパスワードが違います。",
-            )
+    allowed_roles = route.get("roles", [])
+    if allowed_roles:
+        if user is None:
+            return forbidden()
 
-        if not user.get("is_active", True):
-            return LoginResult(
-                ok=False,
-                message="このユーザーは無効化されています。",
-            )
+        if user.get("role") not in allowed_roles:
+            return forbidden()
 
-        stored_hash = user.get("password_hash", "")
-        if not verify_password(password, stored_hash):
-            return LoginResult(
-                ok=False,
-                message="ユーザー名またはパスワードが違います。",
-            )
-
-        if needs_rehash(stored_hash):
-            new_password_hash = hash_password(password)
-            self.users_repo.update_password(user["_id"], new_password_hash)
-            user["password_hash"] = new_password_hash
-
-        session_id = self.sessions_repo.create(username=username)
-        self.users_repo.update_last_login(user["_id"])
-
-        return LoginResult(
-            ok=True,
-            message="ログインに成功しました。",
-            user=user,
-            session_id=session_id,
-        )
-
-    def logout(self, session_id: str) -> None:
-        if not session_id:
-            return
-
-        self.sessions_repo.delete(session_id)
+    return None

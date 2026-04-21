@@ -14,6 +14,7 @@
     </ul>
 
     <form action="/admin/post/delete/{{ post._id }}" method="post" onsubmit="return confirm('本当にゴミ箱へ移動しますか？\nこの投稿は{{ retention_days }}日後に完全に削除されます。');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">ゴミ箱へ移動</button>
     </form>
     <p><a href="/admin/post/list">一覧に戻る</a></p>

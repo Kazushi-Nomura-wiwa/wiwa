@@ -1,10 +1,11 @@
 # パスとファイル名: wiwa/controllers/mypage/post.py
 from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
-from wiwa.core.response import html, not_found, redirect
+from wiwa.core.response import forbidden, html, not_found, redirect
 from wiwa.db.post_repository import PostRepository
 from wiwa.db.users_repository import UsersRepository
 from wiwa.services.post_service import PostService
+from wiwa.utils.csrf import validate_csrf
 from wiwa.utils.localtime import to_localtime_string
 
 renderer = TemplateRenderer()
@@ -66,6 +67,7 @@ def list(request, route=None):
         {
             "title": "Post List",
             "posts": posts,
+            "retention_days": TRASH_RETENTION_DAYS,
         },
         request=request,
     )
@@ -128,6 +130,9 @@ def new(request, route=None):
             request=request,
         )
         return html(body)
+
+    if not validate_csrf(request):
+        return forbidden()
 
     title = request.get_form("title").strip()
     slug = request.get_form("slug").strip()
@@ -198,6 +203,9 @@ def update(request, route=None, id=None):
     if request.method != "POST":
         return redirect("/mypage/post/list")
 
+    if not validate_csrf(request):
+        return forbidden()
+
     post = _find_own_post(request, id)
     if not post:
         return not_found()
@@ -252,6 +260,9 @@ def delete(request, route=None, id=None):
         return not_found()
 
     if request.method == "POST":
+        if not validate_csrf(request):
+            return forbidden()
+
         post_repo.delete_post_by_id(id)
         return redirect("/mypage/post/list")
 
@@ -270,6 +281,9 @@ def delete(request, route=None, id=None):
 def restore(request, route=None, id=None):
     if request.method != "POST":
         return redirect("/mypage/post/trash")
+
+    if not validate_csrf(request):
+        return forbidden()
 
     post = _find_own_trashed_post(request, id)
     if not post:

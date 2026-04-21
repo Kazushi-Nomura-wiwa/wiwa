@@ -15,6 +15,7 @@
                     <p>完全削除予定: {{ post.purge_at_display }}</p>
 
                     <form action="/mypage/post/restore/{{ post._id }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                         <button type="submit">復元する</button>
                     </form>
                 </li>

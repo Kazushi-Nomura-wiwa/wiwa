@@ -1,5 +1,6 @@
 <!-- パスとファイル名: wiwa/templates/html/admin/post/form.html -->
 <form action="{{ action }}" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <div>
         <label for="title">title</label><br>
         <input id="title" type="text" name="title" value="{{ form.title }}" style="width: 40rem;">

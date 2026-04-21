@@ -1,7 +1,7 @@
 # パスとファイル名: wiwa/db/sessions_repository.py
 from datetime import UTC, datetime, timedelta
 from secrets import token_urlsafe
-
+from wiwa.config import CSRF_TOKEN_BYTES
 from wiwa.db.mongo import get_collection
 
 
@@ -11,12 +11,14 @@ class SessionsRepository:
 
     def create(self, username: str, expires_days: int = 7) -> str:
         session_id = token_urlsafe(32)
+        csrf_token = token_urlsafe(CSRF_TOKEN_BYTES)
         now = datetime.now(UTC)
         expires_at = now + timedelta(days=expires_days)
 
         self.collection.insert_one({
             "session_id": session_id,
             "username": username,
+            "csrf_token": csrf_token,
             "created_at": now,
             "expires_at": expires_at,
         })
