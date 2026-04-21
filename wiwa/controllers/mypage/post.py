@@ -1,4 +1,4 @@
-# パスとファイル名: wiwa/controllers/mypage/post.py
+# パスとファイル名: wiwa/controllers/admin/post.py
 from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import forbidden, html, not_found, redirect
@@ -9,14 +9,11 @@ renderer = TemplateRenderer()
 post_service = PostService()
 
 
-def _current_author_id(request) -> str:
+def _current_user_info(request) -> tuple[str, str]:
     current_user = request.user or {}
-    return str(current_user.get("_id", "") or "")
-
-
-def _current_author_name(request) -> str:
-    current_user = request.user or {}
-    return current_user.get("username", "") or ""
+    author_id = str(current_user.get("_id", "") or "")
+    author_name = current_user.get("username", "") or ""
+    return author_id, author_name
 
 
 def _split_tags(raw_tags: str) -> list[str]:
@@ -24,8 +21,7 @@ def _split_tags(raw_tags: str) -> list[str]:
 
 
 def list(request, route=None):
-    author_id = _current_author_id(request)
-    posts = post_service.list_posts(author_id=author_id)
+    posts = post_service.list_posts()
 
     body = renderer.render(
         route["template"],
@@ -40,8 +36,7 @@ def list(request, route=None):
 
 
 def trash(request, route=None):
-    author_id = _current_author_id(request)
-    posts = post_service.list_posts(author_id=author_id, include_trashed=True)
+    posts = post_service.list_posts(include_trashed=True)
 
     body = renderer.render(
         route["template"],
@@ -49,7 +44,6 @@ def trash(request, route=None):
             "title": "Trash Post List",
             "posts": posts,
             "retention_days": TRASH_RETENTION_DAYS,
-            "csrf_token": get_csrf_token(request),
         },
         request=request,
     )
@@ -63,7 +57,7 @@ def new(request, route=None):
             {
                 "title": "New Post",
                 "error": "",
-                "action": "/mypage/post/new",
+                "action": "/admin/post/new",
                 "submit_label": "投稿する",
                 "csrf_token": get_csrf_token(request),
                 "form": {
@@ -93,7 +87,7 @@ def new(request, route=None):
             {
                 "title": "New Post",
                 "error": "title と body は必須です。",
-                "action": "/mypage/post/new",
+                "action": "/admin/post/new",
                 "submit_label": "投稿する",
                 "csrf_token": get_csrf_token(request),
                 "form": {
@@ -108,8 +102,7 @@ def new(request, route=None):
         )
         return html(body, status="400 Bad Request")
 
-    author_id = _current_author_id(request)
-    author_name = _current_author_name(request)
+    author_id, author_name = _current_user_info(request)
 
     post_service.create_post(
         title=title,
@@ -120,12 +113,11 @@ def new(request, route=None):
         tags=tags,
     )
 
-    return redirect("/mypage/post/list")
+    return redirect("/admin/post/list")
 
 
 def edit(request, route=None, id=None):
-    author_id = _current_author_id(request)
-    post = post_service.find_own_post(id, author_id)
+    post = post_service.find_post(id)
     if not post:
         return not_found()
 
@@ -134,7 +126,7 @@ def edit(request, route=None, id=None):
         {
             "title": "Edit Post",
             "error": "",
-            "action": f"/mypage/post/update/{id}",
+            "action": f"/admin/post/update/{id}",
             "submit_label": "更新する",
             "csrf_token": get_csrf_token(request),
             "form": {
@@ -152,13 +144,12 @@ def edit(request, route=None, id=None):
 
 def update(request, route=None, id=None):
     if request.method != "POST":
-        return redirect("/mypage/post/list")
+        return redirect("/admin/post/list")
 
     if not validate_csrf(request):
         return forbidden()
 
-    author_id = _current_author_id(request)
-    post = post_service.find_own_post(id, author_id)
+    post = post_service.find_post(id)
     if not post:
         return not_found()
 
@@ -175,7 +166,7 @@ def update(request, route=None, id=None):
             {
                 "title": "Edit Post",
                 "error": "title と body は必須です。",
-                "action": f"/mypage/post/update/{id}",
+                "action": f"/admin/post/update/{id}",
                 "submit_label": "更新する",
                 "csrf_token": get_csrf_token(request),
                 "form": {
@@ -190,9 +181,10 @@ def update(request, route=None, id=None):
         )
         return html(body, status="400 Bad Request")
 
-    author_name = _current_author_name(request) or post.get("author_name", "")
-    updated_by_id = author_id
-    updated_by_name = author_name
+    author_id = str(post.get("author_id", "") or "")
+    author_name = post.get("author_name", "") or ""
+
+    updated_by_id, updated_by_name = _current_user_info(request)
 
     ok = post_service.update_post(
         post_id=str(post.get("_id")),
@@ -210,12 +202,11 @@ def update(request, route=None, id=None):
     if not ok:
         return not_found()
 
-    return redirect("/mypage/post/list")
+    return redirect("/admin/post/list")
 
 
 def delete(request, route=None, id=None):
-    author_id = _current_author_id(request)
-    post = post_service.find_own_post(id, author_id)
+    post = post_service.find_post(id)
     if not post:
         return not_found()
 
@@ -223,11 +214,11 @@ def delete(request, route=None, id=None):
         if not validate_csrf(request):
             return forbidden()
 
-        ok = post_service.delete_post(id, author_id=author_id)
+        ok = post_service.delete_post(id)
         if not ok:
             return not_found()
 
-        return redirect("/mypage/post/list")
+        return redirect("/admin/post/list")
 
     body = renderer.render(
         route["template"],
@@ -244,14 +235,13 @@ def delete(request, route=None, id=None):
 
 def restore(request, route=None, id=None):
     if request.method != "POST":
-        return redirect("/mypage/post/trash")
+        return redirect("/admin/post/trash")
 
     if not validate_csrf(request):
         return forbidden()
 
-    author_id = _current_author_id(request)
-    ok = post_service.restore_post(id, status="draft", author_id=author_id)
+    ok = post_service.restore_post(id, status="draft")
     if not ok:
         return not_found()
 
-    return redirect("/mypage/post/trash")
+    return redirect("/admin/post/trash")
