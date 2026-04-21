@@ -3,7 +3,7 @@ from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import forbidden, html, not_found, redirect
 from wiwa.services.post_service import PostService
-from wiwa.utils.csrf import validate_csrf, generate_csrf_token
+from wiwa.utils.csrf import validate_csrf
 
 renderer = TemplateRenderer()
 post_service = PostService()
@@ -18,6 +18,10 @@ def _current_user_info(request) -> tuple[str, str]:
 
 def _split_tags(raw_tags: str) -> list[str]:
     return raw_tags.replace("　", " ").split()
+
+
+def _csrf_token(request) -> str:
+    return (request.user or {}).get("csrf_token", "")
 
 
 def list(request, route=None):
@@ -59,7 +63,7 @@ def new(request, route=None):
                 "error": "",
                 "action": "/admin/post/new",
                 "submit_label": "投稿する",
-                "csrf_token": generate_csrf_token(request),
+                "csrf_token": _csrf_token(request),
                 "form": {
                     "_id": "",
                     "title": "",
@@ -89,7 +93,7 @@ def new(request, route=None):
                 "error": "title と body は必須です。",
                 "action": "/admin/post/new",
                 "submit_label": "投稿する",
-                "csrf_token": generate_csrf_token(request),
+                "csrf_token": _csrf_token(request),
                 "form": {
                     "_id": "",
                     "title": title,
@@ -128,7 +132,7 @@ def edit(request, route=None, id=None):
             "error": "",
             "action": f"/admin/post/update/{id}",
             "submit_label": "更新する",
-            "csrf_token": generate_csrf_token(request),
+            "csrf_token": _csrf_token(request),
             "form": {
                 "_id": str(post.get("_id", "")),
                 "title": post.get("title", ""),
@@ -168,7 +172,7 @@ def update(request, route=None, id=None):
                 "error": "title と body は必須です。",
                 "action": f"/admin/post/update/{id}",
                 "submit_label": "更新する",
-                "csrf_token": generate_csrf_token(request),
+                "csrf_token": _csrf_token(request),
                 "form": {
                     "_id": str(post.get("_id", "")),
                     "title": title,
@@ -226,7 +230,7 @@ def delete(request, route=None, id=None):
             "title": "Delete Post",
             "post": post,
             "retention_days": TRASH_RETENTION_DAYS,
-            "csrf_token": generate_csrf_token(request),
+            "csrf_token": _csrf_token(request),
         },
         request=request,
     )
