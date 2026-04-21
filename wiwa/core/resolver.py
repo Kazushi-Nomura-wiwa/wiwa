@@ -108,7 +108,7 @@ class Resolver:
 
         last = base_parts[-1]
 
-        if last in {"edit", "update", "delete"}:
+        if last in {"edit", "update", "delete", "restore"}:
             return base_parts
 
         return base_parts + [param_name]
@@ -119,13 +119,7 @@ class Resolver:
 
         last = base_parts[-1]
 
-        if last == "edit":
-            return "id"
-
-        if last == "update":
-            return "id"
-
-        if last == "delete":
+        if last in {"edit", "update", "delete", "restore"}:
             return "id"
 
         if last in self.DYNAMIC_NAMES:
@@ -162,16 +156,19 @@ class Resolver:
         return [part for part in stripped.split("/") if part]
 
     def _is_auth_required(self, parts: list[str]) -> bool:
-        return bool(parts and parts[0] == "admin")
+        if not parts:
+            return False
+
+        return parts[0] in {"admin", "mypage"}
 
     def _get_allowed_roles(self, parts: list[str]) -> list[str]:
         if not parts:
             return []
 
-        if parts[0] != "admin":
-            return []
-
-        if len(parts) >= 2 and parts[1] == "users":
+        if parts[0] == "admin":
             return ["admin"]
 
-        return ["admin", "editor"]
+        if parts[0] == "mypage":
+            return ["admin", "editor", "author"]
+
+        return []

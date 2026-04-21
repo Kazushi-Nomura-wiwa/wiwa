@@ -1,7 +1,11 @@
 # パスとファイル名: wiwa/app.py
 import traceback
 
-from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
+from wiwa.core.auth import (
+    SESSION_COOKIE_NAME,
+    SESSION_EXPIRES_DAYS,
+    get_current_user_by_session_id,
+)
 from wiwa.core.dispatcher import Dispatcher
 from wiwa.core.request import Request
 from wiwa.core.resolver import Resolver
@@ -78,6 +82,10 @@ def resolve_extension_route(path: str, method: str) -> dict | None:
 
 def application(environ, start_response):
     request = Request(environ)
+
+    session_id = request.cookies.get(SESSION_COOKIE_NAME, "")
+    request.session_id = session_id or None
+    request.user = get_current_user_by_session_id(session_id)
 
     status_holder = {"status_code": 500}
     wrapped_start_response = make_start_response(start_response, status_holder)
