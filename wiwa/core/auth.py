@@ -63,6 +63,8 @@ class Auth:
             request._current_user_loaded = True
             return None
 
+        user["csrf_token"] = session.get("csrf_token", "")
+
         request.user = user
         request._current_user_loaded = True
         return user
@@ -93,7 +95,7 @@ class Auth:
             if not self.has_role(request, ["admin"]):
                 return "forbidden"
 
-        if path.startswith("/my"):
+        if path.startswith("/mypage"):
             if not self.is_authenticated(request):
                 return "login_required"
             if not self.has_role(request, ["admin", "author"]):

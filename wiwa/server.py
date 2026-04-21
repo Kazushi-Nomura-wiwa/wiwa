@@ -12,5 +12,5 @@ class QuietHandler(WSGIRequestHandler):
 
 def run():
     with make_server(HOST, PORT, application, handler_class=QuietHandler) as httpd:
-        print(f"[Kazun] Starting server on http://{HOST}:{PORT}", flush=True)
+        print(f"[WiWA] Starting server on http://{HOST}:{PORT}", flush=True)
         httpd.serve_forever()

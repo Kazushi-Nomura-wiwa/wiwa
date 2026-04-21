@@ -1,44 +1,63 @@
-# パスとファイル名: wiwa/services/access_control_service.py
-from wiwa.config import LOGIN_URL
-from wiwa.core.auth import authorize_path, get_current_user
-from wiwa.core.request import Request
-from wiwa.core.response import forbidden, redirect
+# パスとファイル名: wiwa/services/login_service.py
+from dataclasses import dataclass
+
+from werkzeug.security import check_password_hash
+
 from wiwa.db.sessions_repository import SessionsRepository
+from wiwa.db.users_repository import UsersRepository
 
-sessions_repository = SessionsRepository()
+
+@dataclass
+class LoginResult:
+    ok: bool
+    message: str = ""
+    session_id: str = ""
 
 
-def check_access(request: Request, route: dict):
-    path_access = authorize_path(request)
-    if path_access == "login_required":
-        return redirect(LOGIN_URL)
+class LoginService:
+    def __init__(self):
+        self.users_repository = UsersRepository()
+        self.sessions_repository = SessionsRepository()
 
-    if path_access == "forbidden":
-        return forbidden()
+    def login(self, username: str, password: str) -> LoginResult:
+        username = (username or "").strip()
+        password = password or ""
 
-    user = get_current_user(request)
+        if not username or not password:
+            return LoginResult(
+                ok=False,
+                message="ユーザー名とパスワードは必須です。",
+            )
 
-    session_id = request.cookies.get("session_id", "")
-    if session_id:
-        session = sessions_repository.find_by_session_id(session_id)
-        if session:
-            if user is None:
-                user = {}
+        user = self.users_repository.find_by_username(username)
+        if not user:
+            return LoginResult(
+                ok=False,
+                message="ユーザー名またはパスワードが違います。",
+            )
 
-            user["csrf_token"] = session.get("csrf_token", "")
-            request.user = user
-    else:
-        request.user = user
+        if not user.get("is_active", True):
+            return LoginResult(
+                ok=False,
+                message="このアカウントは無効です。",
+            )
 
-    if route.get("auth_required") and user is None:
-        return redirect(LOGIN_URL)
+        password_hash = user.get("password", "")
+        if not password_hash or not check_password_hash(password_hash, password):
+            return LoginResult(
+                ok=False,
+                message="ユーザー名またはパスワードが違います。",
+            )
 
-    allowed_roles = route.get("roles", [])
-    if allowed_roles:
-        if user is None:
-            return forbidden()
+        session_id = self.sessions_repository.create(username=username)
 
-        if user.get("role") not in allowed_roles:
-            return forbidden()
+        return LoginResult(
+            ok=True,
+            session_id=session_id,
+        )
 
-    return None
+    def logout(self, session_id: str) -> None:
+        if not session_id:
+            return
+
+        self.sessions_repository.delete(session_id)
