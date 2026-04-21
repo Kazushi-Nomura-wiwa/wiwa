@@ -3,7 +3,7 @@ from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import forbidden, html, not_found, redirect
 from wiwa.services.post_service import PostService
-from wiwa.utils.csrf import validate_csrf
+from wiwa.utils.csrf import get_csrf_token, validate_csrf
 
 renderer = TemplateRenderer()
 post_service = PostService()
@@ -17,6 +17,10 @@ def _current_author_id(request) -> str:
 def _current_author_name(request) -> str:
     current_user = request.user or {}
     return current_user.get("username", "") or ""
+
+
+def _split_tags(raw_tags: str) -> list[str]:
+    return raw_tags.replace("　", " ").split()
 
 
 def list(request, route=None):
@@ -45,6 +49,7 @@ def trash(request, route=None):
             "title": "Trash Post List",
             "posts": posts,
             "retention_days": TRASH_RETENTION_DAYS,
+            "csrf_token": get_csrf_token(request),
         },
         request=request,
     )
@@ -60,6 +65,7 @@ def new(request, route=None):
                 "error": "",
                 "action": "/mypage/post/new",
                 "submit_label": "投稿する",
+                "csrf_token": get_csrf_token(request),
                 "form": {
                     "_id": "",
                     "title": "",
@@ -77,7 +83,8 @@ def new(request, route=None):
 
     title = request.get_form("title").strip()
     body_text = request.get_form("body").strip()
-    tags = request.get_form("tags").strip()
+    raw_tags = request.get_form("tags").strip()
+    tags = _split_tags(raw_tags)
     status = request.get_form("status", "published").strip() or "published"
 
     if not title or not body_text:
@@ -88,11 +95,12 @@ def new(request, route=None):
                 "error": "title と body は必須です。",
                 "action": "/mypage/post/new",
                 "submit_label": "投稿する",
+                "csrf_token": get_csrf_token(request),
                 "form": {
                     "_id": "",
                     "title": title,
                     "body": body_text,
-                    "tags": tags,
+                    "tags": raw_tags,
                     "status": status,
                 },
             },
@@ -128,6 +136,7 @@ def edit(request, route=None, id=None):
             "error": "",
             "action": f"/mypage/post/update/{id}",
             "submit_label": "更新する",
+            "csrf_token": get_csrf_token(request),
             "form": {
                 "_id": str(post.get("_id", "")),
                 "title": post.get("title", ""),
@@ -155,7 +164,8 @@ def update(request, route=None, id=None):
 
     title = request.get_form("title").strip()
     body_text = request.get_form("body").strip()
-    tags = request.get_form("tags").strip()
+    raw_tags = request.get_form("tags").strip()
+    tags = _split_tags(raw_tags)
     status = request.get_form("status", "published").strip() or "published"
     slug = post.get("slug", "") or ""
 
@@ -167,11 +177,12 @@ def update(request, route=None, id=None):
                 "error": "title と body は必須です。",
                 "action": f"/mypage/post/update/{id}",
                 "submit_label": "更新する",
+                "csrf_token": get_csrf_token(request),
                 "form": {
                     "_id": str(post.get("_id", "")),
                     "title": title,
                     "body": body_text,
-                    "tags": tags,
+                    "tags": raw_tags,
                     "status": status,
                 },
             },
@@ -224,6 +235,7 @@ def delete(request, route=None, id=None):
             "title": "Delete Post",
             "post": post,
             "retention_days": TRASH_RETENTION_DAYS,
+            "csrf_token": get_csrf_token(request),
         },
         request=request,
     )
