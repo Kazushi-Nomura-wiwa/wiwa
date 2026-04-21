@@ -84,6 +84,23 @@ class Auth:
 
         return user_role in allowed_roles
 
+    def authorize_path(self, request) -> str | None:
+        path = request.path
+
+        if path.startswith("/admin"):
+            if not self.is_authenticated(request):
+                return "login_required"
+            if not self.has_role(request, ["admin"]):
+                return "forbidden"
+
+        if path.startswith("/my"):
+            if not self.is_authenticated(request):
+                return "login_required"
+            if not self.has_role(request, ["admin", "author"]):
+                return "forbidden"
+
+        return None
+
 
 _auth = Auth()
 
@@ -98,3 +115,7 @@ def is_authenticated(request) -> bool:
 
 def has_role(request, allowed_roles: list[str]) -> bool:
     return _auth.has_role(request, allowed_roles)
+
+
+def authorize_path(request) -> str | None:
+    return _auth.authorize_path(request)

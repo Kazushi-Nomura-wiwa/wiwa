@@ -1,16 +1,13 @@
-<!-- パスとファイル名: wiwa/templates/html/layouts/admin_base.html -->
+<!-- パスとファイル名: wiwa/templates/html/layouts/mypage_base.html -->
 <!DOCTYPE html>
 <html lang="ja">
     <head>
         {% include "partials/head.html" %}
     </head>
     <body>
-        {% include "partials/admin_header.html" %}
+        {% include "partials/mypage_header.html" %}
         {% if error_message %}
         <p class="error">{{ error_message }}</p>
-        {% endif %}
-        {% if is_last_active_admin %}
-        <p class="error">このユーザーは最後の有効な admin です。role変更・無効化・削除はできません。</p>
         {% endif %}
         <main>
             {% block content %}{% endblock %}

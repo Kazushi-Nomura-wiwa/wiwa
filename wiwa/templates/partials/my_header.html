@@ -1,0 +1,31 @@
+<!-- パスとファイル名: wiwa/templates/html/partials/mypage_header.html -->
+    <header class="site-header">
+        <div class="site-header__top">
+            <h1 class="site-header__title"><a href="/" class="site-header__link"><img src="/static/themes/default/img/wiwa_logo.svg" alt="WiWA No magic. Just code.()"></a></h1>
+
+        {% if current_user %}
+                <p class="site-header__login-status">ログイン中：{{ current_user.display_name or current_user.username }}</p>
+        {% endif %}
+        </div>
+
+        <div class="site-header__bottom">
+            <nav class="global-nav">
+                <ul class="global-nav__list">
+                    <li class="global-nav__item"><a href="/post" class="global-nav__link">Post</a></li>
+                    {% if current_user %}
+                    <li class="global-nav__item"><a href="/my" class="global-nav__link">my</a></li>
+                    <li class="global-nav__item"><a href="/auth/logout" class="global-nav__link">Logout</a></li>
+                    {% else %}
+                    <li class="global-nav__item"><a href="/auth/login" class="global-nav__link">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <nav class="mypage-nav">
+                <ul class="mypage-nav__list">
+                    <li class="mypage-nav__item"><a href="/mypage" class="mypage-nav__link">管理トップ</a></li>
+                    <li class="mypage-nav__item"><a href="/mypage/post/list" class="mypage-nav__link">Post一覧</a></li>
+                    <li class="mypage-nav__item"><a href="/mypage/users/list" class="mypage-nav__link">ユーザー一覧</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>

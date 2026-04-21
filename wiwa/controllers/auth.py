@@ -2,10 +2,12 @@
 from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response
+from wiwa.db.users_repository import UsersRepository
 from wiwa.services.login_service import LoginService
 
 renderer = TemplateRenderer()
 login_service = LoginService()
+users_repository = UsersRepository()
 
 
 def login(request, route=None, **kwargs):
@@ -40,10 +42,16 @@ def _login_submit(request):
         )
         return Response(body=body)
 
+    user = users_repository.find_by_username(username)
+
+    location = "/mypage"
+    if user and user.get("role") == "admin":
+        location = "/admin"
+
     response = Response(
         body="",
         status="302 Found",
-        headers=[("Location", "/admin")],
+        headers=[("Location", location)],
     )
     response.set_cookie(
         key=SESSION_COOKIE_NAME,
