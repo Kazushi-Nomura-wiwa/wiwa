@@ -1,0 +1,47 @@
+<!-- パスとファイル名: wiwa/templates/html/tag/name.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<section class="tag-posts">
+    <header class="tag-posts__header">
+        <h1 class="tag-posts__title">タグ: {{ tag_name }}</h1>
+        <p class="tag-posts__count">{{ total_count }}件</p>
+    </header>
+
+    {% if posts %}
+        <div class="post-list">
+            {% for post in posts %}
+                <article class="post-list__item">
+                    <h2 class="post-list__title">
+                        <a href="/blog/{{ post.slug }}" class="post-list__link">{{ post.title }}</a>
+                    </h2>
+
+                    <div class="post-list__meta">
+                        {% if post.published_at %}
+                            <time class="post-list__date">
+                                {{ post.published_at.strftime("%Y-%m-%d %H:%M") }}
+                            </time>
+                        {% endif %}
+
+                        {% if post.author_name %}
+                            <span class="post-list__author">{{ post.author_name }}</span>
+                        {% endif %}
+                    </div>
+
+                    {% if post.tags %}
+                        <ul class="post-list__tags">
+                            {% for tag in post.tags %}
+                                <li class="post-list__tag">
+                                    <a href="/tag/{{ tag | urlencode }}" class="post-list__tag-link">{{ tag }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="tag-posts__empty">このタグの記事はまだありません。</p>
+    {% endif %}
+</section>
+{% endblock %}

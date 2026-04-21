@@ -8,6 +8,7 @@ from bson import ObjectId
 from wiwa.db.mongo import get_collection
 from wiwa.config import TRASH_RETENTION_DAYS
 
+
 class PostRepository:
     def __init__(self):
         self.collection = get_collection("posts")
@@ -281,3 +282,22 @@ class PostRepository:
             },
         )
         return result.modified_count > 0
+
+    def list_published_by_tag(self, tag: str) -> list[dict]:
+        posts = list(
+            self.collection.find(
+                {
+                    "status": "published",
+                    "tags": tag,
+                }
+            ).sort("published_at", -1)
+        )
+
+        for post in posts:
+            post["_id"] = str(post["_id"])
+
+        return posts
+
+    def list_tags(self) -> list[str]:
+        tags = self.collection.distinct("tags", {"status": "published"})
+        return sorted([tag for tag in tags if tag])

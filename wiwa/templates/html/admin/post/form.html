@@ -1,15 +1,16 @@
 <!-- パスとファイル名: wiwa/templates/html/admin/post/form.html -->
 <form action="{{ action }}" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
     <div>
         <label for="title">title</label><br>
         <input id="title" type="text" name="title" value="{{ form.title }}" style="width: 40rem;">
     </div>
 
     <div>
-        <label for="slug">slug</label><br>
-        <input id="slug" type="text" name="slug" value="{{ form.slug }}" style="width: 40rem;">
-        <p>slug を空欄にすると title から自動生成されます。/ は - に置換されます。</p>
+        <label for="tags">tags</label><br>
+        <input id="tags" type="text" name="tags" value="{{ form.tags }}" style="width: 40rem;">
+        <p>タグは全角または半角スペース区切りで入力します。</p>
     </div>
 
     <div>
