@@ -1,4 +1,5 @@
 # パスとファイル名: wiwa/controllers/auth.py
+import secrets
 from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, redirect
@@ -44,6 +45,10 @@ def _login_submit(request):
 
     user = users_repository.find_by_username(username)
 
+    # ★ここ追加
+    if user is not None:
+        user["csrf_token"] = secrets.token_urlsafe(32)
+
     location = "/mypage"
     if user and user.get("role") == "admin":
         location = "/admin"
@@ -57,18 +62,5 @@ def _login_submit(request):
         secure=False,
         same_site="Lax",
         max_age=60 * 60 * 24 * SESSION_EXPIRES_DAYS,
-    )
-    return response
-
-
-def logout(request, route=None, **kwargs):
-    session_id = request.cookies.get(SESSION_COOKIE_NAME)
-    if session_id:
-        login_service.logout(session_id)
-
-    response = redirect("/auth/login")
-    response.delete_cookie(
-        key=SESSION_COOKIE_NAME,
-        path="/",
     )
     return response
