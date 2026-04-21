@@ -1,4 +1,5 @@
 # パスとファイル名: wiwa/controllers/mypage/post.py
+from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, not_found, redirect
 from wiwa.db.post_repository import PostRepository
@@ -27,7 +28,15 @@ def _find_own_post(request, post_id: str):
     if not author_id:
         return None
 
-    return post_repo.find_by_id_and_author_id(post_id, author_id)
+    return post_repo.find_active_by_id_and_author_id(post_id, author_id)
+
+
+def _find_own_trashed_post(request, post_id: str):
+    author_id = _current_author_id(request)
+    if not author_id:
+        return None
+
+    return post_repo.find_trashed_by_id_and_author_id(post_id, author_id)
 
 
 def list(request, route=None):
@@ -57,6 +66,42 @@ def list(request, route=None):
         {
             "title": "Post List",
             "posts": posts,
+        },
+        request=request,
+    )
+    return html(body)
+
+
+def trash(request, route=None):
+    author_id = _current_author_id(request)
+    posts = post_repo.list_trashed_by_author_id(author_id)
+
+    author_ids = []
+    for post in posts:
+        post_author_id = post.get("author_id")
+        if post_author_id:
+            author_ids.append(post_author_id)
+
+    display_names = users_repo.find_display_names_by_ids(author_ids)
+
+    for post in posts:
+        post_author_id = post.get("author_id", "")
+        post["author_display_name"] = display_names.get(
+            post_author_id,
+            post.get("author_name", "")
+        )
+        post["published_at_display"] = to_localtime_string(post.get("published_at"))
+        post["created_at_display"] = to_localtime_string(post.get("created_at"))
+        post["updated_at_display"] = to_localtime_string(post.get("updated_at"))
+        post["deleted_at_display"] = to_localtime_string(post.get("deleted_at"))
+        post["purge_at_display"] = to_localtime_string(post.get("purge_at"))
+
+    body = renderer.render(
+        route["template"],
+        {
+            "title": "Trash Post List",
+            "posts": posts,
+            "retention_days": TRASH_RETENTION_DAYS,
         },
         request=request,
     )
@@ -215,7 +260,23 @@ def delete(request, route=None, id=None):
         {
             "title": "Delete Post",
             "post": post,
+            "retention_days": TRASH_RETENTION_DAYS,
         },
         request=request,
     )
     return html(body)
+
+
+def restore(request, route=None, id=None):
+    if request.method != "POST":
+        return redirect("/mypage/post/trash")
+
+    post = _find_own_trashed_post(request, id)
+    if not post:
+        return not_found()
+
+    ok = post_repo.restore_post_by_id(id, status="draft")
+    if not ok:
+        return not_found()
+
+    return redirect("/mypage/post/trash")

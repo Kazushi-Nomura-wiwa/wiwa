@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 from bson import ObjectId
 
 from wiwa.db.mongo import get_collection
-
+from wiwa.config import TRASH_RETENTION_DAYS
 
 class PostRepository:
     def __init__(self):
@@ -188,7 +188,7 @@ class PostRepository:
             return False
 
         now = datetime.now(UTC)
-        purge_at = now + timedelta(days=30)
+        purge_at = now + timedelta(days=TRASH_RETENTION_DAYS)
 
         result = self.collection.update_one(
             {

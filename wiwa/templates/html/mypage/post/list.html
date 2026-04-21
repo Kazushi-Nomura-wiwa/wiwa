@@ -5,7 +5,12 @@
 <section>
     <h2>{{ title }}</h2>
 
-    <p><a href="/mypage/post/new">新規作成</a></p>
+    <nav>
+        <ul>
+            <li><a href="/mypage/post/new">新規作成</a></li>
+            <li><a href="/mypage/post/trash">ゴミ箱</a></li>
+        </ul>
+    </nav>
 
     {% if posts %}
         <table>

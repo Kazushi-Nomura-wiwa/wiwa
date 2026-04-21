@@ -137,24 +137,28 @@ address{
     text-decoration: none !important;
 }
 
-/* 管理者用ナビゲーション */
-.admin-nav {
+/* admin・author用ナビゲーション */
+.admin-nav, 
+.mypage-nav {
     background-color: var(--ash-color);
     border-top: 0.125rem solid var(--text-color);
 }
 
-.admin-nav__list {
+.admin-nav__list,
+.mypage-nav__list {
     display: flex;
     margin-left: 2rem;
     padding: 0;
     border-left:1px solid var(--light-ash-color);
 }
 
-.admin-nav__item {
+.admin-nav__item,
+.mypage-nav__item {
     border-right:1px solid var(--light-ash-color);
 }
 
-.admin-nav__link {
+.admin-nav__link,
+.mypage-nav__link {
     display: block;
     padding: 0.75rem 1rem;
     color: var(--white-color) !important;

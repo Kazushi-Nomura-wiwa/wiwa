@@ -5,5 +5,6 @@
             <section>
                 <h2>Admin管理画面</h2>
                 <p>ようこそ、{{ current_user.display_name or current_user.username }}さん</p>
+                <p><a href="/admin/post/trash">ゴミ箱を見る</a></p>
             </section>
 {% endblock %}

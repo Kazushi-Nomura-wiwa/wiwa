@@ -25,3 +25,5 @@ ENABLED_EXTENSIONS = [
     "sitemap",
     "robots",
 ]
+
+TRASH_RETENTION_DAYS = 30

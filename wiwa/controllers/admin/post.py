@@ -1,4 +1,5 @@
 # パスとファイル名: wiwa/controllers/admin/post.py
+from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, not_found, redirect
 from wiwa.db.post_repository import PostRepository
@@ -12,10 +13,9 @@ users_repo = UsersRepository()
 post_service = PostService()
 
 
-def list(request, route=None):
-    posts = post_repo.list_all()
-
+def _attach_display_names(posts: list[dict]) -> list[dict]:
     author_ids = []
+
     for post in posts:
         author_id = post.get("author_id")
         if author_id:
@@ -32,12 +32,38 @@ def list(request, route=None):
         post["published_at_display"] = to_localtime_string(post.get("published_at"))
         post["created_at_display"] = to_localtime_string(post.get("created_at"))
         post["updated_at_display"] = to_localtime_string(post.get("updated_at"))
+        post["deleted_at_display"] = to_localtime_string(post.get("deleted_at"))
+        post["purge_at_display"] = to_localtime_string(post.get("purge_at"))
+
+    return posts
+
+
+def list(request, route=None):
+    posts = post_repo.list_all()
+    posts = _attach_display_names(posts)
 
     body = renderer.render(
         route["template"],
         {
             "title": "Post List",
             "posts": posts,
+            "retention_days": TRASH_RETENTION_DAYS,
+        },
+        request=request,
+    )
+    return html(body)
+
+
+def trash(request, route=None):
+    posts = post_repo.list_trashed_all()
+    posts = _attach_display_names(posts)
+
+    body = renderer.render(
+        route["template"],
+        {
+            "title": "Trash Post List",
+            "posts": posts,
+            "retention_days": TRASH_RETENTION_DAYS,
         },
         request=request,
     )
@@ -94,7 +120,7 @@ def new(request, route=None):
     author_id = str(current_user.get("_id", "") or "")
     author_name = current_user.get("username", "")
 
-    post_id = post_service.create_post(
+    post_service.create_post(
         title=title,
         body=body_text,
         slug=slug,
@@ -102,9 +128,6 @@ def new(request, route=None):
         author_name=author_name,
         status=status,
     )
-
-    created_post = post_repo.find_by_id(post_id)
-    created_slug = created_post.get("slug", "") if created_post else ""
 
     return redirect("/admin/post/list")
 
@@ -185,9 +208,6 @@ def update(request, route=None, id=None):
     if not ok:
         return not_found()
 
-    updated_post = post_repo.find_by_id(id)
-    updated_slug = updated_post.get("slug", "") if updated_post else ""
-
     return redirect("/admin/post/list")
 
 
@@ -206,7 +226,23 @@ def delete(request, route=None, id=None):
         {
             "title": "Delete Post",
             "post": post,
+            "retention_days": TRASH_RETENTION_DAYS,
         },
         request=request,
     )
     return html(body)
+
+
+def restore(request, route=None, id=None):
+    if request.method != "POST":
+        return redirect("/admin/post/trash")
+
+    post = post_repo.find_by_id(id)
+    if not post or post.get("status") != "trash":
+        return not_found()
+
+    ok = post_repo.restore_post_by_id(id, status="draft")
+    if not ok:
+        return not_found()
+
+    return redirect("/admin/post/trash")
