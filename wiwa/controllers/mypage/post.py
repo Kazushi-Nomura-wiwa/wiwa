@@ -1,4 +1,4 @@
-# パスとファイル名: wiwa/controllers/admin/post.py
+# パスとファイル名: wiwa/controllers/mypage/post.py
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, not_found, redirect
 from wiwa.db.post_repository import PostRepository
@@ -12,21 +12,40 @@ users_repo = UsersRepository()
 post_service = PostService()
 
 
+def _current_author_id(request) -> str:
+    current_user = request.user or {}
+    return str(current_user.get("_id", "") or "")
+
+
+def _current_author_name(request) -> str:
+    current_user = request.user or {}
+    return current_user.get("username", "") or ""
+
+
+def _find_own_post(request, post_id: str):
+    author_id = _current_author_id(request)
+    if not author_id:
+        return None
+
+    return post_repo.find_by_id_and_author_id(post_id, author_id)
+
+
 def list(request, route=None):
-    posts = post_repo.list_all()
+    author_id = _current_author_id(request)
+    posts = post_repo.list_by_author_id(author_id)
 
     author_ids = []
     for post in posts:
-        author_id = post.get("author_id")
-        if author_id:
-            author_ids.append(author_id)
+        post_author_id = post.get("author_id")
+        if post_author_id:
+            author_ids.append(post_author_id)
 
     display_names = users_repo.find_display_names_by_ids(author_ids)
 
     for post in posts:
-        author_id = post.get("author_id", "")
+        post_author_id = post.get("author_id", "")
         post["author_display_name"] = display_names.get(
-            author_id,
+            post_author_id,
             post.get("author_name", "")
         )
         post["published_at_display"] = to_localtime_string(post.get("published_at"))
@@ -51,7 +70,7 @@ def new(request, route=None):
             {
                 "title": "New Post",
                 "error": "",
-                "action": "/admin/post/new",
+                "action": "/mypage/post/new",
                 "submit_label": "投稿する",
                 "form": {
                     "_id": "",
@@ -76,7 +95,7 @@ def new(request, route=None):
             {
                 "title": "New Post",
                 "error": "title と body は必須です。slug は空欄でも構いません。",
-                "action": "/admin/post/new",
+                "action": "/mypage/post/new",
                 "submit_label": "投稿する",
                 "form": {
                     "_id": "",
@@ -90,11 +109,10 @@ def new(request, route=None):
         )
         return html(body, status="400 Bad Request")
 
-    current_user = request.user or {}
-    author_id = str(current_user.get("_id", "") or "")
-    author_name = current_user.get("username", "")
+    author_id = _current_author_id(request)
+    author_name = _current_author_name(request)
 
-    post_id = post_service.create_post(
+    post_service.create_post(
         title=title,
         body=body_text,
         slug=slug,
@@ -103,15 +121,11 @@ def new(request, route=None):
         status=status,
     )
 
-    created_post = post_repo.find_by_id(post_id)
-    created_slug = created_post.get("slug", "") if created_post else ""
-
-    return redirect("/admin/post/list")
+    return redirect("/mypage/post/list")
 
 
 def edit(request, route=None, id=None):
-    post = post_repo.find_by_id(id)
-
+    post = _find_own_post(request, id)
     if not post:
         return not_found()
 
@@ -120,7 +134,7 @@ def edit(request, route=None, id=None):
         {
             "title": "Edit Post",
             "error": "",
-            "action": f"/admin/post/update/{id}",
+            "action": f"/mypage/post/update/{id}",
             "submit_label": "更新する",
             "form": {
                 "_id": str(post.get("_id", "")),
@@ -137,9 +151,9 @@ def edit(request, route=None, id=None):
 
 def update(request, route=None, id=None):
     if request.method != "POST":
-        return redirect("/admin/post/list")
+        return redirect("/mypage/post/list")
 
-    post = post_repo.find_by_id(id)
+    post = _find_own_post(request, id)
     if not post:
         return not_found()
 
@@ -154,7 +168,7 @@ def update(request, route=None, id=None):
             {
                 "title": "Edit Post",
                 "error": "title と body は必須です。slug は空欄でも構いません。",
-                "action": f"/admin/post/update/{id}",
+                "action": f"/mypage/post/update/{id}",
                 "submit_label": "更新する",
                 "form": {
                     "_id": str(post.get("_id", "")),
@@ -168,9 +182,8 @@ def update(request, route=None, id=None):
         )
         return html(body, status="400 Bad Request")
 
-    current_user = request.user or {}
-    author_id = str(current_user.get("_id", "") or post.get("author_id", "") or "")
-    author_name = current_user.get("username", "") or post.get("author_name", "")
+    author_id = _current_author_id(request)
+    author_name = _current_author_name(request) or post.get("author_name", "")
 
     ok = post_service.update_post(
         post_id=str(post.get("_id")),
@@ -185,21 +198,17 @@ def update(request, route=None, id=None):
     if not ok:
         return not_found()
 
-    updated_post = post_repo.find_by_id(id)
-    updated_slug = updated_post.get("slug", "") if updated_post else ""
-
-    return redirect("/admin/post/list")
+    return redirect("/mypage/post/list")
 
 
 def delete(request, route=None, id=None):
-    post = post_repo.find_by_id(id)
-
+    post = _find_own_post(request, id)
     if not post:
         return not_found()
 
     if request.method == "POST":
         post_repo.delete_post_by_id(id)
-        return redirect("/admin/post/list")
+        return redirect("/mypage/post/list")
 
     body = renderer.render(
         route["template"],

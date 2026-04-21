@@ -1,6 +1,7 @@
 # パスとファイル名: wiwa/db/post_repository.py
 import re
-from datetime import UTC, datetime
+import unicodedata
+from datetime import UTC, datetime, timedelta
 
 from bson import ObjectId
 
@@ -18,8 +19,50 @@ class PostRepository:
     def list_all(self) -> list[dict]:
         posts = list(
             self.collection
-            .find()
+            .find({"status": {"$ne": "trash"}})
             .sort("created_at", -1)
+        )
+
+        for post in posts:
+            post["_id"] = str(post["_id"])
+
+        return posts
+
+    def list_by_author_id(self, author_id: str) -> list[dict]:
+        posts = list(
+            self.collection
+            .find({
+                "author_id": author_id,
+                "status": {"$ne": "trash"},
+            })
+            .sort("created_at", -1)
+        )
+
+        for post in posts:
+            post["_id"] = str(post["_id"])
+
+        return posts
+
+    def list_trashed_all(self) -> list[dict]:
+        posts = list(
+            self.collection
+            .find({"status": "trash"})
+            .sort("deleted_at", -1)
+        )
+
+        for post in posts:
+            post["_id"] = str(post["_id"])
+
+        return posts
+
+    def list_trashed_by_author_id(self, author_id: str) -> list[dict]:
+        posts = list(
+            self.collection
+            .find({
+                "author_id": author_id,
+                "status": "trash",
+            })
+            .sort("deleted_at", -1)
         )
 
         for post in posts:
@@ -55,6 +98,64 @@ class PostRepository:
         post["_id"] = str(post["_id"])
         return post
 
+    def find_active_by_id(self, post_id: str) -> dict | None:
+        if not ObjectId.is_valid(post_id):
+            return None
+
+        post = self.collection.find_one({
+            "_id": ObjectId(post_id),
+            "status": {"$ne": "trash"},
+        })
+        if not post:
+            return None
+
+        post["_id"] = str(post["_id"])
+        return post
+
+    def find_by_id_and_author_id(self, post_id: str, author_id: str) -> dict | None:
+        if not ObjectId.is_valid(post_id):
+            return None
+
+        post = self.collection.find_one({
+            "_id": ObjectId(post_id),
+            "author_id": author_id,
+        })
+        if not post:
+            return None
+
+        post["_id"] = str(post["_id"])
+        return post
+
+    def find_active_by_id_and_author_id(self, post_id: str, author_id: str) -> dict | None:
+        if not ObjectId.is_valid(post_id):
+            return None
+
+        post = self.collection.find_one({
+            "_id": ObjectId(post_id),
+            "author_id": author_id,
+            "status": {"$ne": "trash"},
+        })
+        if not post:
+            return None
+
+        post["_id"] = str(post["_id"])
+        return post
+
+    def find_trashed_by_id_and_author_id(self, post_id: str, author_id: str) -> dict | None:
+        if not ObjectId.is_valid(post_id):
+            return None
+
+        post = self.collection.find_one({
+            "_id": ObjectId(post_id),
+            "author_id": author_id,
+            "status": "trash",
+        })
+        if not post:
+            return None
+
+        post["_id"] = str(post["_id"])
+        return post
+
     def find_published_by_slug(self, slug: str) -> dict | None:
         post = self.collection.find_one({
             "slug": slug,
@@ -71,8 +172,13 @@ class PostRepository:
         if not ObjectId.is_valid(post_id):
             return False
 
+        post["updated_at"] = datetime.now(UTC)
+
         result = self.collection.update_one(
-            {"_id": ObjectId(post_id)},
+            {
+                "_id": ObjectId(post_id),
+                "status": {"$ne": "trash"},
+            },
             {"$set": post},
         )
         return result.modified_count > 0
@@ -81,11 +187,61 @@ class PostRepository:
         if not ObjectId.is_valid(post_id):
             return False
 
+        now = datetime.now(UTC)
+        purge_at = now + timedelta(days=30)
+
+        result = self.collection.update_one(
+            {
+                "_id": ObjectId(post_id),
+                "status": {"$ne": "trash"},
+            },
+            {
+                "$set": {
+                    "status": "trash",
+                    "deleted_at": now,
+                    "purge_at": purge_at,
+                    "updated_at": now,
+                }
+            },
+        )
+        return result.modified_count > 0
+
+    def restore_post_by_id(self, post_id: str, status: str = "draft") -> bool:
+        if not ObjectId.is_valid(post_id):
+            return False
+
+        now = datetime.now(UTC)
+
+        result = self.collection.update_one(
+            {
+                "_id": ObjectId(post_id),
+                "status": "trash",
+            },
+            {
+                "$set": {
+                    "status": status,
+                    "updated_at": now,
+                },
+                "$unset": {
+                    "deleted_at": "",
+                    "purge_at": "",
+                },
+            },
+        )
+        return result.modified_count > 0
+
+    def delete_post_permanently_by_id(self, post_id: str) -> bool:
+        if not ObjectId.is_valid(post_id):
+            return False
+
         result = self.collection.delete_one({"_id": ObjectId(post_id)})
         return result.deleted_count > 0
 
     def slug_exists(self, slug: str, exclude_post_id: str | None = None) -> bool:
-        query = {"slug": slug}
+        query = {
+            "slug": slug,
+            "status": {"$ne": "trash"},
+        }
 
         if exclude_post_id and ObjectId.is_valid(exclude_post_id):
             query["_id"] = {"$ne": ObjectId(exclude_post_id)}
@@ -93,7 +249,8 @@ class PostRepository:
         return self.collection.find_one(query) is not None
 
     def normalize_slug(self, value: str) -> str:
-        text = (value or "").strip().lower()
+        text = (value or "").strip()
+        text = unicodedata.normalize("NFKC", text).lower()
 
         text = text.replace("/", "-")
         text = text.replace("\\", "-")
@@ -108,13 +265,18 @@ class PostRepository:
         if not ObjectId.is_valid(post_id):
             return False
 
+        now = datetime.now(UTC)
+
         result = self.collection.update_one(
-            {"_id": ObjectId(post_id)},
+            {
+                "_id": ObjectId(post_id),
+                "status": {"$ne": "trash"},
+            },
             {
                 "$set": {
                     "status": "published",
-                    "published_at": datetime.now(UTC),
-                    "updated_at": datetime.now(UTC),
+                    "published_at": now,
+                    "updated_at": now,
                 }
             },
         )

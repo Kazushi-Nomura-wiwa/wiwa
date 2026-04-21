@@ -6,99 +6,105 @@ from wiwa.db.post_repository import PostRepository
 
 class PostService:
     def __init__(self):
-        self.repo = PostRepository()
+        self.post_repo = PostRepository()
 
     def create_post(
         self,
         title: str,
         body: str,
-        slug: str = "",
-        author_id: str = "",
-        author_name: str = "",
+        slug: str,
+        author_id: str,
+        author_name: str,
         status: str = "published",
-        published_at=None,
     ) -> str:
-        normalized_slug = self._build_unique_slug(title=title, slug=slug)
-
         now = datetime.now(UTC)
-        if published_at is None and status == "published":
-            published_at = now
+
+        final_slug = self._build_unique_slug(
+            raw_slug=slug,
+            fallback_source=title,
+        )
 
         post = {
-            "title": (title or "").strip(),
-            "body": body or "",
-            "slug": normalized_slug,
-            "author_id": author_id or "",
-            "author_name": author_name or "",
-            "status": status or "draft",
-            "published_at": published_at,
+            "title": title,
+            "body": body,
+            "slug": final_slug,
+            "author_id": author_id,
+            "author_name": author_name,
+            "status": status,
             "created_at": now,
             "updated_at": now,
         }
 
-        return self.repo.insert_post(post)
+        if status == "published":
+            post["published_at"] = now
+        else:
+            post["published_at"] = None
+
+        return self.post_repo.insert_post(post)
 
     def update_post(
         self,
         post_id: str,
         title: str,
         body: str,
-        slug: str = "",
-        author_id: str = "",
-        author_name: str = "",
+        slug: str,
+        author_id: str,
+        author_name: str,
         status: str = "published",
-        published_at=None,
     ) -> bool:
-        existing = self.repo.find_by_id(post_id)
-        if not existing:
+        current_post = self.post_repo.find_by_id(post_id)
+        if not current_post:
             return False
 
-        normalized_slug = self._build_unique_slug(
-            title=title,
-            slug=slug,
+        final_slug = self._build_unique_slug(
+            raw_slug=slug,
+            fallback_source=title,
             exclude_post_id=post_id,
         )
 
-        current_status = existing.get("status", "draft")
-        current_published_at = existing.get("published_at")
-
-        if published_at is None:
-            if current_published_at:
-                published_at = current_published_at
-            elif status == "published" and current_status != "published":
-                published_at = datetime.now(UTC)
-
-        post = {
-            "title": (title or "").strip(),
-            "body": body or "",
-            "slug": normalized_slug,
-            "author_id": author_id or "",
-            "author_name": author_name or "",
-            "status": status or "draft",
-            "published_at": published_at,
+        update_data = {
+            "title": title,
+            "body": body,
+            "slug": final_slug,
+            "author_id": author_id,
+            "author_name": author_name,
+            "status": status,
             "updated_at": datetime.now(UTC),
         }
 
-        return self.repo.update_post_by_id(post_id, post)
+        current_status = current_post.get("status", "")
+        current_published_at = current_post.get("published_at")
+
+        if status == "published":
+            if current_status != "published" or not current_published_at:
+                update_data["published_at"] = datetime.now(UTC)
+        else:
+            update_data["published_at"] = None
+
+        return self.post_repo.update_post_by_id(post_id, update_data)
 
     def _build_unique_slug(
         self,
-        title: str,
-        slug: str = "",
+        raw_slug: str,
+        fallback_source: str,
         exclude_post_id: str | None = None,
     ) -> str:
-        base_slug = (slug or title or "").strip()
-        normalized = self.repo.normalize_slug(base_slug)
+        base_slug = self.post_repo.normalize_slug(raw_slug)
 
-        if not normalized:
-            raise ValueError("slug を生成できません。title または slug を入力してください。")
+        if not base_slug:
+            base_slug = self.post_repo.normalize_slug(fallback_source)
 
-        if not self.repo.slug_exists(normalized, exclude_post_id=exclude_post_id):
-            return normalized
+        if not base_slug:
+            base_slug = self._generate_fallback_slug()
 
+        slug = base_slug
         counter = 2
-        while True:
-            candidate = f"{normalized}-{counter}"
-            if not self.repo.slug_exists(candidate, exclude_post_id=exclude_post_id):
-                return candidate
+
+        while self.post_repo.slug_exists(slug, exclude_post_id=exclude_post_id):
+            slug = f"{base_slug}-{counter}"
             counter += 1
+
+        return slug
+
+    def _generate_fallback_slug(self) -> str:
+        return "post-" + datetime.now(UTC).strftime("%Y%m%d%H%M%S%f")

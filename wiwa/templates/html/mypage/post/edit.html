@@ -1,0 +1,14 @@
+<!-- パスとファイル名: wiwa/templates/html/mypage/post/edit.html -->
+{% extends "layouts/mypage_base.html" %}
+
+{% block content %}
+<section>
+    <h2>{{ title }}</h2>
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
+
+    {% include "html/mypage/post/form.html" %}
+</section>
+{% endblock %}

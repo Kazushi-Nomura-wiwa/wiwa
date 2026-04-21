@@ -1,0 +1,30 @@
+<!-- パスとファイル名: wiwa/templates/html/mypage/post/form.html -->
+<form action="{{ action }}" method="post">
+    <div>
+        <label for="title">title</label><br>
+        <input id="title" type="text" name="title" value="{{ form.title }}" style="width: 40rem;">
+    </div>
+
+    <div>
+        <label for="slug">slug</label><br>
+        <input id="slug" type="text" name="slug" value="{{ form.slug }}" style="width: 40rem;">
+        <p>slug を空欄にすると title から自動生成されます。/ は - に置換されます。</p>
+    </div>
+
+    <div>
+        <label for="status">status</label><br>
+        <select id="status" name="status">
+            <option value="published" {% if form.status == "published" %}selected{% endif %}>published</option>
+            <option value="draft" {% if form.status == "draft" %}selected{% endif %}>draft</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="body">body</label><br>
+        <textarea id="body" name="body" rows="16" style="width: 40rem;">{{ form.body }}</textarea>
+    </div>
+
+    <div>
+        <button type="submit">{{ submit_label }}</button>
+    </div>
+</form>
