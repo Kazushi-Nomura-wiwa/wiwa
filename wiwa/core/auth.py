@@ -30,9 +30,16 @@ def get_current_user_by_session_id(session_id: str) -> dict | None:
     if not session_id:
         return None
 
-    session = sessions_repository.find_active_by_session_id(session_id)
+    session = sessions_repository.find_by_session_id(session_id)
     if not session:
         return None
+
+    expires_at = session.get("expires_at")
+    if expires_at and isinstance(expires_at, datetime):
+        if expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=UTC)
+        if expires_at <= datetime.now(UTC):
+            return None
 
     username = session.get("username", "")
     if not username:
@@ -47,6 +54,11 @@ def get_current_user_by_session_id(session_id: str) -> dict | None:
     return user
 
 
+def get_current_user(request):
+    session_id = request.cookies.get(SESSION_COOKIE_NAME, "")
+    return get_current_user_by_session_id(session_id)
+
+
 def is_authenticated(request) -> bool:
     return bool(request.user)
 
@@ -59,11 +71,9 @@ def is_admin(request) -> bool:
 def authorize_path(request) -> bool:
     path = request.path or ""
 
-    # /admin は admin のみ
     if path == "/admin" or path.startswith("/admin/"):
         return is_admin(request)
 
-    # /mypage はログイン済みユーザーなら可
     if path == "/mypage" or path.startswith("/mypage/"):
         return is_authenticated(request)
 
