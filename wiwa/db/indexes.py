@@ -21,16 +21,19 @@ def ensure_indexes(db):
     db.users.create_index(
         [("username", ASCENDING)],
         unique=True,
+        name="uniq_users_username",
     )
 
     # posts（slug一意）
     db.posts.create_index(
         [("slug", ASCENDING)],
         unique=True,
+        name="uniq_posts_slug",
     )
 
     # trash（purge_at 到達で削除）
     db.posts.create_index(
         [("purge_at", ASCENDING)],
         expireAfterSeconds=0,
+        name="ttl_posts_purge_at",
     )
