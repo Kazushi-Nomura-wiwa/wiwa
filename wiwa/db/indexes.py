@@ -18,9 +18,7 @@ def ensure_indexes(db):
     db.access_logs.create_index(
         [("created_at", ASCENDING)],
         expireAfterSeconds=60 * 60 * 24 * ACCESS_LOG_RETENTION_DAYS,
-        name="ttl_access_logs_created_at",
     )
-
     # ------------------------------
     # users（username一意）
     # ------------------------------
