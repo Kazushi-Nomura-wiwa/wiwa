@@ -1,10 +1,10 @@
-# パスとファイル名: wiwa/controllers/admin/routes.py
+# パスとファイル名: wiwa/controllers/admin/assist.py
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response
 from wiwa.core.route_scanner import RouteScanner
 
 
-def index(request, route=None):
+def routes(request, route=None):
     scanner = RouteScanner()
     routes = scanner.get_routes()
 
