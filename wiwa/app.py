@@ -1,6 +1,5 @@
 # パスとファイル名: wiwa/app.py
 import traceback
-
 from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.auth import get_current_user_by_session_id
 from wiwa.core.dispatcher import Dispatcher

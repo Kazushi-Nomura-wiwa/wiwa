@@ -1,0 +1,60 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/post/list.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>{{ title }}</h2>
+
+    <nav>
+        <ul>
+            <li><a href="/admin/post/new">新規作成</a></li>
+            <li><a href="/admin/post/trash">ゴミ箱</a></li>
+        </ul>
+    </nav>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kind</th>
+                <th>Path</th>
+                <th>Handler</th>
+                <th>Template</th>
+                <th>Params</th>
+                <th>Auth</th>
+                <th>Roles</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for route in routes %}
+            <tr>
+                <td class="routes-kind">{{ route.kind }}</td>
+                <td><code>{{ route.path }}</code></td>
+                <td><code>{{ route.handler }}</code></td>
+                <td><code>{{ route.template }}</code></td>
+                <td>
+                    {% if route.params %}
+                        <code>{{ route.params | join(", ") }}</code>
+                    {% else %}
+                        <span class="routes-empty">-</span>
+                    {% endif %}
+                </td>
+                <td class="routes-auth">
+                    {% if route.auth_required %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </td>
+                <td>
+                    {% if route.roles %}
+                        {{ route.roles | join(", ") }}
+                    {% else %}
+                        <span class="routes-empty">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}
