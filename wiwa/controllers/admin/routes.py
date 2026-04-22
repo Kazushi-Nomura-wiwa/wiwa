@@ -11,9 +11,9 @@ def index(request, route=None):
     renderer = TemplateRenderer()
 
     body = renderer.render(
-        "html/admin/routes/index.html",
+        route["template"],
         {
-            "title": "Routes",
+            "title": "Routes一覧",
             "routes": routes,
             "current_user": getattr(request, "current_user", None),
         },
