@@ -8,6 +8,7 @@ def ensure_indexes(db):
     db.sessions.create_index(
         [("expires_at", ASCENDING)],
         expireAfterSeconds=0,
+        name="ttl_sessions_expires_at",
     )
 
     # access_logs（TTL: 保持日数ぶん）
