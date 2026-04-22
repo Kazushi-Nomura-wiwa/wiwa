@@ -11,7 +11,7 @@ def ensure_indexes(db):
         name="ttl_sessions_expires_at",
     )
 
-    # access_logs（TTL: 保持日数ぶん）
+    # access_logs（TTL: 保持日数分）
     db.access_logs.create_index(
         [("created_at", ASCENDING)],
         expireAfterSeconds=60 * 60 * 24 * ACCESS_LOG_RETENTION_DAYS,
