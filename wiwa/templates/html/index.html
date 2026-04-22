@@ -16,7 +16,7 @@
                 {% for post in posts %}
                 <li class="post-list__item">
                     <article class="post-card">
-                        <a href="/post/{{ post.slug }}" class="post-list__link"></a><h3 class="post-card__title">{{ post.title }}</h3></a>
+                        <a href="/post/{{ post.slug }}" class="post-list__link"><h3 class="post-card__title">{{ post.title }}</h3></a>
                         <p class="post-card__meta">
                             <span class="post-card__date">{{ post.published_at_display }}</span>
                             <span class="post-card__author">{{ post.author_display_name }}</span>
