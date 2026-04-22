@@ -16,17 +16,10 @@
                         <a href="/post/{{ post.slug }}" class="post-list__link">{{ post.title }}</a>
                     </h2>
 
-                    <div class="post-list__meta">
-                        {% if post.published_at %}
-                            <time class="post-list__date">
-                                {{ post.published_at.strftime("%Y-%m-%d %H:%M") }}
-                            </time>
-                        {% endif %}
-
-                        {% if post.author_name %}
-                            <span class="post-list__author">{{ post.author_name }}</span>
-                        {% endif %}
-                    </div>
+                    <p class="post-card__meta">
+                        <span class="post-card__date">{{ post.published_at_display }}</span>
+                        <span class="post-card__author">{{ post.author_display_name }}</span>
+                    </p>
 
                     {% if post.tags %}
                         <ul class="post-list__tags">
