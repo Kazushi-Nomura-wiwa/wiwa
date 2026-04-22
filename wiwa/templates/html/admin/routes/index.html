@@ -5,12 +5,7 @@
 <section>
     <h2>{{ title }}</h2>
 
-    <nav>
-        <ul>
-            <li><a href="/admin/post/new">新規作成</a></li>
-            <li><a href="/admin/post/trash">ゴミ箱</a></li>
-        </ul>
-    </nav>
+    <p class="routes-summary">total: {{ routes|length }}</p>
 
     <table>
         <thead>

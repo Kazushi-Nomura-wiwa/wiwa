@@ -41,6 +41,9 @@ class RouteScanner:
             if obj.__module__ != module_name:
                 continue
 
+            if function_name.startswith("_"):
+                continue
+
             routes.extend(
                 self._build_routes_for_function(
                     relative_parts=relative_parts,
@@ -60,7 +63,12 @@ class RouteScanner:
         if not relative:
             return []
 
-        return relative.split(".")
+        parts = relative.split(".")
+
+        if parts and parts[-1] == "index":
+            parts = parts[:-1]
+
+        return parts
 
     def _build_routes_for_function(
         self,
@@ -92,9 +100,9 @@ class RouteScanner:
         relative_parts: list[str],
         function_name: str,
     ) -> dict | None:
-        handler = ".".join(relative_parts + [function_name])
+        handler = ".".join(relative_parts + [function_name]) if relative_parts else function_name
 
-        if relative_parts == ["index"] and function_name == "index":
+        if not relative_parts and function_name == "index":
             path = "/"
             template = "html/index.html"
         elif function_name == "index":
@@ -119,7 +127,7 @@ class RouteScanner:
         relative_parts: list[str],
         function_name: str,
     ) -> dict:
-        handler = ".".join(relative_parts + [function_name])
+        handler = ".".join(relative_parts + [function_name]) if relative_parts else function_name
 
         return {
             "kind": "action_dynamic",
@@ -136,7 +144,7 @@ class RouteScanner:
         relative_parts: list[str],
         function_name: str,
     ) -> dict:
-        handler = ".".join(relative_parts + [function_name])
+        handler = ".".join(relative_parts + [function_name]) if relative_parts else function_name
 
         return {
             "kind": "legacy_dynamic",
