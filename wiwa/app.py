@@ -8,6 +8,7 @@ from wiwa.core.request import Request
 from wiwa.core.resolver import Resolver
 from wiwa.core.response import internal_server_error, not_found
 from wiwa.db.mongo import ensure_indexes
+from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.extensions.loader import ExtensionLoader
 from wiwa.services.access_control_service import check_access
 from wiwa.services.access_log_service import save_access_log
@@ -18,6 +19,7 @@ resolver = Resolver()
 dispatcher = Dispatcher()
 extension_loader = ExtensionLoader()
 extension_routes = extension_loader.load_routes()
+
 
 
 def make_start_response(start_response, status_holder: dict):
@@ -85,6 +87,9 @@ def application(environ, start_response):
     session_id = request.cookies.get(SESSION_COOKIE_NAME, "")
     request.session_id = session_id or None
     request.user = get_current_user_by_session_id(session_id)
+
+    if request.user and session_id:
+        SessionsRepository().touch(session_id)
 
     status_holder = {"status_code": 500}
     wrapped_start_response = make_start_response(start_response, status_holder)
