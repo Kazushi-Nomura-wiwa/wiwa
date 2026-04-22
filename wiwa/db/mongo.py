@@ -28,3 +28,7 @@ def get_db():
 
 def get_collection(name: str):
     return get_db()[name]
+
+def ensure_indexes():
+    from wiwa.db import indexes
+    indexes.ensure_indexes(get_db())

@@ -1,20 +1,19 @@
 # パスとファイル名: wiwa/app.py
 import traceback
 
-from wiwa.core.auth import (
-    SESSION_COOKIE_NAME,
-    SESSION_EXPIRES_DAYS,
-    get_current_user_by_session_id,
-)
+from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
+from wiwa.core.auth import get_current_user_by_session_id
 from wiwa.core.dispatcher import Dispatcher
 from wiwa.core.request import Request
 from wiwa.core.resolver import Resolver
 from wiwa.core.response import internal_server_error, not_found
+from wiwa.db.mongo import ensure_indexes
 from wiwa.extensions.loader import ExtensionLoader
 from wiwa.services.access_control_service import check_access
 from wiwa.services.access_log_service import save_access_log
 from wiwa.services.static_files_service import serve_static
 
+ensure_indexes()
 resolver = Resolver()
 dispatcher = Dispatcher()
 extension_loader = ExtensionLoader()

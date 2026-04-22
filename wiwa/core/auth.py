@@ -4,9 +4,7 @@ from datetime import UTC, datetime, timedelta
 
 from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.db.users_repository import UsersRepository
-
-SESSION_COOKIE_NAME = "session_id"
-SESSION_EXPIRES_DAYS = 7
+from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 
 sessions_repository = SessionsRepository()
 users_repository = UsersRepository()
