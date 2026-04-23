@@ -21,14 +21,13 @@ def _split_tags(raw_tags: str) -> list[str]:
 
 
 def list(request, route=None):
-    author_id, _ = _current_user_info(request)
-    posts = post_service.list_posts(author_id=author_id)
+    posts = post_service.list_posts()
 
     template_name = (route or {}).get("template", "html/admin/post/list.html")
     body = renderer.render(
         template_name,
         {
-            "title": "My Post List",
+            "title": "Post List",
             "posts": posts,
             "retention_days": TRASH_RETENTION_DAYS,
         },
@@ -38,14 +37,13 @@ def list(request, route=None):
 
 
 def trash(request, route=None):
-    author_id, _ = _current_user_info(request)
-    posts = post_service.list_posts(author_id=author_id, include_trashed=True)
+    posts = post_service.list_posts(include_trashed=True)
 
     template_name = (route or {}).get("template", "html/admin/post/trash.html")
     body = renderer.render(
         template_name,
         {
-            "title": "My Trash Post List",
+            "title": "Trash Post List",
             "posts": posts,
             "retention_days": TRASH_RETENTION_DAYS,
         },
@@ -123,8 +121,7 @@ def new(request, route=None):
 
 
 def edit(request, route=None, id=None):
-    author_id, _ = _current_user_info(request)
-    post = post_service.find_own_post(id, author_id)
+    post = post_service.find_post(id)
     if not post:
         return not_found()
 
@@ -157,8 +154,7 @@ def update(request, route=None, id=None):
     if not validate_csrf(request):
         return forbidden()
 
-    author_id, current_username = _current_user_info(request)
-    post = post_service.find_own_post(id, author_id)
+    post = post_service.find_post(id)
     if not post:
         return not_found()
 
@@ -192,9 +188,10 @@ def update(request, route=None, id=None):
         )
         return html(body, status="400 Bad Request")
 
-    author_name = post.get("author_name", "") or current_username
-    updated_by_id = author_id
-    updated_by_name = current_username
+    author_id = str(post.get("author_id", "") or "")
+    author_name = post.get("author_name", "") or ""
+
+    updated_by_id, updated_by_name = _current_user_info(request)
 
     ok = post_service.update_post(
         post_id=str(post.get("_id")),
@@ -216,8 +213,7 @@ def update(request, route=None, id=None):
 
 
 def delete(request, route=None, id=None):
-    author_id, _ = _current_user_info(request)
-    post = post_service.find_own_post(id, author_id)
+    post = post_service.find_post(id)
     if not post:
         return not_found()
 
@@ -225,7 +221,7 @@ def delete(request, route=None, id=None):
         if not validate_csrf(request):
             return forbidden()
 
-        ok = post_service.delete_post(id, author_id=author_id)
+        ok = post_service.delete_post(id)
         if not ok:
             return not_found()
 
@@ -247,13 +243,12 @@ def delete(request, route=None, id=None):
 
 def restore(request, route=None, id=None):
     if request.method != "POST":
-        return redirect("/mypage/post/trash")
+        return redirect("/admin/post/trash")
 
     if not validate_csrf(request):
         return forbidden()
 
-    author_id, _ = _current_user_info(request)
-    ok = post_service.restore_post(id, status="draft", author_id=author_id)
+    ok = post_service.restore_post(id, status="draft")
     if not ok:
         return not_found()
 
