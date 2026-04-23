@@ -23,9 +23,9 @@ def _split_tags(raw_tags: str) -> list[str]:
 def list(request, route=None):
     author_id, _ = _current_user_info(request)
     posts = post_service.list_posts(author_id=author_id)
-
+    template_name = (route or {}).get("template", "html/mypage/post/list.html")
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "My Post List",
             "posts": posts,
@@ -40,8 +40,9 @@ def trash(request, route=None):
     author_id, _ = _current_user_info(request)
     posts = post_service.list_posts(author_id=author_id, include_trashed=True)
 
+    template_name = (route or {}).get("template", "html/mypage/post/trash.html")
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "My Trash Post List",
             "posts": posts,
@@ -54,8 +55,9 @@ def trash(request, route=None):
 
 def new(request, route=None):
     if request.method == "GET":
+        template_name = (route or {}).get("template", "html/mypage/post/new.html")
         body = renderer.render(
-            route["template"],
+            template_name,
             {
                 "title": "New Post",
                 "error": "",
@@ -85,7 +87,7 @@ def new(request, route=None):
 
     if not title or not body_text:
         body = renderer.render(
-            route["template"],
+            template_name,
             {
                 "title": "New Post",
                 "error": "title と body は必須です。",
@@ -124,8 +126,9 @@ def edit(request, route=None, id=None):
     if not post:
         return not_found()
 
+    template_name = (route or {}).get("template", "html/mypage/post/edit.html")
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "Edit Post",
             "error": "",
@@ -165,8 +168,9 @@ def update(request, route=None, id=None):
     slug = post.get("slug", "") or ""
 
     if not title or not body_text:
+        template_name = (route or {}).get("template", "html/mypage/post/edit.html")
         body = renderer.render(
-            route["template"],
+            template_name,
             {
                 "title": "Edit Post",
                 "error": "title と body は必須です。",
@@ -224,8 +228,9 @@ def delete(request, route=None, id=None):
 
         return redirect("/mypage/post/list")
 
+    template_name = (route or {}).get("template", "html/mypage/post/delete.html")
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "Delete Post",
             "post": post,

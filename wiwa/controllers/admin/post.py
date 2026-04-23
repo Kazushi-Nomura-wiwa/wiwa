@@ -52,8 +52,9 @@ def trash(request, route=None):
 
 def new(request, route=None):
     if request.method == "GET":
+        template_name = (route or {}).get("template", "html/admin/post/new.html")
         body = renderer.render(
-            route["template"],
+            template_name,
             {
                 "title": "New Post",
                 "error": "",
@@ -83,7 +84,7 @@ def new(request, route=None):
 
     if not title or not body_text:
         body = renderer.render(
-            route["template"],
+            template_name,
             {
                 "title": "New Post",
                 "error": "title と body は必須です。",
@@ -121,8 +122,9 @@ def edit(request, route=None, id=None):
     if not post:
         return not_found()
 
+    template_name = (route or {}).get("template", "html/admin/post/edit.html")
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "Edit Post",
             "error": "",
@@ -160,9 +162,12 @@ def update(request, route=None, id=None):
     status = request.get_form("status", "published").strip() or "published"
     slug = post.get("slug", "") or ""
 
+    template_name = (route or {}).get("template", "html/admin/post/edit.html")
+
+
     if not title or not body_text:
         body = renderer.render(
-            route["template"],
+            template_name,
             {
                 "title": "Edit Post",
                 "error": "title と body は必須です。",
@@ -220,8 +225,9 @@ def delete(request, route=None, id=None):
 
         return redirect("/admin/post/list")
 
+    template_name = (route or {}).get("template", "html/admin/post/delete.html")
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "Delete Post",
             "post": post,

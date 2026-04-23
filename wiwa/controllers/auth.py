@@ -13,9 +13,9 @@ users_repository = UsersRepository()
 def login(request, route=None, **kwargs):
     if request.method == "POST":
         return _login_submit(request)
-
+    template_name = (route or {}).get("template", "html/auth/login.html")
     body = renderer.render(
-        "html/auth/login.html",
+        template_name,
         {
             "error_message": "",
             "username": "",

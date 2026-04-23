@@ -15,9 +15,9 @@ def name(request, route=None, name: str = ""):
         return not_found()
 
     posts = post_service.list_posts_by_tag(tag_name)
-
+    template_name = (route or {}).get("template", "html/tag/name.html")
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": f"タグ: {tag_name}",
             "tag_name": tag_name,

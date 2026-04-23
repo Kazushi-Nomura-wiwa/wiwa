@@ -7,8 +7,9 @@ renderer = TemplateRenderer()
 
 
 def index(request, route=None, **params):
+    template_name = (route or {}).get("template", "html/admin/index.html")
     body = renderer.render(
-        (route or {}).get("template", "html/admin/index.html"),
+        template_name,
         {
             "title": "Admin",
         },

@@ -9,9 +9,10 @@ def routes(request, route=None):
     routes = scanner.get_routes()
 
     renderer = TemplateRenderer()
+    template_name = (route or {}).get("template", "html/admin/routes.html")
 
     body = renderer.render(
-        route["template"],
+        template_name,
         {
             "title": "Routes一覧",
             "routes": routes,

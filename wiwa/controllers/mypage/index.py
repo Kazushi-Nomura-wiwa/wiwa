@@ -8,9 +8,9 @@ renderer = TemplateRenderer()
 
 def index(request, route=None, **kwargs):
     current_user = get_current_user(request)
-
+    template_name = (route or {}).get("template", "html/mypage/index.html")
     body = renderer.render(
-        "html/mypage/index.html",
+        template_name,
         {
             "title": "MyPage",
             "current_user": current_user,
