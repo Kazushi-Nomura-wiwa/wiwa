@@ -5,10 +5,9 @@
     --white-color: rgba(255 255 255 / 100%);
     --black-color: rgba(0 0 0 / 100%);
     --text-color: rgba(51 51 51 / 100%);
-    --ash-color: rgba(100 100 100 / 100%);
-    --dark-ash-color: rgba(75 75 75 / 100%);
-    --light-ash-color: rgba(200 200 200 / 100%);
     --green-color: hsla(75 50% 50% / 100%);
+    --dark-green-color: hsla(75 50% 25% / 100%);
+    --light-ash-color: rgba(200 200 200 / 100%);
 
     /* --- テキスト --- */
     --regular: 400;
@@ -111,7 +110,7 @@ address{
 }
 
 .site-header__bottom {
-    background-color: var(--dark-ash-color);
+    background-color: var(--dark-green-color);
     border-top: 0.25rem solid var(--green-color);
 }
 
