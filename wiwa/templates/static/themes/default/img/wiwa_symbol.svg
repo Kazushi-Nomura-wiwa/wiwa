@@ -10,6 +10,7 @@
    inkscape:export-filename="wiwa_symbol.svg"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
+   sodipodi:docname="wiwa_symbol.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +30,7 @@
        y="0"
        width="91.952545"
        height="91.952545"
-       id="page2"
+       id="page1"
        margin="0"
        bleed="0" />
   </sodipodi:namedview>
@@ -41,7 +42,7 @@
      id="layer1"
      transform="translate(-59.023727,-102.52373)">
     <rect
-       style="fill:#add84a;stroke-width:0.264583"
+       style="fill:#a1bf43;fill-opacity:1;stroke-width:0.264583"
        id="rect1"
        width="91.952545"
        height="91.952545"
