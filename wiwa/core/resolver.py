@@ -136,6 +136,9 @@ class Resolver:
     def _handler_exists(self, handler: str) -> bool:
         module_path, function_name = self._split_handler(handler)
 
+        if not function_name or function_name.startswith("_"):
+            return False
+
         try:
             module = importlib.import_module(module_path)
         except ModuleNotFoundError:
