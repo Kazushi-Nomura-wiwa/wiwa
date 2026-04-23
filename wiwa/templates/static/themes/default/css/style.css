@@ -52,16 +52,12 @@ html{
 a,
 a:link,
 a:visited{
-    color: var(--text-color);
-    text-decoration-line: underline;
-    text-decoration-color: var(--green-color);
-    text-decoration-thickness: 0.125rem;
-    transition: text-decoration-color 0.25s;
+    color: var(--dark-green-color);
+    transition: opacity 0.25s;
 }
 
 a:hover{
-    text-decoration-color: transparent;
-}
+    opacity: 0.5;}
 
 p{
     margin-bottom: 1rem;
