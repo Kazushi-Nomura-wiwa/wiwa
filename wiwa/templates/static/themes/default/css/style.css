@@ -8,7 +8,7 @@
     --ash-color: rgba(100 100 100 / 100%);
     --dark-ash-color: rgba(75 75 75 / 100%);
     --light-ash-color: rgba(200 200 200 / 100%);
-    --green-color: rgba(173 216 74 / 100%);
+    --green-color: hsla(75 50% 50% / 100%);
 
     /* --- テキスト --- */
     --regular: 400;
