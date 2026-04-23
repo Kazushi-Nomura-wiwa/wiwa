@@ -32,8 +32,9 @@ def _login_submit(request):
     result = login_service.login(username=username, password=password)
 
     if not result.ok:
+        html_template = (route or {}).get("template", "html/auth/login.html")
         body = renderer.render(
-            "html/auth/login.html",
+            html_template,
             {
                 "error_message": result.message,
                 "username": username,

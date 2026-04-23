@@ -38,9 +38,9 @@ def _is_last_active_admin(user: dict) -> bool:
 
 def list(request, route=None, **params):
     error_message = request.get_query("error", "")
-
+    templates_name = (route or {}).get("template", "html/admin/users/list.html")
     body = renderer.render(
-        "html/admin/users/list.html",
+        templates_name,
         {
             "title": "Users",
             "users": users_repo.list_users(),
@@ -99,9 +99,9 @@ def new(request, route=None, **params):
 
         except ValueError as e:
             error_message = str(e)
-
+    html_template = (route or {}).get("template", "html/admin/users/new.html")  
     body = renderer.render(
-        "html/admin/users/new.html",
+        html_template,
         {
             "title": "ユーザー追加",
             "error_message": error_message,
@@ -125,8 +125,9 @@ def edit(request, route=None, **params):
     if not user:
         return _redirect_with_error("対象ユーザーが存在しません。")
 
+    html_template = (route or {}).get("template", "html/admin/users/edit.html") 
     body = renderer.render(
-        "html/admin/users/edit.html",
+        html_template,
         {
             "title": "ユーザー編集",
             "user": user,

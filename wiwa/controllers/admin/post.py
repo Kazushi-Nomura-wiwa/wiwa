@@ -22,9 +22,9 @@ def _split_tags(raw_tags: str) -> list[str]:
 
 def list(request, route=None):
     posts = post_service.list_posts()
-
+    html_template = (route or {}).get("template", "html/admin/post/list.html")  
     body = renderer.render(
-        route["template"],
+        html_template,
         {
             "title": "Post List",
             "posts": posts,
@@ -37,9 +37,9 @@ def list(request, route=None):
 
 def trash(request, route=None):
     posts = post_service.list_posts(include_trashed=True)
-
+    html_template = (route or {}).get("template", "html/admin/post/trash.html") 
     body = renderer.render(
-        route["template"],
+        html_template,
         {
             "title": "Trash Post List",
             "posts": posts,
