@@ -119,7 +119,7 @@ def new(request, route=None):
         tags=tags,
     )
 
-    return redirect("/mypage/post/list")
+    return redirect("/admin/post/list")
 
 
 def edit(request, route=None, id=None):
@@ -212,7 +212,7 @@ def update(request, route=None, id=None):
     if not ok:
         return not_found()
 
-    return redirect("/mypage/post/list")
+    return redirect("/admin/post/list")
 
 
 def delete(request, route=None, id=None):
@@ -229,7 +229,7 @@ def delete(request, route=None, id=None):
         if not ok:
             return not_found()
 
-        return redirect("/mypage/post/list")
+        return redirect("/admin/post/list")
 
     template_name = (route or {}).get("template", "html/mypage/post/delete.html")
     body = renderer.render(
@@ -257,4 +257,4 @@ def restore(request, route=None, id=None):
     if not ok:
         return not_found()
 
-    return redirect("/mypage/post/trash")
+    return redirect("/admin/post/trash")
