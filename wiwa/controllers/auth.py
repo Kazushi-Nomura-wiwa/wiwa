@@ -11,9 +11,11 @@ users_repository = UsersRepository()
 
 
 def login(request, route=None, **kwargs):
-    if request.method == "POST":
-        return _login_submit(request)
     template_name = (route or {}).get("template", "html/auth/login.html")
+
+    if request.method == "POST":
+        return _login_submit(request, template_name)
+
     body = renderer.render(
         template_name,
         {
@@ -25,16 +27,15 @@ def login(request, route=None, **kwargs):
     return html(body)
 
 
-def _login_submit(request):
+def _login_submit(request, template_name: str):
     username = request.get_form("username", "").strip()
     password = request.get_form("password", "")
 
     result = login_service.login(username=username, password=password)
 
     if not result.ok:
-        html_template = (route or {}).get("template", "html/auth/login.html")
         body = renderer.render(
-            html_template,
+            template_name,
             {
                 "error_message": result.message,
                 "username": username,
