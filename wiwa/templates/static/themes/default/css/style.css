@@ -52,7 +52,7 @@ html{
 a,
 a:link,
 a:visited{
-    color: var(--dark-green-color);
+    color: var(--green-color);
     transition: opacity 0.25s;
 }
 
