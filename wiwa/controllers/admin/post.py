@@ -51,8 +51,8 @@ def trash(request, route=None):
 
 
 def new(request, route=None):
+    template_name = (route or {}).get("template", "html/admin/post/new.html")
     if request.method == "GET":
-        template_name = (route or {}).get("template", "html/admin/post/new.html")
         body = renderer.render(
             template_name,
             {
