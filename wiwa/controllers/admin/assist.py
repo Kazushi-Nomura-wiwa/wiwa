@@ -16,8 +16,9 @@ def routes(request, route=None):
         {
             "title": "Routes一覧",
             "routes": routes,
-            "current_user": getattr(request, "current_user", None),
+            "current_user": request.user,
         },
+        request=request,
     )
 
     return Response(
