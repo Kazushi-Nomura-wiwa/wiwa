@@ -1,4 +1,4 @@
-# パスとファイル名: wiwa/controllers/mypage/post.py
+# パスとファイル名: wiwa/controllers/admin/post.py
 from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import forbidden, html, not_found, redirect
@@ -24,7 +24,7 @@ def list(request, route=None):
     author_id, _ = _current_user_info(request)
     posts = post_service.list_posts(author_id=author_id)
 
-    template_name = (route or {}).get("template", "html/mypage/post/list.html")
+    template_name = (route or {}).get("template", "html/admin/post/list.html")
     body = renderer.render(
         template_name,
         {
@@ -41,7 +41,7 @@ def trash(request, route=None):
     author_id, _ = _current_user_info(request)
     posts = post_service.list_posts(author_id=author_id, include_trashed=True)
 
-    template_name = (route or {}).get("template", "html/mypage/post/trash.html")
+    template_name = (route or {}).get("template", "html/admin/post/trash.html")
     body = renderer.render(
         template_name,
         {
@@ -55,7 +55,7 @@ def trash(request, route=None):
 
 
 def new(request, route=None):
-    template_name = (route or {}).get("template", "html/mypage/post/new.html")
+    template_name = (route or {}).get("template", "html/admin/post/new.html")
 
     if request.method == "GET":
         body = renderer.render(
@@ -63,7 +63,7 @@ def new(request, route=None):
             {
                 "title": "New Post",
                 "error": "",
-                "action": "/mypage/post/new",
+                "action": "/admin/post/new",
                 "submit_label": "投稿する",
                 "csrf_token": get_csrf_token(request),
                 "form": {
@@ -93,7 +93,7 @@ def new(request, route=None):
             {
                 "title": "New Post",
                 "error": "title と body は必須です。",
-                "action": "/mypage/post/new",
+                "action": "/admin/post/new",
                 "submit_label": "投稿する",
                 "csrf_token": get_csrf_token(request),
                 "form": {
@@ -128,13 +128,13 @@ def edit(request, route=None, id=None):
     if not post:
         return not_found()
 
-    template_name = (route or {}).get("template", "html/mypage/post/edit.html")
+    template_name = (route or {}).get("template", "html/admin/post/edit.html")
     body = renderer.render(
         template_name,
         {
             "title": "Edit Post",
             "error": "",
-            "action": f"/mypage/post/update/{id}",
+            "action": f"/admin/post/update/{id}",
             "submit_label": "更新する",
             "csrf_token": get_csrf_token(request),
             "form": {
@@ -152,7 +152,7 @@ def edit(request, route=None, id=None):
 
 def update(request, route=None, id=None):
     if request.method != "POST":
-        return redirect("/mypage/post/list")
+        return redirect("/admin/post/list")
 
     if not validate_csrf(request):
         return forbidden()
@@ -169,7 +169,7 @@ def update(request, route=None, id=None):
     status = request.get_form("status", "published").strip() or "published"
     slug = post.get("slug", "") or ""
 
-    template_name = (route or {}).get("template", "html/mypage/post/edit.html")
+    template_name = (route or {}).get("template", "html/admin/post/edit.html")
 
     if not title or not body_text:
         body = renderer.render(
@@ -177,7 +177,7 @@ def update(request, route=None, id=None):
             {
                 "title": "Edit Post",
                 "error": "title と body は必須です。",
-                "action": f"/mypage/post/update/{id}",
+                "action": f"/admin/post/update/{id}",
                 "submit_label": "更新する",
                 "csrf_token": get_csrf_token(request),
                 "form": {
@@ -231,7 +231,7 @@ def delete(request, route=None, id=None):
 
         return redirect("/admin/post/list")
 
-    template_name = (route or {}).get("template", "html/mypage/post/delete.html")
+    template_name = (route or {}).get("template", "html/admin/post/delete.html")
     body = renderer.render(
         template_name,
         {
