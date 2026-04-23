@@ -23,6 +23,7 @@ def _split_tags(raw_tags: str) -> list[str]:
 def list(request, route=None):
     author_id, _ = _current_user_info(request)
     posts = post_service.list_posts(author_id=author_id)
+
     template_name = (route or {}).get("template", "html/mypage/post/list.html")
     body = renderer.render(
         template_name,
@@ -54,8 +55,9 @@ def trash(request, route=None):
 
 
 def new(request, route=None):
+    template_name = (route or {}).get("template", "html/mypage/post/new.html")
+
     if request.method == "GET":
-        template_name = (route or {}).get("template", "html/mypage/post/new.html")
         body = renderer.render(
             template_name,
             {
@@ -167,8 +169,9 @@ def update(request, route=None, id=None):
     status = request.get_form("status", "published").strip() or "published"
     slug = post.get("slug", "") or ""
 
+    template_name = (route or {}).get("template", "html/mypage/post/edit.html")
+
     if not title or not body_text:
-        template_name = (route or {}).get("template", "html/mypage/post/edit.html")
         body = renderer.render(
             template_name,
             {
