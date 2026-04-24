@@ -73,6 +73,7 @@ th,
 td {
     border-collapse: collapse;
     width: 100%;
+    border: 1px solid var(--light-ash);
 }
 /* スマホ版 */
 /* ヘッダー */
@@ -139,11 +140,7 @@ td {
 }
 
 /* admin・author用ナビゲーション */
-.admin-nav, 
-.mypage-nav {
-    background: var(--ash);
-    border-top: 0.125rem solid var(--text);
-}
+
 
 .admin-nav__list,
 .mypage-nav__list {
@@ -162,8 +159,7 @@ td {
 .mypage-nav__link {
     display: block;
     padding: 0.75rem 1rem;
-    color: var(--white) !important;
-    text-decoration: none !important;
+    text-decoration: none;
 }
 
 /* メインコンテンツ */
