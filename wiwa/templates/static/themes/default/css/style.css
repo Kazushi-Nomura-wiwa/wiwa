@@ -129,8 +129,7 @@ address{
 .global-nav__link {
     display: block;
     padding: 0.75rem 1rem;
-    color: var(--white-color) !important;
-    text-decoration: none !important;
+    text-decoration: none;
 }
 
 /* admin・author用ナビゲーション */
