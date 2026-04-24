@@ -206,6 +206,6 @@ main {
 .hero__title {
     font-family: "Inter", sans-serif;
     font-size: 2.5rem;
-    font-weight: var(--exbold);
+    font-weight: var(--bold);
     margin-bottom: 1rem;
 }
