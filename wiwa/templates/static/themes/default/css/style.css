@@ -68,7 +68,9 @@ p{
 address{
     font-style: normal;
 }
-table {
+table,
+th,
+td {
     border-collapse: collapse;
     width: 100%;
 }
