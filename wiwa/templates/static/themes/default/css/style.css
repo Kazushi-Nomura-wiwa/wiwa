@@ -140,7 +140,10 @@ td {
 }
 
 /* admin・author用ナビゲーション */
-
+.admin-nav, 
+.mypage-nav {
+    border-top: 1px solid var(--light-ash);
+}
 
 .admin-nav__list,
 .mypage-nav__list {
