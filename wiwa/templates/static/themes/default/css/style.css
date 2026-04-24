@@ -175,4 +175,7 @@ main {
       transparent 60%
     ),
     hsl(0 0% 8%);
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
 }
