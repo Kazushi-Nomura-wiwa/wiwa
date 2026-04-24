@@ -2,12 +2,12 @@
 
 :root{
     /* ---------- カスタムプロパティ(カラー設定ほか) ---------- */
-    --white-color: rgba(255 255 255 / 100%);
-    --black-color: rgba(0 0 0 / 100%);
-    --text-color: rgba(51 51 51 / 100%);
-    --orange-color: hsl(35, 100%, 50%);
-    --ash-color: hsl(230 0% 25% / 100%);
-    --light-ash-color: rgba(200 200 200 / 100%);
+    --white: rgba(255 255 255 / 100%);
+    --black rgba(0 0 0 / 100%);
+    --text: rgba(51 51 51 / 100%);
+    --orange: hsl(35, 100%, 50%);
+    --ash: hsl(230 0% 25% / 100%);
+    --light-ash: rgba(200 200 200 / 100%);
 
     /* --- テキスト --- */
     --regular: 400;
@@ -41,8 +41,8 @@ img {
 html{
     font-size: 16px;
     scroll-behavior: smooth;
-    background-color: var(--white-color);
-    color: var(--text-color);
+    background: var(--white);
+    color: var(--text);
     font-family: "Noto Sans JP", sans-serif;
     font-optical-sizing: auto;
     font-weight: 500;
@@ -52,7 +52,7 @@ html{
 a,
 a:link,
 a:visited{
-    color: var(--orange-color);
+    color: var(--orange);
     transition: opacity 0.25s;
 }
 
@@ -75,7 +75,7 @@ address{
     position:sticky;
     top:0;
     z-index: 100;
-    background-color: var(--white-color);
+    background: var(--white);
     box-shadow: 0 1px 4px rgba(0 0 0 / 8%);
 }
 .site-header__top {
@@ -107,8 +107,8 @@ address{
 }
 
 .site-header__bottom {
-    background-color: var(--dark-green-color);
-    border-top: 0.25rem solid var(--green-color);
+    background: var(--dark-green);
+    border-top: 0.25rem solid var(--green);
 }
 
 /* グローバルナビゲーション */
@@ -119,11 +119,11 @@ address{
 .global-nav__list {
     display: flex;
     flex-wrap: wrap;
-    border-left:1px solid var(--light-ash-color);
+    border-left:1px solid var(--light-ash);
 }
 
 .global-nav__item {
-    border-right:1px solid var(--light-ash-color);
+    border-right:1px solid var(--light-ash);
 }
 
 .global-nav__link {
@@ -135,8 +135,8 @@ address{
 /* admin・author用ナビゲーション */
 .admin-nav, 
 .mypage-nav {
-    background-color: var(--ash-color);
-    border-top: 0.125rem solid var(--text-color);
+    background: var(--ash);
+    border-top: 0.125rem solid var(--text);
 }
 
 .admin-nav__list,
@@ -144,19 +144,19 @@ address{
     display: flex;
     margin-left: 2rem;
     padding: 0;
-    border-left:1px solid var(--light-ash-color);
+    border-left:1px solid var(--light-ash);
 }
 
 .admin-nav__item,
 .mypage-nav__item {
-    border-right:1px solid var(--light-ash-color);
+    border-right:1px solid var(--light-ash);
 }
 
 .admin-nav__link,
 .mypage-nav__link {
     display: block;
     padding: 0.75rem 1rem;
-    color: var(--white-color) !important;
+    color: var(--white) !important;
     text-decoration: none !important;
 }
 
