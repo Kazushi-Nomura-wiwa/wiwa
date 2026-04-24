@@ -171,16 +171,16 @@ main {
     background:
         radial-gradient(
             circle at 80% 100%,
-            hsl(30 80% 45% / 30%),
+            hsl(30, 100%, 50%),
             transparent 60%
         ),
         linear-gradient(
-            hsl(0 0% 100% / 3%) 1px,
+            hsla(0, 0%, 100%, 30%) 1px,
             transparent 1px
         ),
         linear-gradient(
             90deg,
-            hsl(0 0% 100% / 3%) 1px,
+            hsl(0 0% 100% / 30%) 1px,
             transparent 1px
         ),
         hsl(0 0% 8%);
