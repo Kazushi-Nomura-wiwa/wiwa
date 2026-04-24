@@ -171,14 +171,27 @@ main {
     background:
         radial-gradient(
             circle at 80% 100%,
-            hsl(30, 100%, 50%),
+            hsl(30 80% 45% / 30%),
             transparent 60%
         ),
         linear-gradient(
-            to bottom,
-            hsl(0 0% 5%),
-            hsl(0 0% 8%)
-     );
+            hsl(0 0% 100% / 3%) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            hsl(0 0% 100% / 3%) 1px,
+            transparent 1px
+        ),
+        hsl(0 0% 8%);
+
+    background-size:
+        auto,
+        64px 64px,
+        64px 64px,
+        auto;
+}
+.hero {
     width: 100%;
     aspect-ratio: 16 / 9;
     display: flex;
