@@ -174,5 +174,6 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 40px;
+    padding: 3rem;
+    box-sizing: border-box;
 }
