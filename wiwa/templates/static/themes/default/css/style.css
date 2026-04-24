@@ -68,7 +68,10 @@ p{
 address{
     font-style: normal;
 }
-
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
 /* スマホ版 */
 /* ヘッダー */
 .site-header {
