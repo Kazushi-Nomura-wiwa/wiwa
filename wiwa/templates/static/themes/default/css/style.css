@@ -107,7 +107,8 @@ address{
 
 .site-header__sub {
     background: var(--dark-green);
-    border-top: 0.25rem solid var(--green);
+    border-top: 1px solid var(--green);
+    border-bottom: 1px solid var(--green);
 }
 
 /* グローバルナビゲーション */
