@@ -78,7 +78,7 @@ address{
     background: var(--white);
     box-shadow: 0 1px 4px rgba(0 0 0 / 8%);
 }
-.site-header__top {
+.site-header__main {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -106,7 +106,7 @@ address{
     margin-left: auto;
 }
 
-.site-header__bottom {
+.site-header__sub {
     background: var(--dark-green);
     border-top: 0.25rem solid var(--green);
 }
