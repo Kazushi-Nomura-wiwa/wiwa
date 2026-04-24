@@ -5,8 +5,8 @@
     --white-color: rgba(255 255 255 / 100%);
     --black-color: rgba(0 0 0 / 100%);
     --text-color: rgba(51 51 51 / 100%);
-    --green-color: hsl(35 75% 50% / 100%);
-    --dark-green-color: hsl(75 50% 25% / 100%);
+    --orange-color: hsl(35 75% 50% / 100%);
+    --ash-color: hsl(230 0% 25% / 100%);
     --light-ash-color: rgba(200 200 200 / 100%);
 
     /* --- テキスト --- */
@@ -52,12 +52,13 @@ html{
 a,
 a:link,
 a:visited{
-    color: var(--green-color);
+    color: var(--orange-color);
     transition: opacity 0.25s;
 }
 
 a:hover{
-    opacity: 0.5;}
+    opacity: 0.5;
+}
 
 p{
     margin-bottom: 1rem;
