@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", function(){
     const form = document.getElementById("page-form");
     const editorHolder = document.getElementById("editorjs");
     const bodyJsonInput = document.getElementById("body_json");
-    const initialDataElement = document.getElementById("editorjs-initial-data");
 
     if (!form || !editorHolder || !bodyJsonInput) {
         return;
@@ -14,9 +13,9 @@ document.addEventListener("DOMContentLoaded", function(){
         blocks: []
     };
 
-    if (initialDataElement) {
+    if (bodyJsonInput.value) {
         try {
-            initialData = JSON.parse(initialDataElement.textContent);
+            initialData = JSON.parse(bodyJsonInput.value);
         } catch (error) {
             initialData = {
                 blocks: []
