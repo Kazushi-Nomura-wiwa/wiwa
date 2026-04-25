@@ -201,6 +201,6 @@ class Resolver:
             return ["admin"]
 
         if parts[0] == "mypage":
-            return ["admin", "editor", "author"]
+            return ["admin", "author"]
 
         return []

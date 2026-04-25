@@ -1,9 +1,10 @@
 # パスとファイル名: wiwa/controllers/admin/post.py
+
 from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
-from wiwa.core.response import forbidden, html, not_found, redirect
+from wiwa.core.response import html, not_found, redirect
 from wiwa.services.post_service import PostService
-from wiwa.utils.csrf import get_csrf_token, validate_csrf
+
 
 renderer = TemplateRenderer()
 post_service = PostService()
@@ -20,7 +21,7 @@ def _split_tags(raw_tags: str) -> list[str]:
     return raw_tags.replace("　", " ").split()
 
 
-def list(request, route=None):
+def list(request, route=None, **params):
     posts = post_service.list_posts()
 
     template_name = (route or {}).get("template", "html/admin/post/list.html")
@@ -36,7 +37,7 @@ def list(request, route=None):
     return html(body)
 
 
-def trash(request, route=None):
+def trash(request, route=None, **params):
     posts = post_service.list_posts(include_trashed=True)
 
     template_name = (route or {}).get("template", "html/admin/post/trash.html")
@@ -52,7 +53,7 @@ def trash(request, route=None):
     return html(body)
 
 
-def new(request, route=None):
+def new(request, route=None, **params):
     template_name = (route or {}).get("template", "html/admin/post/new.html")
 
     if request.method == "GET":
@@ -63,7 +64,6 @@ def new(request, route=None):
                 "error": "",
                 "action": "/admin/post/new",
                 "submit_label": "投稿する",
-                "csrf_token": get_csrf_token(request),
                 "form": {
                     "_id": "",
                     "title": "",
@@ -75,9 +75,6 @@ def new(request, route=None):
             request=request,
         )
         return html(body)
-
-    if not validate_csrf(request):
-        return forbidden()
 
     title = request.get_form("title").strip()
     body_text = request.get_form("body").strip()
@@ -93,7 +90,6 @@ def new(request, route=None):
                 "error": "title と body は必須です。",
                 "action": "/admin/post/new",
                 "submit_label": "投稿する",
-                "csrf_token": get_csrf_token(request),
                 "form": {
                     "_id": "",
                     "title": title,
@@ -120,7 +116,7 @@ def new(request, route=None):
     return redirect("/admin/post/list")
 
 
-def edit(request, route=None, id=None):
+def edit(request, route=None, id=None, **params):
     post = post_service.find_post(id)
     if not post:
         return not_found()
@@ -133,7 +129,6 @@ def edit(request, route=None, id=None):
             "error": "",
             "action": f"/admin/post/update/{id}",
             "submit_label": "更新する",
-            "csrf_token": get_csrf_token(request),
             "form": {
                 "_id": str(post.get("_id", "")),
                 "title": post.get("title", ""),
@@ -147,12 +142,9 @@ def edit(request, route=None, id=None):
     return html(body)
 
 
-def update(request, route=None, id=None):
+def update(request, route=None, id=None, **params):
     if request.method != "POST":
         return redirect("/admin/post/list")
-
-    if not validate_csrf(request):
-        return forbidden()
 
     post = post_service.find_post(id)
     if not post:
@@ -175,7 +167,6 @@ def update(request, route=None, id=None):
                 "error": "title と body は必須です。",
                 "action": f"/admin/post/update/{id}",
                 "submit_label": "更新する",
-                "csrf_token": get_csrf_token(request),
                 "form": {
                     "_id": str(post.get("_id", "")),
                     "title": title,
@@ -212,15 +203,12 @@ def update(request, route=None, id=None):
     return redirect("/admin/post/list")
 
 
-def delete(request, route=None, id=None):
+def delete(request, route=None, id=None, **params):
     post = post_service.find_post(id)
     if not post:
         return not_found()
 
     if request.method == "POST":
-        if not validate_csrf(request):
-            return forbidden()
-
         ok = post_service.delete_post(id)
         if not ok:
             return not_found()
@@ -234,19 +222,15 @@ def delete(request, route=None, id=None):
             "title": "Delete Post",
             "post": post,
             "retention_days": TRASH_RETENTION_DAYS,
-            "csrf_token": get_csrf_token(request),
         },
         request=request,
     )
     return html(body)
 
 
-def restore(request, route=None, id=None):
+def restore(request, route=None, id=None, **params):
     if request.method != "POST":
         return redirect("/admin/post/trash")
-
-    if not validate_csrf(request):
-        return forbidden()
 
     ok = post_service.restore_post(id, status="draft")
     if not ok:

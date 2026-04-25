@@ -1,5 +1,15 @@
 # パスとファイル名: wiwa/core/dispatcher.py
+
 import importlib
+
+from wiwa.core.response import forbidden
+from wiwa.utils.csrf import validate_csrf
+
+
+# CSRFチェックを除外するパス
+CSRF_EXEMPT_PATHS = {
+    "/auth/login",
+}
 
 
 class Dispatcher:
@@ -30,6 +40,13 @@ class Dispatcher:
         return func
 
     def dispatch(self, resolved: dict, request):
+        if not resolved:
+            return forbidden()
+
+        if request.method == "POST" and request.path not in CSRF_EXEMPT_PATHS:
+            if not validate_csrf(request):
+                return forbidden()
+
         handler = resolved.get("handler")
         params = resolved.get("params", {})
 

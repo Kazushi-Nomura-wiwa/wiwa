@@ -65,6 +65,7 @@ def new(request, route=None, **params):
 
     return Response(body=body)
 
+
 def edit(request, route=None, **params):
     service = PageService()
     page_id = (params.get("id") or "").strip()
@@ -88,7 +89,10 @@ def edit(request, route=None, **params):
 
     body = renderer.render(
         (route or {}).get("template", "html/admin/page/edit.html"),
-        {"title": "固定ページ編集", "page": page},
+        {
+            "title": "固定ページ編集",
+            "page": page,
+        },
         request=request,
     )
 
@@ -104,10 +108,15 @@ def delete(request, route=None, **params):
         return redirect("/admin/page/list")
 
     page = service.get_page_by_id(page_id)
+    if not page:
+        return Response("Not found", 404)
 
     body = renderer.render(
         (route or {}).get("template", "html/admin/page/delete.html"),
-        {"title": "削除", "page": page},
+        {
+            "title": "削除",
+            "page": page,
+        },
         request=request,
     )
 
