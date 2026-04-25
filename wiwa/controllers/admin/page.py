@@ -1,6 +1,7 @@
 # パスとファイル名: wiwa/controllers/admin/page.py
 
 from urllib.parse import quote
+import builtins
 import json
 
 from wiwa.core.renderer import TemplateRenderer
@@ -22,7 +23,7 @@ def _normalize_body_json_for_editor(page):
         page["body_json"] = json.dumps(body_json, ensure_ascii=False)
         return page
 
-    if isinstance(body_json, list):
+    if isinstance(body_json, builtins.list):
         page["body_json"] = json.dumps({"blocks": body_json}, ensure_ascii=False)
         return page
 
