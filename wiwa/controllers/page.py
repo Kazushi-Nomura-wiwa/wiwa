@@ -2,7 +2,6 @@
 
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response
-from wiwa.db.connection import get_db
 from wiwa.services.page_service import PageService
 
 
@@ -10,8 +9,7 @@ renderer = TemplateRenderer()
 
 
 def slug(request, route=None, **params):
-    db = get_db()
-    service = PageService(db)
+    service = PageService()
 
     page_slug = (params.get("slug") or "").strip()
 
