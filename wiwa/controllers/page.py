@@ -11,15 +11,8 @@ renderer = TemplateRenderer()
 def slug(request, route=None, **params):
     service = PageService()
 
-    page_slug = (params.get("slug") or "").strip()
-
-    if not page_slug:
-        return Response(
-            body="固定ページが見つかりません。",
-            status="404 Not Found"
-        )
-
-    page = service.get_published_page_by_slug(page_slug)
+    # slugではなくpathで取得
+    page = service.get_page_by_path(request.path)
 
     if not page:
         return Response(
