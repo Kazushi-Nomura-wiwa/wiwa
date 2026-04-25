@@ -46,8 +46,6 @@ def new(request, route=None, **params):
             "slug": request.get_form("slug"),
             "body_json": request.get_form("body_json"),
             "status": request.get_form("status"),
-            "created_by": request.current_user.get("_id"),
-            "updated_by": request.current_user.get("_id"),
         })
 
         if error:
@@ -81,7 +79,6 @@ def edit(request, route=None, **params):
             "slug": request.get_form("slug"),
             "body_json": request.get_form("body_json"),
             "status": request.get_form("status"),
-            "updated_by": request.current_user.get("_id"),
         })
 
         if error:
