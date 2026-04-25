@@ -10,6 +10,7 @@
     {% endif %}
 
     <form id="page-form" action="/admin/page/new" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <p>
             <label for="title">タイトル</label><br>
             <input type="text" id="title" name="title" value="{{ form_data.title }}">

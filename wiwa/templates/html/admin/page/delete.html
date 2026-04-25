@@ -16,6 +16,7 @@
     </dl>
 
     <form action="/admin/page/delete/{{ page._id }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">削除する</button>
         <a href="/admin/page/list">キャンセル</a>
     </form>
