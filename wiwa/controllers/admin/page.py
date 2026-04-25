@@ -1,6 +1,7 @@
 # パスとファイル名: wiwa/controllers/admin/page.py
 
 from urllib.parse import quote
+import json
 
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response, redirect
@@ -12,6 +13,36 @@ renderer = TemplateRenderer()
 
 def _redirect_with_error(msg, path):
     return redirect(f"{path}?error=" + quote(msg))
+
+
+def _normalize_body_json_for_editor(page):
+    body_json = page.get("body_json", "")
+
+    if isinstance(body_json, dict):
+        page["body_json"] = json.dumps(body_json, ensure_ascii=False)
+        return page
+
+    if isinstance(body_json, list):
+        page["body_json"] = json.dumps({"blocks": body_json}, ensure_ascii=False)
+        return page
+
+    if not isinstance(body_json, str):
+        page["body_json"] = json.dumps({"blocks": []}, ensure_ascii=False)
+        return page
+
+    body_json = body_json.strip()
+
+    if not body_json:
+        page["body_json"] = json.dumps({"blocks": []}, ensure_ascii=False)
+        return page
+
+    try:
+        parsed = json.loads(body_json)
+        page["body_json"] = json.dumps(parsed, ensure_ascii=False)
+    except json.JSONDecodeError:
+        page["body_json"] = json.dumps({"blocks": []}, ensure_ascii=False)
+
+    return page
 
 
 def list(request, route=None, **params):
@@ -36,7 +67,7 @@ def new(request, route=None, **params):
     form_data = {
         "title": "",
         "slug": "",
-        "body_json": "",
+        "body_json": json.dumps({"blocks": []}, ensure_ascii=False),
         "status": "draft",
     }
 
@@ -87,11 +118,14 @@ def edit(request, route=None, **params):
 
         return redirect("/admin/page/list")
 
+    page = _normalize_body_json_for_editor(page)
+
     body = renderer.render(
         (route or {}).get("template", "html/admin/page/edit.html"),
         {
             "title": "固定ページ編集",
             "page": page,
+            "error_message": request.get_query("error", ""),
         },
         request=request,
     )
