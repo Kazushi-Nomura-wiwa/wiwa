@@ -1,109 +1,173 @@
 # パスとファイル名: wiwa/services/page_service.py
 
+from datetime import datetime
+from bson import ObjectId
 import json
-import re
 
-from wiwa.config import RESERVED_SLUGS
-from wiwa.db.page_repository import PageRepository
-from wiwa.services.editorjs_builder import EditorJSBuilder
+from wiwa.db.mongo import get_db
 
 
 class PageService:
     def __init__(self):
-        self.repository = PageRepository()
-        self.editorjs_builder = EditorJSBuilder()
+        self.db = get_db()
+        self.collection = self.db.pages
 
-    def list_pages(self):
-        return self.repository.find_all()
+    # ----------------------------
+    # 共通
+    # ----------------------------
 
-    def get_page_by_id(self, page_id: str):
-        return self.repository.find_by_id(page_id)
+    def _normalize_body_json(self, raw_body_json) -> str:
+        """
+        Editor.jsのJSONを安全に正規化して保存する。
+        MongoDBにはJSON文字列として保存する。
+        """
+        empty_data = {"blocks": []}
 
-    def get_published_page_by_slug(self, slug: str):
-        return self.repository.find_by_slug(slug)
+        if not raw_body_json:
+            return json.dumps(empty_data, ensure_ascii=False)
 
-    def create_page(self, data: dict):
-        clean_data = self._clean_page_data(data)
+        if isinstance(raw_body_json, dict):
+            return json.dumps(raw_body_json, ensure_ascii=False)
 
-        error = self._validate_page_data(clean_data)
-        if error:
-            return None, error
+        if isinstance(raw_body_json, list):
+            return json.dumps({"blocks": raw_body_json}, ensure_ascii=False)
 
-        if self.repository.find_any_by_slug(clean_data["slug"]):
-            return None, "同じスラッグの固定ページがすでに存在します。"
+        if not isinstance(raw_body_json, str):
+            return json.dumps(empty_data, ensure_ascii=False)
 
-        page_id = self.repository.create(clean_data)
-        return page_id, None
+        raw_body_json = raw_body_json.strip()
 
-    def update_page(self, page_id: str, data: dict):
-        clean_data = self._clean_page_data(data)
-
-        error = self._validate_page_data(clean_data)
-        if error:
-            return False, error
-
-        existing = self.repository.find_any_by_slug(clean_data["slug"])
-        if existing and str(existing["_id"]) != str(page_id):
-            return False, "同じスラッグの固定ページがすでに存在します。"
-
-        result = self.repository.update(page_id, clean_data)
-        return result, None
-
-    def delete_page(self, page_id: str):
-        return self.repository.delete(page_id)
-
-    def _clean_page_data(self, data: dict):
-        body_json = self._parse_body_json(data.get("body_json", ""))
-
-        return {
-            "title": data.get("title", "").strip(),
-            "slug": self._normalize_slug(data.get("slug", "")),
-            "body": self.editorjs_builder.build_html(body_json),
-            "body_json": body_json,
-            "status": data.get("status", "draft"),
-            "created_by": data.get("created_by"),
-            "updated_by": data.get("updated_by"),
-        }
-
-    def _parse_body_json(self, raw):
-        if isinstance(raw, dict):
-            return raw
-
-        if not raw:
-            return {"blocks": []}
+        if not raw_body_json:
+            return json.dumps(empty_data, ensure_ascii=False)
 
         try:
-            parsed = json.loads(raw)
+            parsed = json.loads(raw_body_json)
+        except json.JSONDecodeError:
+            return json.dumps(empty_data, ensure_ascii=False)
+
+        if isinstance(parsed, dict):
+            if "blocks" not in parsed:
+                parsed["blocks"] = []
+            return json.dumps(parsed, ensure_ascii=False)
+
+        if isinstance(parsed, list):
+            return json.dumps({"blocks": parsed}, ensure_ascii=False)
+
+        return json.dumps(empty_data, ensure_ascii=False)
+
+    def _build_path(self, slug: str, parent: dict | None = None) -> str:
+        slug = (slug or "").strip().strip("/")
+
+        if parent:
+            parent_path = (parent.get("path") or "").rstrip("/")
+            return f"{parent_path}/{slug}"
+
+        return f"/{slug}"
+
+    # ----------------------------
+    # Create
+    # ----------------------------
+
+    def create_page(self, data: dict) -> tuple[str | None, str | None]:
+        title = (data.get("title") or "").strip()
+        slug = (data.get("slug") or "").strip().strip("/")
+        raw_body_json = data.get("body_json", "")
+        status = (data.get("status") or "draft").strip()
+
+        if not title:
+            return None, "タイトルは必須です。"
+
+        if not slug:
+            return None, "スラッグは必須です。"
+
+        body_json = self._normalize_body_json(raw_body_json)
+        path = self._build_path(slug)
+
+        now = datetime.utcnow()
+
+        doc = {
+            "title": title,
+            "slug": slug,
+            "path": path,
+            "body_json": body_json,
+            "status": status,
+            "created_at": now,
+            "updated_at": now,
+        }
+
+        try:
+            result = self.collection.insert_one(doc)
+            return str(result.inserted_id), None
         except Exception:
-            return {"blocks": []}
+            return None, "ページの保存に失敗しました。"
 
-        if not isinstance(parsed, dict):
-            return {"blocks": []}
+    # ----------------------------
+    # Read
+    # ----------------------------
 
-        return parsed
+    def list_pages(self) -> list[dict]:
+        return list(self.collection.find().sort("created_at", -1))
 
-    def _validate_page_data(self, data: dict):
-        if not data["title"]:
-            return "タイトルを入力してください。"
+    def get_page_by_id(self, page_id: str) -> dict | None:
+        try:
+            return self.collection.find_one({"_id": ObjectId(page_id)})
+        except Exception:
+            return None
 
-        if not data["slug"]:
-            return "スラッグを入力してください。"
+    def get_page_by_path(self, path: str) -> dict | None:
+        return self.collection.find_one({
+            "path": path,
+            "status": "published",
+        })
 
-        if data["slug"] in RESERVED_SLUGS:
-            return "このスラッグは使用できません。"
+    # ----------------------------
+    # Update
+    # ----------------------------
 
-        if "/" in data["slug"]:
-            return "スラッグに / は使えません。"
+    def update_page(self, page_id: str, data: dict) -> tuple[bool, str | None]:
+        page = self.get_page_by_id(page_id)
+        if not page:
+            return False, "ページが見つかりません。"
 
-        if not re.fullmatch(r"[a-z0-9_-]+", data["slug"]):
-            return "スラッグ形式が不正です。"
+        title = (data.get("title") or "").strip()
+        slug = (data.get("slug") or "").strip().strip("/")
+        raw_body_json = data.get("body_json", "")
+        status = (data.get("status") or "draft").strip()
 
-        if data["status"] not in ["draft", "published"]:
-            return "公開状態が不正です。"
+        if not title:
+            return False, "タイトルは必須です。"
 
-        return None
+        if not slug:
+            return False, "スラッグは必須です。"
 
-    def _normalize_slug(self, slug: str):
-        slug = slug.strip().lower()
-        slug = re.sub(r"\s+", "-", slug)
-        return slug
+        body_json = self._normalize_body_json(raw_body_json)
+        path = self._build_path(slug)
+
+        update_doc = {
+            "title": title,
+            "slug": slug,
+            "path": path,
+            "body_json": body_json,
+            "status": status,
+            "updated_at": datetime.utcnow(),
+        }
+
+        try:
+            self.collection.update_one(
+                {"_id": ObjectId(page_id)},
+                {"$set": update_doc},
+            )
+            return True, None
+        except Exception:
+            return False, "更新に失敗しました。"
+
+    # ----------------------------
+    # Delete
+    # ----------------------------
+
+    def delete_page(self, page_id: str) -> bool:
+        try:
+            result = self.collection.delete_one({"_id": ObjectId(page_id)})
+            return result.deleted_count > 0
+        except Exception:
+            return False
