@@ -5,6 +5,7 @@ from xml.sax.saxutils import escape
 from wiwa.config import SITE_URL
 from wiwa.core.resolver import Resolver
 from wiwa.core.response import Response
+from wiwa.db.mongo import get_collection
 from wiwa.db.post_repository import PostRepository
 
 
@@ -104,6 +105,16 @@ def build_absolute_url(path: str) -> str:
     return f"{SITE_URL}{path}"
 
 
+def format_lastmod(value) -> str:
+    if not value:
+        return ""
+
+    if hasattr(value, "strftime"):
+        return value.strftime("%Y-%m-%d")
+
+    return ""
+
+
 def list_post_urls() -> list[dict]:
     post_repo = PostRepository()
     posts = post_repo.list_published(limit=10000, skip=0)
@@ -123,10 +134,46 @@ def list_post_urls() -> list[dict]:
 
         items.append({
             "loc": f"{SITE_URL}/post/{slug}",
-            "lastmod": updated_at.strftime("%Y-%m-%d") if updated_at else "",
+            "lastmod": format_lastmod(updated_at),
         })
 
     return items
+
+
+def list_page_urls() -> list[dict]:
+    pages = (
+        get_collection("pages")
+        .find({"status": "published"})
+        .sort("updated_at", -1)
+    )
+
+    items = []
+
+    for page in pages:
+        slug = (page.get("slug") or "").strip()
+        if not slug:
+            continue
+
+        updated_at = (
+            page.get("updated_at")
+            or page.get("published_at")
+            or page.get("created_at")
+        )
+
+        items.append({
+            "loc": f"{SITE_URL}/{slug}",
+            "lastmod": format_lastmod(updated_at),
+        })
+
+    return items
+
+
+def append_url(xml_lines: list[str], loc: str, lastmod: str = ""):
+    xml_lines.append("  <url>")
+    xml_lines.append(f"    <loc>{escape(loc)}</loc>")
+    if lastmod:
+        xml_lines.append(f"    <lastmod>{lastmod}</lastmod>")
+    xml_lines.append("  </url>")
 
 
 def index(request, route=None, **params):
@@ -135,19 +182,17 @@ def index(request, route=None, **params):
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ]
 
-    # 固定ページ
+    # 静的ページ
     for path in list_static_urls():
-        xml_lines.append("  <url>")
-        xml_lines.append(f"    <loc>{escape(build_absolute_url(path))}</loc>")
-        xml_lines.append("  </url>")
+        append_url(xml_lines, build_absolute_url(path))
 
     # 投稿ページ
     for item in list_post_urls():
-        xml_lines.append("  <url>")
-        xml_lines.append(f"    <loc>{escape(item['loc'])}</loc>")
-        if item["lastmod"]:
-            xml_lines.append(f"    <lastmod>{item['lastmod']}</lastmod>")
-        xml_lines.append("  </url>")
+        append_url(xml_lines, item["loc"], item["lastmod"])
+
+    # 固定ページ
+    for item in list_page_urls():
+        append_url(xml_lines, item["loc"], item["lastmod"])
 
     xml_lines.append("</urlset>")
 
