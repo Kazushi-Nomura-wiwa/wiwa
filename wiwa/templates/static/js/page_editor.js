@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function(){
     const form = document.getElementById("page-form");
     const editorHolder = document.getElementById("editorjs");
     const bodyJsonInput = document.getElementById("body_json");
+    const initialDataElement = document.getElementById("editorjs-initial-data");
 
     if (!form || !editorHolder || !bodyJsonInput) {
         return;
@@ -13,17 +14,18 @@ document.addEventListener("DOMContentLoaded", function(){
         blocks: []
     };
 
-    const rawBodyJson = bodyJsonInput.value.trim();
+    if (initialDataElement) {
+        const rawJson = initialDataElement.textContent.trim();
 
-    if (rawBodyJson) {
-        try {
-            const parsedData = JSON.parse(rawBodyJson);
-
-            if (parsedData && Array.isArray(parsedData.blocks)) {
-                initialData = parsedData;
+        if (rawJson) {
+            try {
+                initialData = JSON.parse(rawJson);
+            } catch (error) {
+                console.error("Editor.js initial data parse error:", error);
+                initialData = {
+                    blocks: []
+                };
             }
-        } catch (error) {
-            console.error("Editor.js initial data parse error:", error);
         }
     }
 

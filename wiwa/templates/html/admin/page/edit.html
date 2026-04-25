@@ -24,7 +24,11 @@
         <div>
             <p>本文</p>
             <div id="editorjs"></div>
-            <input type="hidden" id="body_json" name="body_json" value='{{ page.body_json | e }}'>
+            <input type="hidden" id="body_json" name="body_json" value="">
+
+            <script id="editorjs-initial-data" type="application/json">
+            {{ page.body_json | safe }}
+            </script>
         </div>
 
         <p>
