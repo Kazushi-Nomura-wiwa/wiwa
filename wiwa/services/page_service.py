@@ -1,16 +1,17 @@
 # パスとファイル名: wiwa/services/page_service.py
 
-import html
 import json
 import re
 
 from wiwa.config import RESERVED_SLUGS
 from wiwa.db.page_repository import PageRepository
+from wiwa.services.editorjs_builder import EditorJSBuilder
 
 
 class PageService:
     def __init__(self):
         self.repository = PageRepository()
+        self.editorjs_builder = EditorJSBuilder()
 
     def list_pages(self):
         return self.repository.find_all()
@@ -57,7 +58,7 @@ class PageService:
         return {
             "title": data.get("title", "").strip(),
             "slug": self._normalize_slug(data.get("slug", "")),
-            "body": self._build_html_from_editorjs(body_json),
+            "body": self.editorjs_builder.build_html(body_json),
             "body_json": body_json,
             "status": data.get("status", "draft"),
             "created_by": data.get("created_by"),
@@ -72,33 +73,14 @@ class PageService:
             return {"blocks": []}
 
         try:
-            return json.loads(raw)
+            parsed = json.loads(raw)
         except Exception:
             return {"blocks": []}
 
-    def _build_html_from_editorjs(self, body_json: dict):
-        blocks = body_json.get("blocks", [])
-        html_parts = []
+        if not isinstance(parsed, dict):
+            return {"blocks": []}
 
-        for block in blocks:
-            t = block.get("type")
-            d = block.get("data", {})
-
-            if t == "paragraph":
-                html_parts.append(f"<p>{html.escape(d.get('text', ''))}</p>")
-
-            elif t == "header":
-                level = min(max(int(d.get("level", 2)), 2), 4)
-                html_parts.append(f"<h{level}>{html.escape(d.get('text', ''))}</h{level}>")
-
-            elif t == "list":
-                tag = "ol" if d.get("style") == "ordered" else "ul"
-                html_parts.append(f"<{tag}>")
-                for item in d.get("items", []):
-                    html_parts.append(f"<li>{html.escape(str(item))}</li>")
-                html_parts.append(f"</{tag}>")
-
-        return "\n".join(html_parts)
+        return parsed
 
     def _validate_page_data(self, data: dict):
         if not data["title"]:
@@ -115,6 +97,9 @@ class PageService:
 
         if not re.fullmatch(r"[a-z0-9_-]+", data["slug"]):
             return "スラッグ形式が不正です。"
+
+        if data["status"] not in ["draft", "published"]:
+            return "公開状態が不正です。"
 
         return None
 
