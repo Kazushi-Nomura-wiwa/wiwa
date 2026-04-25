@@ -14,12 +14,18 @@ def slug(request, route=None, **params):
     page_slug = (params.get("slug") or "").strip()
 
     if not page_slug:
-        return Response(body="固定ページが見つかりません。", status=404)
+        return Response(
+            body="固定ページが見つかりません。",
+            status="404 Not Found"
+        )
 
     page = service.get_published_page_by_slug(page_slug)
 
     if not page:
-        return Response(body="固定ページが見つかりません。", status=404)
+        return Response(
+            body="固定ページが見つかりません。",
+            status="404 Not Found"
+        )
 
     template_name = (route or {}).get("template", "html/page/slug.html")
 
