@@ -9,8 +9,8 @@ from wiwa.db.page_repository import PageRepository
 
 
 class PageService:
-    def __init__(self, db):
-        self.repository = PageRepository(db)
+    def __init__(self):
+        self.repository = PageRepository()
 
     def list_pages(self):
         return self.repository.find_all()
@@ -64,71 +64,37 @@ class PageService:
             "updated_by": data.get("updated_by"),
         }
 
-    def _parse_body_json(self, raw_body_json):
-        if isinstance(raw_body_json, dict):
-            return raw_body_json
+    def _parse_body_json(self, raw):
+        if isinstance(raw, dict):
+            return raw
 
-        if not raw_body_json:
-            return {
-                "time": None,
-                "blocks": [],
-                "version": "",
-            }
+        if not raw:
+            return {"blocks": []}
 
         try:
-            parsed = json.loads(raw_body_json)
-        except json.JSONDecodeError:
-            return {
-                "time": None,
-                "blocks": [],
-                "version": "",
-            }
-
-        if not isinstance(parsed, dict):
-            return {
-                "time": None,
-                "blocks": [],
-                "version": "",
-            }
-
-        return parsed
+            return json.loads(raw)
+        except Exception:
+            return {"blocks": []}
 
     def _build_html_from_editorjs(self, body_json: dict):
         blocks = body_json.get("blocks", [])
-
-        if not isinstance(blocks, list):
-            return ""
-
         html_parts = []
 
         for block in blocks:
-            if not isinstance(block, dict):
-                continue
+            t = block.get("type")
+            d = block.get("data", {})
 
-            block_type = block.get("type")
-            data = block.get("data", {})
+            if t == "paragraph":
+                html_parts.append(f"<p>{html.escape(d.get('text', ''))}</p>")
 
-            if block_type == "paragraph":
-                text = html.escape(data.get("text", ""))
-                html_parts.append(f"<p>{text}</p>")
+            elif t == "header":
+                level = min(max(int(d.get("level", 2)), 2), 4)
+                html_parts.append(f"<h{level}>{html.escape(d.get('text', ''))}</h{level}>")
 
-            elif block_type == "header":
-                text = html.escape(data.get("text", ""))
-                level = int(data.get("level", 2))
-
-                if level < 2 or level > 4:
-                    level = 2
-
-                html_parts.append(f"<h{level}>{text}</h{level}>")
-
-            elif block_type == "list":
-                items = data.get("items", [])
-                style = data.get("style", "unordered")
-
-                tag = "ol" if style == "ordered" else "ul"
-
+            elif t == "list":
+                tag = "ol" if d.get("style") == "ordered" else "ul"
                 html_parts.append(f"<{tag}>")
-                for item in items:
+                for item in d.get("items", []):
                     html_parts.append(f"<li>{html.escape(str(item))}</li>")
                 html_parts.append(f"</{tag}>")
 
@@ -142,16 +108,13 @@ class PageService:
             return "スラッグを入力してください。"
 
         if data["slug"] in RESERVED_SLUGS:
-            return "このスラッグは予約されているため使用できません。"
+            return "このスラッグは使用できません。"
 
         if "/" in data["slug"]:
-            return "スラッグに / は使用できません。"
+            return "スラッグに / は使えません。"
 
         if not re.fullmatch(r"[a-z0-9_-]+", data["slug"]):
-            return "スラッグには半角英数字、ハイフン、アンダースコアのみ使用できます。"
-
-        if data["status"] not in ["draft", "published"]:
-            return "公開状態が不正です。"
+            return "スラッグ形式が不正です。"
 
         return None
 

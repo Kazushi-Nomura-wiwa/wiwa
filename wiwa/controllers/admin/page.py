@@ -4,30 +4,25 @@ from urllib.parse import quote
 
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response, redirect
-from wiwa.db.connection import get_db
 from wiwa.services.page_service import PageService
 
 
 renderer = TemplateRenderer()
 
 
-def _redirect_with_error(message: str, path: str):
-    return redirect(f"{path}?error=" + quote(message))
+def _redirect_with_error(msg, path):
+    return redirect(f"{path}?error=" + quote(msg))
 
 
 def list(request, route=None, **params):
-    db = get_db()
-    service = PageService(db)
-
-    error_message = request.get_query("error", "")
-    template_name = (route or {}).get("template", "html/admin/page/list.html")
+    service = PageService()
 
     body = renderer.render(
-        template_name,
+        (route or {}).get("template", "html/admin/page/list.html"),
         {
             "title": "固定ページ一覧",
             "pages": service.list_pages(),
-            "error_message": error_message,
+            "error_message": request.get_query("error", ""),
         },
         request=request,
     )
@@ -36,43 +31,26 @@ def list(request, route=None, **params):
 
 
 def new(request, route=None, **params):
-    db = get_db()
-    service = PageService(db)
-
-    error_message = ""
-    form_data = {
-        "title": "",
-        "slug": "",
-        "body_json": "",
-        "status": "draft",
-    }
+    service = PageService()
 
     if request.method == "POST":
-        data = {
+        page_id, error = service.create_page({
             "title": request.get_form("title"),
             "slug": request.get_form("slug"),
             "body_json": request.get_form("body_json"),
-            "status": request.get_form("status") or "draft",
+            "status": request.get_form("status"),
             "created_by": request.current_user.get("_id"),
             "updated_by": request.current_user.get("_id"),
-        }
-
-        page_id, error = service.create_page(data)
+        })
 
         if error:
             return _redirect_with_error(error, "/admin/page/new")
 
         return redirect("/admin/page/list")
 
-    template_name = (route or {}).get("template", "html/admin/page/new.html")
-
     body = renderer.render(
-        template_name,
-        {
-            "title": "固定ページ作成",
-            "error_message": error_message,
-            "form_data": form_data,
-        },
+        (route or {}).get("template", "html/admin/page/new.html"),
+        {"title": "固定ページ作成"},
         request=request,
     )
 
@@ -80,41 +58,30 @@ def new(request, route=None, **params):
 
 
 def edit(request, route=None, **params):
-    db = get_db()
-    service = PageService(db)
-
+    service = PageService()
     page_id = (params.get("id") or "").strip()
-    if not page_id:
-        return _redirect_with_error("id が不正です。", "/admin/page/list")
 
     page = service.get_page_by_id(page_id)
     if not page:
-        return _redirect_with_error("固定ページが見つかりません。", "/admin/page/list")
+        return Response("Not found", 404)
 
     if request.method == "POST":
-        data = {
+        success, error = service.update_page(page_id, {
             "title": request.get_form("title"),
             "slug": request.get_form("slug"),
             "body_json": request.get_form("body_json"),
-            "status": request.get_form("status") or "draft",
+            "status": request.get_form("status"),
             "updated_by": request.current_user.get("_id"),
-        }
-
-        success, error = service.update_page(page_id, data)
+        })
 
         if error:
             return _redirect_with_error(error, f"/admin/page/edit/{page_id}")
 
         return redirect("/admin/page/list")
 
-    template_name = (route or {}).get("template", "html/admin/page/edit.html")
-
     body = renderer.render(
-        template_name,
-        {
-            "title": "固定ページ編集",
-            "page": page,
-        },
+        (route or {}).get("template", "html/admin/page/edit.html"),
+        {"title": "固定ページ編集", "page": page},
         request=request,
     )
 
@@ -122,29 +89,18 @@ def edit(request, route=None, **params):
 
 
 def delete(request, route=None, **params):
-    db = get_db()
-    service = PageService(db)
-
+    service = PageService()
     page_id = (params.get("id") or "").strip()
-    if not page_id:
-        return _redirect_with_error("id が不正です。", "/admin/page/list")
-
-    page = service.get_page_by_id(page_id)
-    if not page:
-        return _redirect_with_error("固定ページが見つかりません。", "/admin/page/list")
 
     if request.method == "POST":
         service.delete_page(page_id)
         return redirect("/admin/page/list")
 
-    template_name = (route or {}).get("template", "html/admin/page/delete.html")
+    page = service.get_page_by_id(page_id)
 
     body = renderer.render(
-        template_name,
-        {
-            "title": "固定ページ削除",
-            "page": page,
-        },
+        (route or {}).get("template", "html/admin/page/delete.html"),
+        {"title": "削除", "page": page},
         request=request,
     )
 
