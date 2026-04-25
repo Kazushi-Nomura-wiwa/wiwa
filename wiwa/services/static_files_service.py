@@ -15,11 +15,21 @@ def normalize_static_path(static_path: str) -> str | None:
     normalized = static_path.strip("/")
 
     theme_prefix = f"themes/{ACTIVE_THEME}/"
+
     if normalized.startswith(theme_prefix):
         return normalized
 
     if normalized.startswith("themes/"):
         return None
+
+    if normalized.startswith("js/"):
+        return normalized
+
+    if normalized.startswith("css/"):
+        return normalized
+
+    if normalized.startswith("img/"):
+        return normalized
 
     return f"themes/{ACTIVE_THEME}/{normalized}"
 
