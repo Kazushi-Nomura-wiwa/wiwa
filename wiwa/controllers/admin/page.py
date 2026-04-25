@@ -33,6 +33,13 @@ def list(request, route=None, **params):
 def new(request, route=None, **params):
     service = PageService()
 
+    form_data = {
+        "title": "",
+        "slug": "",
+        "body_json": "",
+        "status": "draft",
+    }
+
     if request.method == "POST":
         page_id, error = service.create_page({
             "title": request.get_form("title"),
@@ -50,12 +57,15 @@ def new(request, route=None, **params):
 
     body = renderer.render(
         (route or {}).get("template", "html/admin/page/new.html"),
-        {"title": "固定ページ作成"},
+        {
+            "title": "固定ページ作成",
+            "form_data": form_data,
+            "error_message": request.get_query("error", ""),
+        },
         request=request,
     )
 
     return Response(body=body)
-
 
 def edit(request, route=None, **params):
     service = PageService()
