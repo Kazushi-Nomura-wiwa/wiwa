@@ -1,0 +1,23 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/page/delete.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>{{ title }}</h2>
+
+    <p>以下の固定ページを削除します。</p>
+
+    <dl>
+        <dt>タイトル</dt>
+        <dd>{{ page.title }}</dd>
+
+        <dt>URL</dt>
+        <dd>/{{ page.slug }}</dd>
+    </dl>
+
+    <form action="/admin/page/delete/{{ page._id }}" method="post">
+        <button type="submit">削除する</button>
+        <a href="/admin/page/list">キャンセル</a>
+    </form>
+</section>
+{% endblock %}

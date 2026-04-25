@@ -1,0 +1,38 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/page/list.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>{{ title }}</h2>
+
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+
+    <p><a href="/admin/page/new">固定ページを作成</a></p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>タイトル</th>
+                <th>URL</th>
+                <th>状態</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for page in pages %}
+            <tr>
+                <td>{{ page.title }}</td>
+                <td><a href="/{{ page.slug }}" target="_blank">/{{ page.slug }}</a></td>
+                <td>{{ page.status }}</td>
+                <td>
+                    <a href="/admin/page/edit/{{ page._id }}">編集</a>
+                    <a href="/admin/page/delete/{{ page._id }}">削除</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

@@ -1,0 +1,48 @@
+<!-- パスとファイル名: wiwa/templates/html/admin/page/edit.html -->
+{% extends "layouts/admin_base.html" %}
+
+{% block content %}
+<section>
+    <h2>{{ title }}</h2>
+
+    {% if error_message %}
+        <p>{{ error_message }}</p>
+    {% endif %}
+
+    <form id="page-form" action="/admin/page/edit/{{ page._id }}" method="post">
+        <p>
+            <label for="title">タイトル</label><br>
+            <input type="text" id="title" name="title" value="{{ page.title }}">
+        </p>
+
+        <p>
+            <label for="slug">スラッグ</label><br>
+            <input type="text" id="slug" name="slug" value="{{ page.slug }}">
+        </p>
+
+        <div>
+            <p>本文</p>
+            <div id="editorjs"></div>
+            <input type="hidden" id="body_json" name="body_json" value="">
+        </div>
+
+        <p>
+            <label for="status">状態</label><br>
+            <select id="status" name="status">
+                <option value="draft" {% if page.status == "draft" %}selected{% endif %}>下書き</option>
+                <option value="published" {% if page.status == "published" %}selected{% endif %}>公開</option>
+            </select>
+        </p>
+
+        <p>
+            <button type="submit">更新する</button>
+            <a href="/admin/page/list">戻る</a>
+        </p>
+    </form>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+<script src="/static/js/admin/page_editor.js"></script>
+{% endblock %}

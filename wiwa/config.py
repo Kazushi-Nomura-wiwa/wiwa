@@ -90,3 +90,20 @@ CSRF_TOKEN_BYTES = 32
 # ------------------------------
 # ログが自動削除されるまでの日数（MongoDB TTL）
 ACCESS_LOG_RETENTION_DAYS = 90
+
+# ------------------------------
+# 予約されたスラッグ
+# ------------------------------
+# これらのスラッグは固定ページで使用できないようにする
+RESERVED_SLUGS = [
+    "admin",
+    "mypage",
+    "auth",
+    "post",
+    "tag",
+    "search",
+    "index",
+    "api",
+    "static",
+    "assets",
+]

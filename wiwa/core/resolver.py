@@ -1,6 +1,8 @@
 # パスとファイル名: wiwa/core/resolver.py
 import importlib
 
+from wiwa.config import RESERVED_SLUGS
+
 
 class Resolver:
     DYNAMIC_NAMES = ["slug", "id", "name", "query"]
@@ -16,6 +18,10 @@ class Resolver:
         dynamic_result = self._resolve_dynamic(parts)
         if dynamic_result:
             return self._attach_meta(dynamic_result, parts, method)
+
+        page_result = self._resolve_page_fallback(parts)
+        if page_result:
+            return self._attach_meta(page_result, parts, method)
 
         return None
 
@@ -97,6 +103,29 @@ class Resolver:
             }
 
         return None
+
+    def _resolve_page_fallback(self, parts: list[str]) -> dict | None:
+        if len(parts) != 1:
+            return None
+
+        slug = parts[0].strip().lower()
+
+        if not slug:
+            return None
+
+        if slug in RESERVED_SLUGS:
+            return None
+
+        if not self._handler_exists("page.slug"):
+            return None
+
+        return {
+            "handler": "page.slug",
+            "template": "html/page/slug.html",
+            "params": {
+                "slug": slug,
+            },
+        }
 
     def _build_dynamic_template_parts(
         self,
