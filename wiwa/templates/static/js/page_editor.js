@@ -13,13 +13,17 @@ document.addEventListener("DOMContentLoaded", function(){
         blocks: []
     };
 
-    if (bodyJsonInput.value) {
+    const rawBodyJson = bodyJsonInput.value.trim();
+
+    if (rawBodyJson) {
         try {
-            initialData = JSON.parse(bodyJsonInput.value);
+            const parsedData = JSON.parse(rawBodyJson);
+
+            if (parsedData && Array.isArray(parsedData.blocks)) {
+                initialData = parsedData;
+            }
         } catch (error) {
-            initialData = {
-                blocks: []
-            };
+            console.error("Editor.js initial data parse error:", error);
         }
     }
 
