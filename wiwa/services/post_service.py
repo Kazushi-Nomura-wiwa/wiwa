@@ -1,5 +1,8 @@
 # パスとファイル名: wiwa/services/post_service.py
+
 from datetime import UTC, datetime
+
+from pymongo.errors import DuplicateKeyError
 
 from wiwa.db.post_repository import PostRepository
 from wiwa.db.users_repository import UsersRepository
@@ -22,29 +25,40 @@ class PostService:
     ) -> str:
         now = datetime.now(UTC)
 
-        final_slug = self._build_unique_slug(
-            raw_slug=title,
-            fallback_source=title,
-        )
+        base_slug = self.post_repo.normalize_slug(title)
 
-        post = {
-            "title": title,
-            "body": body,
-            "slug": final_slug,
-            "tags": tags or [],
-            "author_id": author_id,
-            "author_name": author_name,
-            "status": status,
-            "created_at": now,
-            "updated_at": now,
-        }
+        if not base_slug:
+            base_slug = self._generate_fallback_slug()
 
-        if status == "published":
-            post["published_at"] = now
-        else:
-            post["published_at"] = None
+        counter = 1
 
-        return self.post_repo.insert_post(post)
+        while True:
+            if counter == 1:
+                final_slug = base_slug
+            else:
+                final_slug = f"{base_slug}-{counter}"
+
+            post = {
+                "title": title,
+                "body": body,
+                "slug": final_slug,
+                "tags": tags or [],
+                "author_id": author_id,
+                "author_name": author_name,
+                "status": status,
+                "created_at": now,
+                "updated_at": now,
+            }
+
+            if status == "published":
+                post["published_at"] = now
+            else:
+                post["published_at"] = None
+
+            try:
+                return self.post_repo.insert_post(post)
+            except DuplicateKeyError:
+                counter += 1
 
     def update_post(
         self,
