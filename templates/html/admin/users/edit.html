@@ -98,6 +98,7 @@
 
     <form method="post" action="/admin/users/delete" onsubmit="return confirm('このユーザーを削除しますか？');">
         <input type="hidden" name="user_id" value="{{ user._id }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">削除する</button>
     </form>
     {% endif %}
