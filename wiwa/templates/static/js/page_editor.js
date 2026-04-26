@@ -33,7 +33,16 @@ document.addEventListener("DOMContentLoaded", function(){
         holder: "editorjs",
         tools: {
             header: Header,
-            list: EditorjsList
+            list: EditorjsList,
+
+            table: {
+                class: Table,
+                inlineToolbar: true,
+                config: {
+                    rows: 2,
+                    cols: 2
+                }
+            }
         },
         data: initialData
     });
