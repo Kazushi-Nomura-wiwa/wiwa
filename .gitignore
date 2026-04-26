@@ -37,3 +37,11 @@ dist/
 # Coverage
 .coverage
 htmlcov/
+
+# Static files
+uploads/img/*
+!uploads/img/.gitkeep
+uploads/file/*
+!uploads/file/.gitkeep
+uploads/tmp/*
+!uploads/tmp/.gitkeep
