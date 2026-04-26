@@ -14,9 +14,7 @@ PORT = 8000
 # ------------------------------
 # パス設定
 # ------------------------------
-# ------------------------------
-# パス設定
-# ------------------------------
+
 # このファイル（config.py）のディレクトリ
 PACKAGE_DIR = Path(__file__).resolve().parent
 
@@ -49,6 +47,12 @@ UPLOAD_TMP_DIR = UPLOAD_BASE / "tmp"
 
 # 一時ファイルアップロードURL
 UPLOAD_TMP_URL_PREFIX = "/uploads/tmp"
+
+# テーマファイルのベースディレクトリ
+THEME_BASE = BASE_DIR / "themes"
+
+# テーマURL
+THEME_URL_PREFIX = "/themes"
 
 # ------------------------------
 # MongoDB設定

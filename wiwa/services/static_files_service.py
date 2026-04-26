@@ -17,12 +17,15 @@ def normalize_static_path(static_path: str) -> str | None:
 
     theme_prefix = f"themes/{ACTIVE_THEME}/"
 
+    # すでに themes/default/... の形ならそのまま
     if normalized.startswith(theme_prefix):
         return normalized
 
+    # 他テーマへの直接アクセスは禁止
     if normalized.startswith("themes/"):
         return None
 
+    # 直下許可（js/css/img）
     if normalized.startswith("js/"):
         return normalized
 
@@ -32,11 +35,13 @@ def normalize_static_path(static_path: str) -> str | None:
     if normalized.startswith("img/"):
         return normalized
 
+    # それ以外は themes/default 配下にフォールバック
     return f"themes/{ACTIVE_THEME}/{normalized}"
 
 
 def serve_static(request: Request) -> Response:
     static_base_dir = get_static_base_dir().resolve()
+
     raw_static_path = request.path.removeprefix("/static/")
     static_path = normalize_static_path(raw_static_path)
 
@@ -45,6 +50,7 @@ def serve_static(request: Request) -> Response:
 
     file_path = (static_base_dir / static_path).resolve()
 
+    # ディレクトリトラバーサル防止
     if not str(file_path).startswith(str(static_base_dir)):
         return not_found()
 
