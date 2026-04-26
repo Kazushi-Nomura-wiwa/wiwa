@@ -1,32 +1,31 @@
 # パスとファイル名: wiwa/controllers/mypage/post.py
+
 from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import forbidden, html, not_found, redirect
+from wiwa.services.post_form_service import (
+    current_user_info,
+    empty_post_form,
+    post_to_form,
+    split_tags,
+    submitted_post_form,
+    validate_post_form,
+)
 from wiwa.services.post_service import PostService
 from wiwa.utils.csrf import get_csrf_token, validate_csrf
+
 
 renderer = TemplateRenderer()
 post_service = PostService()
 
 
-def _current_user_info(request) -> tuple[str, str]:
-    current_user = request.user or {}
-    author_id = str(current_user.get("_id", "") or "")
-    author_name = current_user.get("username", "") or ""
-    return author_id, author_name
-
-
-def _split_tags(raw_tags: str) -> list[str]:
-    return raw_tags.replace("　", " ").split()
-
-
 def list(request, route=None):
-    author_id, _ = _current_user_info(request)
+    author_id, _ = current_user_info(request)
     posts = post_service.list_posts(author_id=author_id)
 
-    template_name = (route or {}).get("template", "html/mypage/post/list.html")
-    body = renderer.render(
-        template_name,
+    body = renderer.render_route(
+        route,
+        "html/mypage/post/list.html",
         {
             "title": "My Post List",
             "posts": posts,
@@ -38,12 +37,12 @@ def list(request, route=None):
 
 
 def trash(request, route=None):
-    author_id, _ = _current_user_info(request)
+    author_id, _ = current_user_info(request)
     posts = post_service.list_posts(author_id=author_id, include_trashed=True)
 
-    template_name = (route or {}).get("template", "html/mypage/post/trash.html")
-    body = renderer.render(
-        template_name,
+    body = renderer.render_route(
+        route,
+        "html/mypage/post/trash.html",
         {
             "title": "My Trash Post List",
             "posts": posts,
@@ -55,24 +54,17 @@ def trash(request, route=None):
 
 
 def new(request, route=None):
-    template_name = (route or {}).get("template", "html/mypage/post/new.html")
-
     if request.method == "GET":
-        body = renderer.render(
-            template_name,
+        body = renderer.render_route(
+            route,
+            "html/mypage/post/new.html",
             {
                 "title": "New Post",
                 "error": "",
                 "action": "/mypage/post/new",
                 "submit_label": "投稿する",
                 "csrf_token": get_csrf_token(request),
-                "form": {
-                    "_id": "",
-                    "title": "",
-                    "body": "",
-                    "tags": "",
-                    "status": "published",
-                },
+                "form": empty_post_form(),
             },
             request=request,
         )
@@ -81,69 +73,55 @@ def new(request, route=None):
     if not validate_csrf(request):
         return forbidden()
 
-    title = request.get_form("title").strip()
-    body_text = request.get_form("body").strip()
-    raw_tags = request.get_form("tags").strip()
-    tags = _split_tags(raw_tags)
-    status = request.get_form("status", "published").strip() or "published"
+    form = submitted_post_form(request)
+    error = validate_post_form(form)
 
-    if not title or not body_text:
-        body = renderer.render(
-            template_name,
+    if error:
+        body = renderer.render_route(
+            route,
+            "html/mypage/post/new.html",
             {
                 "title": "New Post",
-                "error": "title と body は必須です。",
+                "error": error,
                 "action": "/mypage/post/new",
                 "submit_label": "投稿する",
                 "csrf_token": get_csrf_token(request),
-                "form": {
-                    "_id": "",
-                    "title": title,
-                    "body": body_text,
-                    "tags": raw_tags,
-                    "status": status,
-                },
+                "form": form,
             },
             request=request,
         )
         return html(body, status="400 Bad Request")
 
-    author_id, author_name = _current_user_info(request)
+    author_id, author_name = current_user_info(request)
 
     post_service.create_post(
-        title=title,
-        body=body_text,
+        title=form["title"],
+        body=form["body"],
         author_id=author_id,
         author_name=author_name,
-        status=status,
-        tags=tags,
+        status=form["status"],
+        tags=split_tags(form["tags"]),
     )
 
     return redirect("/mypage/post/list")
 
 
 def edit(request, route=None, id=None):
-    author_id, _ = _current_user_info(request)
+    author_id, _ = current_user_info(request)
     post = post_service.find_own_post(id, author_id)
     if not post:
         return not_found()
 
-    template_name = (route or {}).get("template", "html/mypage/post/edit.html")
-    body = renderer.render(
-        template_name,
+    body = renderer.render_route(
+        route,
+        "html/mypage/post/edit.html",
         {
             "title": "Edit Post",
             "error": "",
             "action": f"/mypage/post/update/{id}",
             "submit_label": "更新する",
             "csrf_token": get_csrf_token(request),
-            "form": {
-                "_id": str(post.get("_id", "")),
-                "title": post.get("title", ""),
-                "body": post.get("body", ""),
-                "tags": " ".join(post.get("tags", [])),
-                "status": post.get("status", "published"),
-            },
+            "form": post_to_form(post),
         },
         request=request,
     )
@@ -157,56 +135,44 @@ def update(request, route=None, id=None):
     if not validate_csrf(request):
         return forbidden()
 
-    author_id, current_username = _current_user_info(request)
+    author_id, current_username = current_user_info(request)
     post = post_service.find_own_post(id, author_id)
     if not post:
         return not_found()
 
-    title = request.get_form("title").strip()
-    body_text = request.get_form("body").strip()
-    raw_tags = request.get_form("tags").strip()
-    tags = _split_tags(raw_tags)
-    status = request.get_form("status", "published").strip() or "published"
-    slug = post.get("slug", "") or ""
+    form = submitted_post_form(request)
+    error = validate_post_form(form)
 
-    template_name = (route or {}).get("template", "html/mypage/post/edit.html")
-
-    if not title or not body_text:
-        body = renderer.render(
-            template_name,
+    if error:
+        form["_id"] = str(post.get("_id", ""))
+        body = renderer.render_route(
+            route,
+            "html/mypage/post/edit.html",
             {
                 "title": "Edit Post",
-                "error": "title と body は必須です。",
+                "error": error,
                 "action": f"/mypage/post/update/{id}",
                 "submit_label": "更新する",
                 "csrf_token": get_csrf_token(request),
-                "form": {
-                    "_id": str(post.get("_id", "")),
-                    "title": title,
-                    "body": body_text,
-                    "tags": raw_tags,
-                    "status": status,
-                },
+                "form": form,
             },
             request=request,
         )
         return html(body, status="400 Bad Request")
 
     author_name = post.get("author_name", "") or current_username
-    updated_by_id = author_id
-    updated_by_name = current_username
 
     ok = post_service.update_post(
         post_id=str(post.get("_id")),
-        title=title,
-        body=body_text,
-        slug=slug,
+        title=form["title"],
+        body=form["body"],
+        slug=post.get("slug", "") or "",
         author_id=author_id,
         author_name=author_name,
-        status=status,
-        updated_by_id=updated_by_id,
-        updated_by_name=updated_by_name,
-        tags=tags,
+        status=form["status"],
+        updated_by_id=author_id,
+        updated_by_name=current_username,
+        tags=split_tags(form["tags"]),
     )
 
     if not ok:
@@ -216,7 +182,7 @@ def update(request, route=None, id=None):
 
 
 def delete(request, route=None, id=None):
-    author_id, _ = _current_user_info(request)
+    author_id, _ = current_user_info(request)
     post = post_service.find_own_post(id, author_id)
     if not post:
         return not_found()
@@ -231,9 +197,9 @@ def delete(request, route=None, id=None):
 
         return redirect("/mypage/post/list")
 
-    template_name = (route or {}).get("template", "html/mypage/post/delete.html")
-    body = renderer.render(
-        template_name,
+    body = renderer.render_route(
+        route,
+        "html/mypage/post/delete.html",
         {
             "title": "Delete Post",
             "post": post,
@@ -252,7 +218,7 @@ def restore(request, route=None, id=None):
     if not validate_csrf(request):
         return forbidden()
 
-    author_id, _ = _current_user_info(request)
+    author_id, _ = current_user_info(request)
     ok = post_service.restore_post(id, status="draft", author_id=author_id)
     if not ok:
         return not_found()

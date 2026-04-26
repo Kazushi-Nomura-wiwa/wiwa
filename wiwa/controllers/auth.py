@@ -1,9 +1,11 @@
 # パスとファイル名: wiwa/controllers/auth.py
+
 from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, redirect
 from wiwa.db.users_repository import UsersRepository
 from wiwa.services.login_service import LoginService
+
 
 renderer = TemplateRenderer()
 login_service = LoginService()
@@ -11,13 +13,12 @@ users_repository = UsersRepository()
 
 
 def login(request, route=None, **kwargs):
-    template_name = (route or {}).get("template", "html/auth/login.html")
-
     if request.method == "POST":
-        return _login_submit(request, template_name)
+        return _login_submit(request, route)
 
-    body = renderer.render(
-        template_name,
+    body = renderer.render_route(
+        route,
+        "html/auth/login.html",
         {
             "error_message": "",
             "username": "",
@@ -27,15 +28,16 @@ def login(request, route=None, **kwargs):
     return html(body)
 
 
-def _login_submit(request, template_name: str):
+def _login_submit(request, route):
     username = request.get_form("username", "").strip()
     password = request.get_form("password", "")
 
     result = login_service.login(username=username, password=password)
 
     if not result.ok:
-        body = renderer.render(
-            template_name,
+        body = renderer.render_route(
+            route,
+            "html/auth/login.html",
             {
                 "error_message": result.message,
                 "username": username,

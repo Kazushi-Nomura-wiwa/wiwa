@@ -1,56 +1,27 @@
 # パスとファイル名: wiwa/controllers/admin/page.py
 
 from urllib.parse import quote
-import builtins
-import json
 
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response, redirect
+from wiwa.services.editorjs_service import EditorJSService
 from wiwa.services.page_service import PageService
 
 
 renderer = TemplateRenderer()
+editorjs_service = EditorJSService()
 
 
 def _redirect_with_error(msg, path):
     return redirect(f"{path}?error=" + quote(msg))
 
 
-def _normalize_body_json_for_editor(page):
-    body_json = page.get("body_json", "")
-
-    if isinstance(body_json, dict):
-        page["body_json"] = json.dumps(body_json, ensure_ascii=False)
-        return page
-
-    if isinstance(body_json, builtins.list):
-        page["body_json"] = json.dumps({"blocks": body_json}, ensure_ascii=False)
-        return page
-
-    if not isinstance(body_json, str):
-        page["body_json"] = json.dumps({"blocks": []}, ensure_ascii=False)
-        return page
-
-    body_json = body_json.strip()
-
-    if not body_json:
-        page["body_json"] = json.dumps({"blocks": []}, ensure_ascii=False)
-        return page
-
-    try:
-        parsed = json.loads(body_json)
-        page["body_json"] = json.dumps(parsed, ensure_ascii=False)
-    except json.JSONDecodeError:
-        page["body_json"] = json.dumps({"blocks": []}, ensure_ascii=False)
-
-    return page
-
-
 def list(request, route=None, **params):
     service = PageService()
 
-    body = renderer.render(
-        (route or {}).get("template", "html/admin/page/list.html"),
+    body = renderer.render_route(
+        route,
+        "html/admin/page/list.html",
         {
             "title": "固定ページ一覧",
             "pages": service.list_pages(),
@@ -68,7 +39,7 @@ def new(request, route=None, **params):
     form_data = {
         "title": "",
         "slug": "",
-        "body_json": json.dumps({"blocks": []}, ensure_ascii=False),
+        "body_json": editorjs_service.empty(),
         "status": "draft",
     }
 
@@ -85,8 +56,9 @@ def new(request, route=None, **params):
 
         return redirect("/admin/page/list")
 
-    body = renderer.render(
-        (route or {}).get("template", "html/admin/page/new.html"),
+    body = renderer.render_route(
+        route,
+        "html/admin/page/new.html",
         {
             "title": "固定ページ作成",
             "form_data": form_data,
@@ -119,10 +91,11 @@ def edit(request, route=None, **params):
 
         return redirect("/admin/page/list")
 
-    page = _normalize_body_json_for_editor(page)
+    page["body_json"] = editorjs_service.normalize(page.get("body_json"))
 
-    body = renderer.render(
-        (route or {}).get("template", "html/admin/page/edit.html"),
+    body = renderer.render_route(
+        route,
+        "html/admin/page/edit.html",
         {
             "title": "固定ページ編集",
             "page": page,
@@ -146,8 +119,9 @@ def delete(request, route=None, **params):
     if not page:
         return Response("Not found", 404)
 
-    body = renderer.render(
-        (route or {}).get("template", "html/admin/page/delete.html"),
+    body = renderer.render_route(
+        route,
+        "html/admin/page/delete.html",
         {
             "title": "削除",
             "page": page,

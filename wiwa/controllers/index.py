@@ -1,38 +1,23 @@
 # パスとファイル名: wiwa/controllers/index.py
+
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html
 from wiwa.db.post_repository import PostRepository
-from wiwa.db.users_repository import UsersRepository
-from wiwa.utils.localtime import to_localtime_string
+from wiwa.services.post_view_service import PostViewService
+
 
 renderer = TemplateRenderer()
 post_repo = PostRepository()
-users_repo = UsersRepository()
+post_view_service = PostViewService()
 
 
 def index(request, route=None):
     posts = post_repo.list_published()[:5]
+    posts = post_view_service.build_post_list(posts)
 
-    author_ids = []
-    for post in posts:
-        author_id = post.get("author_id")
-        if author_id:
-            author_ids.append(author_id)
-
-    display_names = users_repo.find_display_names_by_ids(author_ids)
-
-    for post in posts:
-        author_id = post.get("author_id", "")
-        post["author_display_name"] = display_names.get(
-            author_id,
-            post.get("author_name", "")
-        )
-        post["published_at_display"] = to_localtime_string(post.get("published_at"))
-
-    template_name = (route or {}).get("template", "html/index.html")
-
-    body = renderer.render(
-        template_name,
+    body = renderer.render_route(
+        route,
+        "html/index.html",
         {
             "title": "Home",
             "posts": posts,

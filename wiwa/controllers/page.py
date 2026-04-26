@@ -1,83 +1,13 @@
 # パスとファイル名: wiwa/controllers/page.py
 
-import html
-import json
-
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import Response
+from wiwa.services.editorjs_service import EditorJSService
 from wiwa.services.page_service import PageService
 
 
 renderer = TemplateRenderer()
-
-
-def _editorjs_to_html(body_json):
-    if not body_json:
-        return ""
-
-    if isinstance(body_json, dict):
-        data = body_json
-    else:
-        try:
-            data = json.loads(body_json)
-        except Exception:
-            return ""
-
-    html_parts = []
-
-    for block in data.get("blocks", []):
-        block_type = block.get("type")
-        block_data = block.get("data", {})
-
-        if block_type == "header":
-            text = html.escape(block_data.get("text", ""))
-            level = int(block_data.get("level", 2))
-            level = max(1, min(level, 6))
-            html_parts.append(f"<h{level}>{text}</h{level}>")
-
-        elif block_type == "paragraph":
-            text = html.escape(block_data.get("text", ""))
-            html_parts.append(f"<p>{text}</p>")
-
-        elif block_type == "list":
-            items = block_data.get("items", [])
-            style = block_data.get("style", "unordered")
-
-            tag = "ol" if style == "ordered" else "ul"
-            html_parts.append(f"<{tag}>")
-
-            for item in items:
-                if isinstance(item, dict):
-                    item_text = item.get("content", "")
-                else:
-                    item_text = str(item)
-
-                html_parts.append(f"<li>{html.escape(item_text)}</li>")
-
-            html_parts.append(f"</{tag}>")
-
-        elif block_type == "table":
-            rows = block_data.get("content", [])
-            with_headings = block_data.get("withHeadings", False)
-
-            html_parts.append("<table>")
-
-            for row_index, row in enumerate(rows):
-                html_parts.append("<tr>")
-
-                for cell in row:
-                    cell_text = html.escape(str(cell))
-
-                    if with_headings and row_index == 0:
-                        html_parts.append(f"<th>{cell_text}</th>")
-                    else:
-                        html_parts.append(f"<td>{cell_text}</td>")
-
-                html_parts.append("</tr>")
-
-            html_parts.append("</table>")
-
-    return "\n".join(html_parts)
+editorjs_service = EditorJSService()
 
 
 def slug(request, route=None, **params):
@@ -88,15 +18,14 @@ def slug(request, route=None, **params):
     if not page:
         return Response(
             body="固定ページが見つかりません。",
-            status="404 Not Found"
+            status="404 Not Found",
         )
 
-    page["body_html"] = _editorjs_to_html(page.get("body_json", ""))
+    page["body_html"] = editorjs_service.build_html(page.get("body_json", ""))
 
-    template_name = (route or {}).get("template", "html/page/slug.html")
-
-    body = renderer.render(
-        template_name,
+    body = renderer.render_route(
+        route,
+        "html/page/slug.html",
         {
             "title": page.get("title", ""),
             "page": page,

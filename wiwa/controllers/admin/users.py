@@ -1,4 +1,5 @@
 # パスとファイル名: wiwa/controllers/admin/users.py
+
 from bson import ObjectId
 from urllib.parse import quote
 
@@ -38,9 +39,10 @@ def _is_last_active_admin(user: dict) -> bool:
 
 def list(request, route=None, **params):
     error_message = request.get_query("error", "")
-    templates_name = (route or {}).get("template", "html/admin/users/list.html")
-    body = renderer.render(
-        templates_name,
+
+    body = renderer.render_route(
+        route,
+        "html/admin/users/list.html",
         {
             "title": "Users",
             "users": users_repo.list_users(),
@@ -99,9 +101,10 @@ def new(request, route=None, **params):
 
         except ValueError as e:
             error_message = str(e)
-    html_template = (route or {}).get("template", "html/admin/users/new.html")  
-    body = renderer.render(
-        html_template,
+
+    body = renderer.render_route(
+        route,
+        "html/admin/users/new.html",
         {
             "title": "ユーザー追加",
             "error_message": error_message,
@@ -125,9 +128,9 @@ def edit(request, route=None, **params):
     if not user:
         return _redirect_with_error("対象ユーザーが存在しません。")
 
-    html_template = (route or {}).get("template", "html/admin/users/edit.html") 
-    body = renderer.render(
-        html_template,
+    body = renderer.render_route(
+        route,
+        "html/admin/users/edit.html",
         {
             "title": "ユーザー編集",
             "user": user,

@@ -1,9 +1,11 @@
 # パスとファイル名: wiwa/controllers/tag.py
+
 from urllib.parse import unquote
 
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, not_found
 from wiwa.services.post_service import PostService
+
 
 renderer = TemplateRenderer()
 post_service = PostService()
@@ -15,9 +17,10 @@ def name(request, route=None, name: str = ""):
         return not_found()
 
     posts = post_service.list_posts_by_tag(tag_name)
-    template_name = (route or {}).get("template", "html/tag/name.html")
-    body = renderer.render(
-        template_name,
+
+    body = renderer.render_route(
+        route,
+        "html/tag/name.html",
         {
             "title": f"タグ: {tag_name}",
             "tag_name": tag_name,

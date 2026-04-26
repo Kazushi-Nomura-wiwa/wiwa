@@ -1,6 +1,9 @@
 # パスとファイル名: wiwa/core/renderer.py
+
 from pathlib import Path
+
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+
 from wiwa.config import ACTIVE_THEME, TEMPLATE_BASE
 
 
@@ -28,3 +31,17 @@ class TemplateRenderer:
 
         template = self.env.get_template(template_name)
         return template.render(**render_context)
+
+    def render_route(
+        self,
+        route: dict | None,
+        default_template: str,
+        context: dict | None = None,
+        request=None,
+    ) -> str:
+        template_name = (route or {}).get("template", default_template)
+        return self.render(
+            template_name,
+            context,
+            request=request,
+        )
