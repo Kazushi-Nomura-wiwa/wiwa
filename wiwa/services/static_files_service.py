@@ -1,14 +1,15 @@
 # パスとファイル名: wiwa/services/static_files_service.py
+
 import mimetypes
 from pathlib import Path
 
-from wiwa.config import ACTIVE_THEME, TEMPLATE_BASE
+from wiwa.config import ACTIVE_THEME, STATIC_BASE
 from wiwa.core.request import Request
 from wiwa.core.response import Response, not_found
 
 
 def get_static_base_dir() -> Path:
-    return TEMPLATE_BASE / "static"
+    return STATIC_BASE
 
 
 def normalize_static_path(static_path: str) -> str | None:

@@ -14,11 +14,41 @@ PORT = 8000
 # ------------------------------
 # パス設定
 # ------------------------------
+# ------------------------------
+# パス設定
+# ------------------------------
 # このファイル（config.py）のディレクトリ
-BASE_DIR = Path(__file__).resolve().parent
+PACKAGE_DIR = Path(__file__).resolve().parent
+
+# run.py があるプロジェクトルート
+BASE_DIR = PACKAGE_DIR.parent
 
 # テンプレートのベースディレクトリ
 TEMPLATE_BASE = BASE_DIR / "templates"
+
+# 静的ファイルのベースディレクトリ
+STATIC_BASE = BASE_DIR / "static"
+
+# アップロードファイルのベースディレクトリ
+UPLOAD_BASE = BASE_DIR / "uploads"
+
+# 画像アップロード先
+UPLOAD_IMG_DIR = UPLOAD_BASE / "img"
+
+# 画像アップロードURL
+UPLOAD_IMG_URL_PREFIX = "/uploads/img"
+
+# ファイルアップロード先
+UPLOAD_FILE_DIR = UPLOAD_BASE / "file"
+
+# ファイルアップロードURL
+UPLOAD_FILE_URL_PREFIX = "/uploads/file"
+
+# 一時ファイルアップロード先
+UPLOAD_TMP_DIR = UPLOAD_BASE / "tmp"
+
+# 一時ファイルアップロードURL
+UPLOAD_TMP_URL_PREFIX = "/uploads/tmp"
 
 # ------------------------------
 # MongoDB設定
