@@ -9,7 +9,7 @@
 
     <form method="post" action="/admin/users/update">
         <input type="hidden" name="user_id" value="{{ user._id }}">
-
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <table>
             <tbody>
                 <tr>

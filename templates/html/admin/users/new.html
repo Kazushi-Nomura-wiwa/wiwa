@@ -5,6 +5,7 @@
 <section>
     <h2>ユーザー追加</h2>
     <form method="post" action="/admin/users/new">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <table>
             <tr>
                 <th>username</th>
