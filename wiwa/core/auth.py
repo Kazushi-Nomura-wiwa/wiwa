@@ -1,27 +1,14 @@
 # パスとファイル名: wiwa/core/auth.py
-import secrets
-from datetime import UTC, datetime, timedelta
 
+from datetime import UTC, datetime
+
+from wiwa.config import SESSION_COOKIE_NAME
 from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.db.users_repository import UsersRepository
-from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
+
 
 sessions_repository = SessionsRepository()
 users_repository = UsersRepository()
-
-
-def create_session(username: str) -> str:
-    session_id = secrets.token_urlsafe(32)
-    expires_at = datetime.now(UTC) + timedelta(days=SESSION_EXPIRES_DAYS)
-    csrf_token = secrets.token_urlsafe(32)
-
-    sessions_repository.create(
-        session_id=session_id,
-        username=username,
-        expires_at=expires_at,
-        csrf_token=csrf_token,
-    )
-    return session_id
 
 
 def get_current_user_by_session_id(session_id: str) -> dict | None:
@@ -36,6 +23,7 @@ def get_current_user_by_session_id(session_id: str) -> dict | None:
     if expires_at and isinstance(expires_at, datetime):
         if expires_at.tzinfo is None:
             expires_at = expires_at.replace(tzinfo=UTC)
+
         if expires_at <= datetime.now(UTC):
             return None
 
@@ -49,6 +37,7 @@ def get_current_user_by_session_id(session_id: str) -> dict | None:
 
     user["_id"] = str(user.get("_id", ""))
     user["csrf_token"] = session.get("csrf_token", "") or ""
+
     return user
 
 

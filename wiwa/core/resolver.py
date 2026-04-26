@@ -1,12 +1,12 @@
 # パスとファイル名: wiwa/core/resolver.py
+
 import importlib
 
 from wiwa.config import RESERVED_SLUGS
+from wiwa.core.route_rules import DYNAMIC_NAMES
 
 
 class Resolver:
-    DYNAMIC_NAMES = ["slug", "id", "name", "query"]
-
     def resolve(self, path: str, method: str = "GET") -> dict | None:
         normalized_path = self._normalize_path(path)
         parts = self._split(normalized_path)
@@ -87,7 +87,7 @@ class Resolver:
                 },
             }
 
-        for dynamic_name in self.DYNAMIC_NAMES:
+        for dynamic_name in DYNAMIC_NAMES:
             candidate_parts = parts[:-1] + [dynamic_name]
             legacy_handler = ".".join(candidate_parts)
 
@@ -151,7 +151,7 @@ class Resolver:
         if last in {"edit", "update", "delete", "restore"}:
             return "id"
 
-        if last in self.DYNAMIC_NAMES:
+        if last in DYNAMIC_NAMES:
             return last
 
         return "id"

@@ -17,12 +17,15 @@ from wiwa.services.static_files_service import serve_static
 from wiwa.services.theme_files_service import serve_theme_file
 
 
+# 初期化
 ensure_indexes()
 resolver = Resolver()
 dispatcher = Dispatcher()
 extension_loader = ExtensionLoader()
 extension_routes = extension_loader.load_routes()
 
+
+# --- ヘルパー --------------------------------------------------
 
 def make_start_response(start_response, status_holder: dict):
     def custom_start_response(status, headers, exc_info=None):
@@ -83,15 +86,39 @@ def resolve_extension_route(path: str, method: str) -> dict | None:
     return None
 
 
-def application(environ, start_response):
-    request = Request(environ)
-
+def attach_request_user(request: Request):
     session_id = request.cookies.get(SESSION_COOKIE_NAME, "")
     request.session_id = session_id or None
     request.user = get_current_user_by_session_id(session_id)
 
     if request.user and session_id:
         SessionsRepository().touch(session_id)
+
+
+def handle_static(request):
+    if request.path.startswith("/static/"):
+        return serve_static(request)
+
+    if request.path.startswith("/themes/"):
+        return serve_theme_file(request)
+
+    return None
+
+
+def resolve_route(request):
+    resolved = resolve_extension_route(request.path, request.method)
+
+    if resolved is None:
+        resolved = resolver.resolve(request.path, request.method)
+
+    return resolved
+
+
+# --- WSGI Entry --------------------------------------------------
+
+def application(environ, start_response):
+    request = Request(environ)
+    attach_request_user(request)
 
     status_holder = {"status_code": 500}
     wrapped_start_response = make_start_response(start_response, status_holder)
@@ -102,18 +129,13 @@ def application(environ, start_response):
     )
 
     try:
-        if request.path.startswith("/static/"):
-            response = serve_static(request)
-            return response(environ, wrapped_start_response)
+        # static / theme
+        static_response = handle_static(request)
+        if static_response:
+            return static_response(environ, wrapped_start_response)
 
-        if request.path.startswith("/themes/"):
-            response = serve_theme_file(request)
-            return response(environ, wrapped_start_response)
-
-        resolved = resolve_extension_route(request.path, request.method)
-
-        if resolved is None:
-            resolved = resolver.resolve(request.path, request.method)
+        # routing
+        resolved = resolve_route(request)
 
         if resolved is None:
             return finish_response(
@@ -124,6 +146,7 @@ def application(environ, start_response):
                 status_holder,
             )
 
+        # access control
         access_response = check_access(request, resolved)
         if access_response is not None:
             return finish_response(
@@ -134,7 +157,9 @@ def application(environ, start_response):
                 status_holder,
             )
 
+        # dispatch
         response = dispatcher.dispatch(resolved, request)
+
         return finish_response(
             response,
             environ,
@@ -146,6 +171,7 @@ def application(environ, start_response):
     except Exception:
         error_text = traceback.format_exc()
         print(error_text, flush=True)
+
         return finish_response(
             internal_server_error(error_text),
             environ,
