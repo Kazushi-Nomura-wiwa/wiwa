@@ -37,10 +37,16 @@ document.addEventListener("DOMContentLoaded", function(){
 
             table: {
                 class: Table,
-                inlineToolbar: true,
+                inlineToolbar: true
+            },
+
+            image: {
+                class: ImageTool,
                 config: {
-                    rows: 2,
-                    cols: 2
+                    endpoints: {
+                        byFile: "/admin/upload/image",
+                        byUrl: "/admin/upload/image-by-url"
+                    }
                 }
             }
         },
