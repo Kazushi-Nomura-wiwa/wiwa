@@ -1,11 +1,10 @@
 # パスとファイル名: wiwa/controllers/auth.py
 
-from wiwa.core.auth import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
+from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, redirect
 from wiwa.db.users_repository import UsersRepository
 from wiwa.services.login_service import LoginService
-
 
 renderer = TemplateRenderer()
 login_service = LoginService()
