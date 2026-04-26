@@ -1,5 +1,7 @@
 # パスとファイル名: wiwa/app.py
+
 import traceback
+
 from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
 from wiwa.core.auth import get_current_user_by_session_id
 from wiwa.core.dispatcher import Dispatcher
@@ -12,13 +14,14 @@ from wiwa.extensions.loader import ExtensionLoader
 from wiwa.services.access_control_service import check_access
 from wiwa.services.access_log_service import save_access_log
 from wiwa.services.static_files_service import serve_static
+from wiwa.services.theme_files_service import serve_theme_file
+
 
 ensure_indexes()
 resolver = Resolver()
 dispatcher = Dispatcher()
 extension_loader = ExtensionLoader()
 extension_routes = extension_loader.load_routes()
-
 
 
 def make_start_response(start_response, status_holder: dict):
@@ -95,12 +98,16 @@ def application(environ, start_response):
 
     print(
         f'{request.remote_addr} "{request.user_agent}" "{request.method} {request.path}"',
-        flush=True
+        flush=True,
     )
 
     try:
         if request.path.startswith("/static/"):
             response = serve_static(request)
+            return response(environ, wrapped_start_response)
+
+        if request.path.startswith("/themes/"):
+            response = serve_theme_file(request)
             return response(environ, wrapped_start_response)
 
         resolved = resolve_extension_route(request.path, request.method)
