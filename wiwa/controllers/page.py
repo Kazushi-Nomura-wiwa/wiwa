@@ -56,6 +56,27 @@ def _editorjs_to_html(body_json):
 
             html_parts.append(f"</{tag}>")
 
+        elif block_type == "table":
+            rows = block_data.get("content", [])
+            with_headings = block_data.get("withHeadings", False)
+
+            html_parts.append("<table>")
+
+            for row_index, row in enumerate(rows):
+                html_parts.append("<tr>")
+
+                for cell in row:
+                    cell_text = html.escape(str(cell))
+
+                    if with_headings and row_index == 0:
+                        html_parts.append(f"<th>{cell_text}</th>")
+                    else:
+                        html_parts.append(f"<td>{cell_text}</td>")
+
+                html_parts.append("</tr>")
+
+            html_parts.append("</table>")
+
     return "\n".join(html_parts)
 
 
