@@ -1,5 +1,20 @@
 # パスとファイル名: wiwa/app.py
 
+# WiWA WSGIアプリケーション本体
+# Core WSGI application for WiWA
+#
+# Flow:
+#   1. Request生成 / Build request
+#   2. セッション＆ユーザー取得 / Attach session & user
+#   3. static処理 / Handle static files
+#   4. ルーティング / Resolve route
+#   5. 認可チェック / Access control
+#   6. dispatch / Execute handler
+#   7. レスポンス処理 / Finalize response
+#
+# このファイルは「処理の流れ」を記述する
+# This file defines the request lifecycle
+
 import traceback
 
 from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
@@ -17,17 +32,34 @@ from wiwa.services.static_files_service import serve_static
 from wiwa.services.theme_files_service import serve_theme_file
 
 
-# 初期化
+# ------------------------------
+# 初期化 / Initialization
+# ------------------------------
+
+# DBインデックスを保証
+# Ensure MongoDB indexes
 ensure_indexes()
+
+# ルーティング関連
+# Routing components
 resolver = Resolver()
 dispatcher = Dispatcher()
+
+# 拡張機能ルート読み込み
+# Load extension routes
 extension_loader = ExtensionLoader()
 extension_routes = extension_loader.load_routes()
 
 
-# --- ヘルパー --------------------------------------------------
+# ------------------------------
+# ヘルパー / Helpers
+# ------------------------------
 
 def make_start_response(start_response, status_holder: dict):
+    """
+    ステータスコードを取得するラッパー
+    Wrap start_response to capture status code
+    """
     def custom_start_response(status, headers, exc_info=None):
         try:
             status_holder["status_code"] = int(status.split(" ", 1)[0])
@@ -39,6 +71,10 @@ def make_start_response(start_response, status_holder: dict):
 
 
 def refresh_session_cookie(response, request) -> None:
+    """
+    セッションCookieを延長する
+    Refresh session cookie if needed
+    """
     session_id = getattr(request, "session_id", None)
     if not session_id:
         return
@@ -61,6 +97,13 @@ def refresh_session_cookie(response, request) -> None:
 
 
 def finish_response(response, environ, start_response, request, status_holder: dict):
+    """
+    レスポンスの最終処理
+    Finalize response
+
+    - Cookie更新
+    - アクセスログ保存
+    """
     refresh_session_cookie(response, request)
     result = response(environ, start_response)
     save_access_log(request, status_holder["status_code"])
@@ -68,6 +111,10 @@ def finish_response(response, environ, start_response, request, status_holder: d
 
 
 def resolve_extension_route(path: str, method: str) -> dict | None:
+    """
+    拡張機能ルートの解決
+    Resolve extension route
+    """
     normalized_method = method.upper()
 
     for route in extension_routes:
@@ -87,15 +134,25 @@ def resolve_extension_route(path: str, method: str) -> dict | None:
 
 
 def attach_request_user(request: Request):
+    """
+    Requestにユーザー情報を付与
+    Attach user to request
+    """
     session_id = request.cookies.get(SESSION_COOKIE_NAME, "")
     request.session_id = session_id or None
     request.user = get_current_user_by_session_id(session_id)
 
+    # セッション延命（スライディング方式）
+    # Sliding session expiration
     if request.user and session_id:
         SessionsRepository().touch(session_id)
 
 
 def handle_static(request):
+    """
+    静的ファイルの処理
+    Handle static and theme files
+    """
     if request.path.startswith("/static/"):
         return serve_static(request)
 
@@ -106,6 +163,10 @@ def handle_static(request):
 
 
 def resolve_route(request):
+    """
+    ルーティング解決
+    Resolve route (extension → core)
+    """
     resolved = resolve_extension_route(request.path, request.method)
 
     if resolved is None:
@@ -114,27 +175,47 @@ def resolve_route(request):
     return resolved
 
 
-# --- WSGI Entry --------------------------------------------------
+# ------------------------------
+# WSGI Entry
+# ------------------------------
 
 def application(environ, start_response):
+    """
+    WSGIエントリーポイント
+    WSGI application entry point
+    """
+
+    # Request生成
+    # Build request object
     request = Request(environ)
+
+    # ユーザー情報付与
+    # Attach user/session
     attach_request_user(request)
 
+    # ステータス保持
+    # Status tracking
     status_holder = {"status_code": 500}
     wrapped_start_response = make_start_response(start_response, status_holder)
 
+    # アクセスログ（簡易）
+    # Simple access log
     print(
         f'{request.remote_addr} "{request.user_agent}" "{request.method} {request.path}"',
         flush=True,
     )
 
     try:
+        # ------------------------------
         # static / theme
+        # ------------------------------
         static_response = handle_static(request)
         if static_response:
             return static_response(environ, wrapped_start_response)
 
+        # ------------------------------
         # routing
+        # ------------------------------
         resolved = resolve_route(request)
 
         if resolved is None:
@@ -146,7 +227,9 @@ def application(environ, start_response):
                 status_holder,
             )
 
+        # ------------------------------
         # access control
+        # ------------------------------
         access_response = check_access(request, resolved)
         if access_response is not None:
             return finish_response(
@@ -157,7 +240,9 @@ def application(environ, start_response):
                 status_holder,
             )
 
+        # ------------------------------
         # dispatch
+        # ------------------------------
         response = dispatcher.dispatch(resolved, request)
 
         return finish_response(
