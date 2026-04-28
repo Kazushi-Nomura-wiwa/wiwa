@@ -75,7 +75,7 @@ def _validate_user(request):
 def _get_uploaded_file(request):
     files = getattr(request, "files", {})
 
-    uploaded_file = files.get("file")
+    uploaded_file = files.get("file") or files.get("image")
 
     if not uploaded_file:
         return None, json_response({
@@ -84,7 +84,6 @@ def _get_uploaded_file(request):
         }, status="400 Bad Request")
 
     return uploaded_file, None
-
 
 # ファイルを保存する
 # Save uploaded file
