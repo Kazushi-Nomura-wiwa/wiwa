@@ -73,7 +73,9 @@ def _validate_user(request):
 # アップロードファイルを取得する
 # Get uploaded file
 def _get_uploaded_file(request):
-    uploaded_file = request.files.get("file")
+    files = getattr(request, "files", {})
+
+    uploaded_file = files.get("file")
 
     if not uploaded_file:
         return None, json_response({
