@@ -1,4 +1,24 @@
 # パスとファイル名: wiwa/services/editorjs_service.py
+# Path and filename: wiwa/services/editorjs_service.py
+
+# Editor.js変換サービス
+# Editor.js conversion service
+#
+# 概要
+# Summary
+#   Editor.jsのJSONデータをHTMLへ変換し、正規化・初期化を提供する
+#   Convert Editor.js JSON to HTML and provide normalization utilities
+#
+# 処理の流れ
+# Flow
+#   1. JSON正規化
+#      Normalize JSON
+#   2. ブロック解析
+#      Parse blocks
+#   3. HTML生成
+#      Build HTML
+#   4. 出力結合
+#      Join output
 
 import html
 import json
@@ -6,6 +26,10 @@ import json
 
 class EditorJSService:
     def build_html(self, body_json) -> str:
+        """
+        HTML生成
+        Build HTML from Editor.js data
+        """
         data = self._ensure_dict(body_json)
         blocks = data.get("blocks", [])
 
@@ -14,6 +38,8 @@ class EditorJSService:
 
         html_parts = []
 
+        # ブロック処理
+        # Process blocks
         for block in blocks:
             if not isinstance(block, dict):
                 continue
@@ -36,13 +62,25 @@ class EditorJSService:
         return "\n".join(html_parts)
 
     def normalize(self, body_json) -> str:
+        """
+        JSON正規化
+        Normalize JSON string
+        """
         data = self._ensure_dict(body_json)
         return json.dumps(data, ensure_ascii=False)
 
     def empty(self) -> str:
+        """
+        空データ生成
+        Generate empty Editor.js data
+        """
         return json.dumps({"blocks": []}, ensure_ascii=False)
 
     def _ensure_dict(self, body_json) -> dict:
+        """
+        JSONをdictに変換
+        Ensure dict structure
+        """
         if isinstance(body_json, dict):
             return body_json
 
@@ -69,6 +107,10 @@ class EditorJSService:
         return {"blocks": []}
 
     def _build_header(self, data: dict) -> str:
+        """
+        headerブロック生成
+        Build header block
+        """
         text = html.escape(data.get("text", ""))
 
         try:
@@ -81,10 +123,18 @@ class EditorJSService:
         return f"<h{level}>{text}</h{level}>"
 
     def _build_paragraph(self, data: dict) -> str:
+        """
+        paragraphブロック生成
+        Build paragraph block
+        """
         text = html.escape(data.get("text", ""))
         return f"<p>{text}</p>"
 
     def _build_list(self, data: dict) -> str:
+        """
+        listブロック生成
+        Build list block
+        """
         items = data.get("items", [])
         style = data.get("style", "unordered")
 
@@ -104,6 +154,10 @@ class EditorJSService:
         return "\n".join(html_parts)
 
     def _build_table(self, data: dict) -> str:
+        """
+        tableブロック生成
+        Build table block
+        """
         rows = data.get("content", [])
         with_headings = data.get("withHeadings", False)
 

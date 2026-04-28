@@ -1,4 +1,5 @@
 # パスとファイル名: wiwa/config.py
+# Path and filename: wiwa/config.py
 
 # WiWA基本設定
 # Basic configuration for WiWA
@@ -8,7 +9,8 @@ from zoneinfo import ZoneInfo
 
 
 # ------------------------------
-# i18n設定 / i18n settings
+# i18n設定
+# i18n settings
 # ------------------------------
 
 # 標準言語
@@ -21,7 +23,8 @@ SUPPORTED_LANGS = ["ja", "en"]
 
 
 # ------------------------------
-# サーバー設定 / Server settings
+# サーバー設定
+# Server settings
 # ------------------------------
 
 # アプリケーションのバインドアドレス
@@ -34,7 +37,8 @@ PORT = 8000
 
 
 # ------------------------------
-# パス設定 / Path settings
+# パス設定
+# Path settings
 # ------------------------------
 
 # このファイル（config.py）のディレクトリ
@@ -83,7 +87,8 @@ THEME_URL_PREFIX = "/themes"
 
 
 # ------------------------------
-# MongoDB設定 / MongoDB settings
+# MongoDB設定
+# MongoDB settings
 # ------------------------------
 
 # MongoDBの接続URI
@@ -96,7 +101,8 @@ MONGODB_DB_NAME = "wiwa"
 
 
 # ------------------------------
-# タイムゾーン設定 / Timezone settings
+# タイムゾーン設定
+# Timezone settings
 # ------------------------------
 
 # アプリケーション全体で使用するタイムゾーン
@@ -105,7 +111,8 @@ TIMEZONE = ZoneInfo("Asia/Tokyo")
 
 
 # ------------------------------
-# 認証・ログイン設定 / Authentication settings
+# 認証・ログイン設定
+# Authentication settings
 # ------------------------------
 
 # 未認証時のリダイレクト先URL
@@ -125,7 +132,8 @@ SESSION_EXPIRES_DAYS = 7
 
 
 # ------------------------------
-# テーマ設定 / Theme settings
+# テーマ設定
+# Theme settings
 # ------------------------------
 
 # 使用するテーマ名
@@ -137,7 +145,8 @@ ACTIVE_THEME = "default"
 
 
 # ------------------------------
-# 投稿設定 / Post settings
+# 投稿設定
+# Post settings
 # ------------------------------
 
 # 一覧ページの表示件数
@@ -153,7 +162,8 @@ TRASH_RETENTION_DAYS = 30
 
 
 # ------------------------------
-# サイト設定 / Site settings
+# サイト設定
+# Site settings
 # ------------------------------
 
 # サイトのベースURL
@@ -165,7 +175,8 @@ SITE_URL = "https://wiwa.jp"
 
 
 # ------------------------------
-# 拡張機能設定 / Extension settings
+# 拡張機能設定
+# Extension settings
 # ------------------------------
 
 # 有効化する拡張機能の一覧
@@ -177,7 +188,8 @@ ENABLED_EXTENSIONS = [
 
 
 # ------------------------------
-# セキュリティ設定 / Security settings
+# セキュリティ設定
+# Security settings
 # ------------------------------
 
 # CSRFトークン生成時のバイト長
@@ -186,7 +198,8 @@ CSRF_TOKEN_BYTES = 32
 
 
 # ------------------------------
-# アクセスログ設定 / Access log settings
+# アクセスログ設定
+# Access log settings
 # ------------------------------
 
 # ログが自動削除されるまでの日数
@@ -198,7 +211,8 @@ ACCESS_LOG_RETENTION_DAYS = 90
 
 
 # ------------------------------
-# 予約スラッグ設定 / Reserved slug settings
+# 予約スラッグ設定
+# Reserved slug settings
 # ------------------------------
 
 # 固定ページで使用できない予約済みスラッグ
@@ -218,3 +232,13 @@ RESERVED_SLUGS = [
     "static",
     "assets",
 ]
+
+
+# ------------------------------
+# トップページ設定
+# Home page settings
+# ------------------------------
+
+# トップページに表示する投稿数
+# Number of posts shown on home page
+HOME_POSTS_LIMIT = 5

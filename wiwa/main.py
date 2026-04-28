@@ -1,10 +1,16 @@
 # パスとファイル名: wiwa/main.py
+# Path and filename: wiwa/main.py
 
-# WSGIアプリケーションの公開用モジュール
-# Public module for exposing the WSGI application
+# WSGIアプリケーション公開モジュール
+# Public module for WSGI application
 #
-# 例:
-# Example:
+# 概要
+# Summary
+#   外部サーバーから参照されるエントリーポイント
+#   Entry point for external WSGI servers
+#
+# 使用例
+# Example
 #   gunicorn wiwa.main:application
 
 # WiWAのWSGIアプリケーション本体
@@ -12,6 +18,6 @@
 from wiwa.app import application
 
 
-# 外部から公開する名前を明示
+# 公開対象の定義
 # Explicitly define public exports
 __all__ = ["application"]

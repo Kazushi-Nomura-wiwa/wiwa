@@ -1,10 +1,37 @@
 # パスとファイル名: wiwa/core/request.py
+# Path and filename: wiwa/core/request.py
+
+# HTTPリクエストラッパー
+# HTTP request wrapper
+#
+# 概要
+# Summary
+#   WSGI environをラップし、クエリ・フォーム・Cookieなどを扱いやすくする
+#   Wrap WSGI environ to provide easy access to query, form, and cookies
+#
+# 処理の流れ
+# Flow
+#   1. environから基本情報取得
+#      Extract basic data from environ
+#   2. クエリ解析
+#      Parse query string
+#   3. フォーム解析
+#      Parse form data
+#   4. Cookie解析
+#      Parse cookies
+#   5. 付加情報取得（IP, UAなど）
+#      Provide extra info (IP, UA, etc.)
+
 from http import cookies
 from urllib.parse import parse_qs, unquote
 
 
 class Request:
     def __init__(self, environ: dict):
+        """
+        リクエストを初期化
+        Initialize request
+        """
         self.environ = environ
         self.method = environ.get("REQUEST_METHOD", "GET").upper()
         self.path = self._decode_path(environ.get("PATH_INFO", "/"))
@@ -19,6 +46,10 @@ class Request:
 
     @property
     def query(self) -> dict[str, str]:
+        """
+        クエリを辞書として取得
+        Get query parameters as dict
+        """
         return {
             key: values[0]
             for key, values in self.query_params.items()
@@ -26,12 +57,20 @@ class Request:
         }
 
     def get_query(self, key: str, default: str = "") -> str:
+        """
+        クエリ値を取得
+        Get query value
+        """
         values = self.query_params.get(key)
         if not values:
             return default
         return values[0]
 
     def get_form(self, key: str, default: str = "") -> str:
+        """
+        フォーム値を取得
+        Get form value
+        """
         if self._form_data is None:
             self._parse_form_data()
 
@@ -42,12 +81,20 @@ class Request:
 
     @property
     def cookies(self) -> dict[str, str]:
+        """
+        Cookieを取得
+        Get cookies
+        """
         if self._cookies is None:
             self._parse_cookies()
         return self._cookies
 
     @property
     def remote_addr(self) -> str:
+        """
+        クライアントIP取得
+        Get client IP address
+        """
         remote_addr = self.environ.get("REMOTE_ADDR", "") or ""
         x_forwarded_for = self.environ.get("HTTP_X_FORWARDED_FOR", "") or ""
         x_real_ip = self.environ.get("HTTP_X_REAL_IP", "") or ""
@@ -67,17 +114,33 @@ class Request:
 
     @property
     def user_agent(self) -> str:
+        """
+        ユーザーエージェント取得
+        Get user agent
+        """
         return self.environ.get("HTTP_USER_AGENT", "")
 
     @property
     def host(self) -> str:
+        """
+        ホスト名取得
+        Get host
+        """
         return self.environ.get("HTTP_HOST", "")
 
     @property
     def referer(self) -> str:
+        """
+        リファラ取得
+        Get referer
+        """
         return self.environ.get("HTTP_REFERER", "")
 
     def _decode_path(self, raw_path: str) -> str:
+        """
+        パスをデコード
+        Decode path safely
+        """
         value = raw_path or "/"
 
         try:
@@ -89,6 +152,10 @@ class Request:
                 return value
 
     def _parse_form_data(self) -> None:
+        """
+        フォームデータ解析
+        Parse form data
+        """
         self._form_data = {}
 
         if self.method not in {"POST", "PUT", "PATCH", "DELETE"}:
@@ -113,6 +180,10 @@ class Request:
         self._form_data = {}
 
     def _parse_cookies(self) -> None:
+        """
+        Cookie解析
+        Parse cookies
+        """
         self._cookies = {}
 
         raw_cookie = self.environ.get("HTTP_COOKIE", "")

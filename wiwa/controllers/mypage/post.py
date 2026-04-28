@@ -1,8 +1,82 @@
 # パスとファイル名: wiwa/controllers/mypage/post.py
+# Path and filename: wiwa/controllers/mypage/post.py
+
+# マイページ投稿管理コントローラ
+# MyPage post management controller
+#
+# URL
+# URL
+#   /mypage/post/list
+#   /mypage/post/trash
+#   /mypage/post/new
+#   /mypage/post/edit/<id>
+#   /mypage/post/update/<id>
+#   /mypage/post/delete/<id>
+#   /mypage/post/restore/<id>
+#
+# 処理の流れ（一覧）
+# Flow (list)
+#   1. 自分の投稿取得
+#      Fetch user's posts
+#   2. テンプレート描画
+#      Render template
+#
+# 処理の流れ（ゴミ箱）
+# Flow (trash)
+#   1. ゴミ箱投稿取得
+#      Fetch trashed posts
+#   2. テンプレート描画
+#      Render template
+#
+# 処理の流れ（作成）
+# Flow (create)
+#   1. GET時はフォーム表示
+#      Render form on GET
+#   2. POST時は入力取得
+#      Get submitted form
+#   3. 入力検証
+#      Validate form
+#   4. 投稿作成
+#      Create post
+#
+# 処理の流れ（編集）
+# Flow (edit)
+#   1. 投稿取得
+#      Fetch post
+#   2. テンプレート描画
+#      Render template
+#
+# 処理の流れ（更新）
+# Flow (update)
+#   1. 投稿取得
+#      Fetch post
+#   2. 入力取得
+#      Get submitted form
+#   3. 入力検証
+#      Validate form
+#   4. 投稿更新
+#      Update post
+#
+# 処理の流れ（削除）
+# Flow (delete)
+#   1. 投稿取得
+#      Fetch post
+#   2. POST時は削除実行
+#      Execute delete
+#   3. 確認画面描画
+#      Render confirmation
+#
+# 処理の流れ（復元）
+# Flow (restore)
+#   1. POST時は復元実行
+#      Execute restore
+#   2. リダイレクト
+#      Redirect
 
 from wiwa.config import TRASH_RETENTION_DAYS
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import forbidden, html, not_found, redirect
+from wiwa.core.i18n import t
 from wiwa.services.post_form_service import (
     current_user_info,
     empty_post_form,
@@ -20,6 +94,10 @@ post_service = PostService()
 
 
 def list(request, route=None):
+    """
+    自分の投稿一覧を表示
+    Display user's post list
+    """
     author_id, _ = current_user_info(request)
     posts = post_service.list_posts(author_id=author_id)
 
@@ -27,7 +105,7 @@ def list(request, route=None):
         route,
         "html/mypage/post/list.html",
         {
-            "title": "My Post List",
+            "title": t("mypage.post.list.title"),
             "posts": posts,
             "retention_days": TRASH_RETENTION_DAYS,
         },
@@ -37,6 +115,10 @@ def list(request, route=None):
 
 
 def trash(request, route=None):
+    """
+    自分のゴミ箱内の投稿一覧を表示
+    Display user's trashed post list
+    """
     author_id, _ = current_user_info(request)
     posts = post_service.list_posts(author_id=author_id, include_trashed=True)
 
@@ -44,7 +126,7 @@ def trash(request, route=None):
         route,
         "html/mypage/post/trash.html",
         {
-            "title": "My Trash Post List",
+            "title": t("mypage.post.trash.title"),
             "posts": posts,
             "retention_days": TRASH_RETENTION_DAYS,
         },
@@ -54,15 +136,19 @@ def trash(request, route=None):
 
 
 def new(request, route=None):
+    """
+    新規投稿を作成
+    Create a new post
+    """
     if request.method == "GET":
         body = renderer.render_route(
             route,
             "html/mypage/post/new.html",
             {
-                "title": "New Post",
+                "title": t("mypage.post.new.title"),
                 "error": "",
                 "action": "/mypage/post/new",
-                "submit_label": "投稿する",
+                "submit_label": t("mypage.post.submit.create"),
                 "csrf_token": get_csrf_token(request),
                 "form": empty_post_form(),
             },
@@ -81,10 +167,10 @@ def new(request, route=None):
             route,
             "html/mypage/post/new.html",
             {
-                "title": "New Post",
+                "title": t("mypage.post.new.title"),
                 "error": error,
                 "action": "/mypage/post/new",
-                "submit_label": "投稿する",
+                "submit_label": t("mypage.post.submit.create"),
                 "csrf_token": get_csrf_token(request),
                 "form": form,
             },
@@ -107,6 +193,10 @@ def new(request, route=None):
 
 
 def edit(request, route=None, id=None):
+    """
+    投稿編集画面を表示
+    Display the post edit screen
+    """
     author_id, _ = current_user_info(request)
     post = post_service.find_own_post(id, author_id)
     if not post:
@@ -116,10 +206,10 @@ def edit(request, route=None, id=None):
         route,
         "html/mypage/post/edit.html",
         {
-            "title": "Edit Post",
+            "title": t("mypage.post.edit.title"),
             "error": "",
             "action": f"/mypage/post/update/{id}",
-            "submit_label": "更新する",
+            "submit_label": t("mypage.post.submit.update"),
             "csrf_token": get_csrf_token(request),
             "form": post_to_form(post),
         },
@@ -129,6 +219,10 @@ def edit(request, route=None, id=None):
 
 
 def update(request, route=None, id=None):
+    """
+    投稿を更新
+    Update the post
+    """
     if request.method != "POST":
         return redirect("/mypage/post/list")
 
@@ -149,10 +243,10 @@ def update(request, route=None, id=None):
             route,
             "html/mypage/post/edit.html",
             {
-                "title": "Edit Post",
+                "title": t("mypage.post.edit.title"),
                 "error": error,
                 "action": f"/mypage/post/update/{id}",
-                "submit_label": "更新する",
+                "submit_label": t("mypage.post.submit.update"),
                 "csrf_token": get_csrf_token(request),
                 "form": form,
             },
@@ -182,6 +276,10 @@ def update(request, route=None, id=None):
 
 
 def delete(request, route=None, id=None):
+    """
+    投稿をゴミ箱へ移動
+    Move the post to trash
+    """
     author_id, _ = current_user_info(request)
     post = post_service.find_own_post(id, author_id)
     if not post:
@@ -201,7 +299,7 @@ def delete(request, route=None, id=None):
         route,
         "html/mypage/post/delete.html",
         {
-            "title": "Delete Post",
+            "title": t("mypage.post.delete.title"),
             "post": post,
             "retention_days": TRASH_RETENTION_DAYS,
             "csrf_token": get_csrf_token(request),
@@ -212,6 +310,10 @@ def delete(request, route=None, id=None):
 
 
 def restore(request, route=None, id=None):
+    """
+    ゴミ箱の投稿を復元
+    Restore the trashed post
+    """
     if request.method != "POST":
         return redirect("/mypage/post/trash")
 

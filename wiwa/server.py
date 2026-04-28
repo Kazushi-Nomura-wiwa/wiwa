@@ -1,7 +1,22 @@
 # パスとファイル名: wiwa/server.py
+# Path and filename: wiwa/server.py
 
 # WiWA開発用サーバー
 # Development server for WiWA
+#
+# 概要
+# Summary
+#   ローカル開発用のWSGIサーバーを提供する
+#   Provide a local WSGI server for development
+#
+# 処理の流れ
+# Flow
+#   1. サーバー生成
+#      Create server
+#   2. 起動ログ出力
+#      Print startup message
+#   3. サーバー起動
+#      Start serving requests
 
 from wsgiref.simple_server import WSGIRequestHandler, make_server
 
@@ -16,8 +31,8 @@ class QuietHandler(WSGIRequestHandler):
     """
 
     def log_message(self, format, *args):
-        # WiWA側でアクセスログを処理するため、標準ログは出力しない
-        # Suppress default logs because WiWA handles access logging
+        # 標準ログを出力しない
+        # Suppress default logs
         pass
 
 

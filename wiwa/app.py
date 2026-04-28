@@ -1,19 +1,30 @@
 # パスとファイル名: wiwa/app.py
+# Path and filename: wiwa/app.py
 
 # WiWA WSGIアプリケーション本体
 # Core WSGI application for WiWA
 #
-# Flow:
-#   1. Request生成 / Build request
-#   2. セッション＆ユーザー取得 / Attach session & user
-#   3. static処理 / Handle static files
-#   4. ルーティング / Resolve route
-#   5. 認可チェック / Access control
-#   6. dispatch / Execute handler
-#   7. レスポンス処理 / Finalize response
+# 概要
+# Summary
+#   リクエストのライフサイクルを管理する
+#   Manage the full request lifecycle
 #
-# このファイルは「処理の流れ」を記述する
-# This file defines the request lifecycle
+# 処理の流れ
+# Flow
+#   1. Request生成
+#      Build request
+#   2. セッションとユーザーを付与
+#      Attach session and user
+#   3. 静的ファイル処理
+#      Handle static files
+#   4. ルーティング解決
+#      Resolve route
+#   5. 認可チェック
+#      Check access control
+#   6. ハンドラ実行
+#      Execute handler
+#   7. レスポンス最終処理
+#      Finalize response
 
 import traceback
 
@@ -33,7 +44,8 @@ from wiwa.services.theme_files_service import serve_theme_file
 
 
 # ------------------------------
-# 初期化 / Initialization
+# 初期化
+# Initialization
 # ------------------------------
 
 # DBインデックスを保証
@@ -52,7 +64,8 @@ extension_routes = extension_loader.load_routes()
 
 
 # ------------------------------
-# ヘルパー / Helpers
+# ヘルパー
+# Helpers
 # ------------------------------
 
 def make_start_response(start_response, status_holder: dict):
@@ -100,13 +113,17 @@ def finish_response(response, environ, start_response, request, status_holder: d
     """
     レスポンスの最終処理
     Finalize response
-
-    - Cookie更新
-    - アクセスログ保存
     """
+    # セッションCookie更新
+    # Refresh session cookie
     refresh_session_cookie(response, request)
+
     result = response(environ, start_response)
+
+    # アクセスログ保存
+    # Save access log
     save_access_log(request, status_holder["status_code"])
+
     return result
 
 
@@ -176,6 +193,7 @@ def resolve_route(request):
 
 
 # ------------------------------
+# WSGIエントリーポイント
 # WSGI Entry
 # ------------------------------
 
@@ -198,7 +216,7 @@ def application(environ, start_response):
     status_holder = {"status_code": 500}
     wrapped_start_response = make_start_response(start_response, status_holder)
 
-    # アクセスログ（簡易）
+    # 簡易アクセスログ
     # Simple access log
     print(
         f'{request.remote_addr} "{request.user_agent}" "{request.method} {request.path}"',
@@ -206,16 +224,14 @@ def application(environ, start_response):
     )
 
     try:
-        # ------------------------------
-        # static / theme
-        # ------------------------------
+        # 静的ファイル処理
+        # Handle static
         static_response = handle_static(request)
         if static_response:
             return static_response(environ, wrapped_start_response)
 
-        # ------------------------------
-        # routing
-        # ------------------------------
+        # ルーティング
+        # Routing
         resolved = resolve_route(request)
 
         if resolved is None:
@@ -227,9 +243,8 @@ def application(environ, start_response):
                 status_holder,
             )
 
-        # ------------------------------
-        # access control
-        # ------------------------------
+        # 認可チェック
+        # Access control
         access_response = check_access(request, resolved)
         if access_response is not None:
             return finish_response(
@@ -240,9 +255,8 @@ def application(environ, start_response):
                 status_holder,
             )
 
-        # ------------------------------
-        # dispatch
-        # ------------------------------
+        # ハンドラ実行
+        # Dispatch handler
         response = dispatcher.dispatch(resolved, request)
 
         return finish_response(

@@ -1,20 +1,29 @@
 # パスとファイル名: wiwa/controllers/auth.py
+# Path and filename: wiwa/controllers/auth.py
 
 # 認証コントローラ
 # Authentication controller
 #
-# URL:
+# URL
+# URL
 #   /auth/login   (GET, POST)
 #   /auth/logout  (GET)
 #
-# Flow (login):
-#   1. フォーム表示 / Render login form
-#   2. 入力受信 / Receive credentials
-#   3. 認証処理 / Authenticate user
-#   4. セッション発行 / Create session
-#   5. リダイレクト / Redirect
+# 処理の流れ（ログイン）
+# Flow (login)
+#   1. フォーム表示
+#      Render login form
+#   2. 入力受信
+#      Receive credentials
+#   3. 認証処理
+#      Authenticate user
+#   4. セッション発行
+#      Create session
+#   5. リダイレクト
+#      Redirect
 
 from wiwa.config import SESSION_COOKIE_NAME, SESSION_EXPIRES_DAYS
+from wiwa.core.i18n import t
 from wiwa.core.renderer import TemplateRenderer
 from wiwa.core.response import html, redirect
 from wiwa.db.users_repository import UsersRepository
@@ -51,6 +60,7 @@ def login(request, route=None, **kwargs):
         route,
         "html/auth/login.html",
         {
+            "title": t("login_title"),
             "error_message": "",
             "username": "",
         },
@@ -81,6 +91,7 @@ def _login_submit(request, route):
             route,
             "html/auth/login.html",
             {
+                "title": t("login_title"),
                 "error_message": result.message,
                 "username": username,
             },

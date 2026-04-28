@@ -1,4 +1,28 @@
 # パスとファイル名: wiwa/core/resolver.py
+# Path and filename: wiwa/core/resolver.py
+
+# ルーティング解決ユーティリティ
+# Routing resolver utility
+#
+# 概要
+# Summary
+#   URLパスからhandlerとtemplateを決定する
+#   Resolve handler and template from URL path
+#
+# 処理の流れ
+# Flow
+#   1. パス正規化
+#      Normalize path
+#   2. パス分割
+#      Split path
+#   3. 静的ルート解決
+#      Resolve static route
+#   4. 動的ルート解決
+#      Resolve dynamic route
+#   5. ページフォールバック
+#      Resolve page fallback
+#   6. メタ情報付与
+#      Attach metadata
 
 import importlib
 
@@ -8,17 +32,27 @@ from wiwa.core.route_rules import DYNAMIC_NAMES
 
 class Resolver:
     def resolve(self, path: str, method: str = "GET") -> dict | None:
+        """
+        パスからルートを解決
+        Resolve route from path
+        """
         normalized_path = self._normalize_path(path)
         parts = self._split(normalized_path)
 
+        # 静的ルート解決
+        # Resolve static route
         static_result = self._resolve_static(parts)
         if static_result:
             return self._attach_meta(static_result, parts, method)
 
+        # 動的ルート解決
+        # Resolve dynamic route
         dynamic_result = self._resolve_dynamic(parts)
         if dynamic_result:
             return self._attach_meta(dynamic_result, parts, method)
 
+        # 固定ページフォールバック
+        # Resolve page fallback
         page_result = self._resolve_page_fallback(parts)
         if page_result:
             return self._attach_meta(page_result, parts, method)
@@ -31,15 +65,27 @@ class Resolver:
         parts: list[str],
         method: str,
     ) -> dict:
+        """
+        ルートにメタ情報を付与
+        Attach metadata to route
+        """
         result["method"] = method.upper()
         result["auth_required"] = self._is_auth_required(parts)
         result["roles"] = self._get_allowed_roles(parts)
         return result
 
     def _build_template_path(self, parts: list[str]) -> str:
+        """
+        テンプレートパス生成
+        Build template path
+        """
         return "html/" + "/".join(parts) + ".html"
 
     def _resolve_static(self, parts: list[str]) -> dict | None:
+        """
+        静的ルート解決
+        Resolve static route
+        """
         if not parts:
             if self._handler_exists("index.index"):
                 return {
@@ -69,6 +115,10 @@ class Resolver:
         return None
 
     def _resolve_dynamic(self, parts: list[str]) -> dict | None:
+        """
+        動的ルート解決
+        Resolve dynamic route
+        """
         if len(parts) < 2:
             return None
 
@@ -105,6 +155,10 @@ class Resolver:
         return None
 
     def _resolve_page_fallback(self, parts: list[str]) -> dict | None:
+        """
+        固定ページフォールバック
+        Resolve page fallback
+        """
         if len(parts) != 1:
             return None
 
@@ -132,6 +186,10 @@ class Resolver:
         base_parts: list[str],
         param_name: str,
     ) -> list[str]:
+        """
+        動的テンプレートパス構築
+        Build dynamic template path parts
+        """
         if not base_parts:
             return [param_name]
 
@@ -143,6 +201,10 @@ class Resolver:
         return base_parts + [param_name]
 
     def _guess_param_name(self, base_parts: list[str]) -> str:
+        """
+        パラメータ名推定
+        Guess parameter name
+        """
         if not base_parts:
             return "id"
 
@@ -157,12 +219,20 @@ class Resolver:
         return "id"
 
     def _split_handler(self, handler: str) -> tuple[str, str]:
+        """
+        handler分割
+        Split handler
+        """
         parts = handler.split(".")
         module_path = "wiwa.controllers." + ".".join(parts[:-1])
         function_name = parts[-1]
         return module_path, function_name
 
     def _handler_exists(self, handler: str) -> bool:
+        """
+        handler存在チェック
+        Check handler existence
+        """
         module_path, function_name = self._split_handler(handler)
 
         if not function_name or function_name.startswith("_"):
@@ -177,23 +247,39 @@ class Resolver:
         return callable(target)
 
     def _normalize_path(self, path: str) -> str:
+        """
+        パス正規化
+        Normalize path
+        """
         if not path:
             return "/"
         return "/" + path.strip("/")
 
     def _split(self, path: str) -> list[str]:
+        """
+        パス分割
+        Split path
+        """
         stripped = path.strip("/")
         if not stripped:
             return []
         return [part for part in stripped.split("/") if part]
 
     def _is_auth_required(self, parts: list[str]) -> bool:
+        """
+        認証必要判定
+        Check auth requirement
+        """
         if not parts:
             return False
 
         return parts[0] in {"admin", "mypage"}
 
     def _get_allowed_roles(self, parts: list[str]) -> list[str]:
+        """
+        許可ロール取得
+        Get allowed roles
+        """
         if not parts:
             return []
 

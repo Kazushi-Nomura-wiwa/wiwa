@@ -1,50 +1,53 @@
 # パスとファイル名: script/create_admin.py
+# Path and filename: script/create_admin.py
 
-# 管理者ユーザーをCLIから作成するスクリプト
+# 管理者ユーザー作成CLIスクリプト
 # CLI script to create an admin user
+#
+# 概要
+# Summary
+#   対話形式で管理者ユーザーを作成する
+#   Create an admin user via interactive CLI
+#
+# 処理の流れ
+# Flow
+#   1. 入力受付
+#      Receive input
+#   2. パスワード確認
+#      Confirm password
+#   3. ハッシュ化
+#      Hash password
+#   4. DB保存
+#      Save to database
 
-import getpass  # パスワード入力を非表示にする / Hide password input
-import sys      # プロセス終了やパス操作に使用 / For exit and path handling
-from pathlib import Path  # パス操作を扱う / Handle filesystem paths
+import getpass
+import sys
+from pathlib import Path
 
 
-# プロジェクトルートを取得（このファイルの2階層上）
-# Get project root (two levels above this file)
+# プロジェクトルートを取得
+# Get project root
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-# Pythonのモジュール検索パスにプロジェクトルートを追加
-# Add project root to Python module search path
+# Pythonのモジュール検索パスに追加
+# Add project root to sys.path
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 
-# パスワードハッシュ化関数
-# Password hashing function
+# モジュール読み込み
+# Import modules
 from wiwa.core.password import hash_password
-
-# ユーザーリポジトリ（DB操作）
-# User repository for database operations
 from wiwa.db.users_repository import UsersRepository
-
-# i18n翻訳関数
-# i18n translation function
 from wiwa.core.i18n import t
 
 
 def main():
     """
-    管理者ユーザーを作成する
-    Create a new admin user
-
-    Flow:
-        1. 入力受付 / Receive input
-        2. パスワード確認 / Confirm password
-        3. ハッシュ化 / Hash password
-        4. DB保存 / Save to database
+    管理者ユーザーを作成
+    Create an admin user
     """
 
-    # ユーザーリポジトリを初期化
-    # Initialize user repository
     repo = UsersRepository()
 
     # ヘッダー表示
@@ -52,16 +55,16 @@ def main():
     print(t("create_admin_title"))
     print("----------------------")
 
-    # ユーザー情報の入力
-    # Receive user input
-    username = input("username: ").strip()
-    email = input("email: ").strip().lower()
-    display_name = input("display_name: ").strip()
+    # 入力受付
+    # Receive input
+    username = input(f"{t('input_username')}: ").strip()
+    email = input(f"{t('input_email')}: ").strip().lower()
+    display_name = input(f"{t('input_display_name')}: ").strip()
 
     # パスワード入力（非表示）
     # Input password (hidden)
-    password = getpass.getpass("password: ").strip()
-    password_confirm = getpass.getpass("password(confirm): ").strip()
+    password = getpass.getpass(f"{t('input_password')}: ").strip()
+    password_confirm = getpass.getpass(f"{t('input_password_confirm')}: ").strip()
 
     # パスワード一致チェック
     # Validate password confirmation
@@ -75,12 +78,12 @@ def main():
         display_name = username
 
     try:
-        # パスワードをハッシュ化
-        # Hash the password
+        # パスワードハッシュ化
+        # Hash password
         password_hash = hash_password(password)
 
-        # 管理者ユーザーを作成
-        # Create admin user in database
+        # ユーザー作成
+        # Create user
         inserted_id = repo.create(
             username=username,
             email=email,
@@ -99,13 +102,11 @@ def main():
         print("role: admin")
 
     except Exception as e:
-        # エラーハンドリング
+        # エラー表示
         # Error handling
         print(f"{t('error_prefix')}: {e}")
         sys.exit(1)
 
 
-# スクリプトとして実行された場合のみmainを呼ぶ
-# Execute main only when run as script
 if __name__ == "__main__":
     main()
