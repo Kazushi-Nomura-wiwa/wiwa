@@ -6,8 +6,8 @@
 #
 # 概要
 # Summary
-#   WSGI environをラップし、クエリ・フォーム・Cookieなどを扱いやすくする
-#   Wrap WSGI environ to provide easy access to query, form, and cookies
+#   WSGI environをラップし、クエリ・フォーム・Cookie・ファイルを扱いやすくする
+#   Wrap WSGI environ to provide easy access to query, form, cookies, and files
 #
 # 処理の流れ
 # Flow
@@ -17,9 +17,11 @@
 #      Parse query string
 #   3. フォーム解析
 #      Parse form data
-#   4. Cookie解析
+#   4. ファイル解析（multipart/form-data）
+#      Parse multipart files
+#   5. Cookie解析
 #      Parse cookies
-#   5. 付加情報取得（IP, UAなど）
+#   6. 付加情報取得（IP, UAなど）
 #      Provide extra info (IP, UA, etc.)
 
 from http import cookies
@@ -39,6 +41,7 @@ class Request:
         self.query_params = parse_qs(self.query_string)
 
         self._form_data = None
+        self._files = None
         self._cookies = None
 
         self.user = None
@@ -78,6 +81,16 @@ class Request:
         if not values:
             return default
         return values[0]
+
+    @property
+    def files(self):
+        """
+        アップロードファイル取得
+        Get uploaded files
+        """
+        if self._files is None:
+            self._parse_multipart()
+        return self._files
 
     @property
     def cookies(self) -> dict[str, str]:
@@ -161,6 +174,13 @@ class Request:
         if self.method not in {"POST", "PUT", "PATCH", "DELETE"}:
             return
 
+        content_type = self.environ.get("CONTENT_TYPE", "")
+
+        # multipartはここでは処理しない
+        # Skip multipart here
+        if "multipart/form-data" in content_type:
+            return
+
         try:
             content_length = int(self.environ.get("CONTENT_LENGTH", "0") or "0")
         except ValueError:
@@ -170,14 +190,40 @@ class Request:
             return
 
         body = self.environ["wsgi.input"].read(content_length)
-        content_type = self.environ.get("CONTENT_TYPE", "")
 
         if "application/x-www-form-urlencoded" in content_type:
             decoded = body.decode("utf-8")
             self._form_data = parse_qs(decoded)
             return
 
-        self._form_data = {}
+    def _parse_multipart(self):
+        """
+        multipart/form-data 解析
+        Parse multipart form data
+        """
+        import cgi
+
+        self._files = {}
+
+        if self.method not in {"POST", "PUT", "PATCH"}:
+            return
+
+        content_type = self.environ.get("CONTENT_TYPE", "")
+
+        if "multipart/form-data" not in content_type:
+            return
+
+        fs = cgi.FieldStorage(
+            fp=self.environ["wsgi.input"],
+            environ=self.environ,
+            keep_blank_values=True,
+        )
+
+        for key in fs:
+            field = fs[key]
+
+            if field.filename:
+                self._files[key] = field
 
     def _parse_cookies(self) -> None:
         """
