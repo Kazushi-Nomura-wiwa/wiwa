@@ -5,3 +5,4 @@ Jinja2
 tzdata
 werkzeug
 argon2-cffi
+python-magic
