@@ -1,4 +1,5 @@
 // パスとファイル名: wiwa/templates/js/admin/page_editor.js
+// Path and filename: wiwa/templates/js/admin/page_editor.js
 
 document.addEventListener("DOMContentLoaded", function(){
     const form = document.getElementById("page-form");
