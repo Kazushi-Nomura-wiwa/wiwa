@@ -223,11 +223,7 @@ def application(environ, start_response):
 
         # 認可チェック
         # Access control
-        print("RESOLVED:", resolved, flush=True)
-        print("REQUEST USER:", request.user, flush=True)
-
         access_response = check_access(request, resolved)
-
         if access_response is not None:
             return finish_response(
                 access_response,
