@@ -35,7 +35,14 @@ def check_access(request: Request, route: dict):
 
     # パス単位の認証チェック
     # Path-level authorization check
-    path_access = authorize_path(request)
+    path = request.path
+
+    # upload系は許可
+    # Allow upload endpoints
+    if path.startswith("/upload/"):
+        path_access = None
+    else:
+        path_access = authorize_path(request)
 
     if path_access == "login_required":
         return redirect(LOGIN_URL)
