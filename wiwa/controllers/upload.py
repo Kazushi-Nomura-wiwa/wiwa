@@ -10,9 +10,17 @@ import uuid
 
 import magic
 
-from wiwa.config import UPLOAD_IMG_DIR, UPLOAD_IMG_URL_PREFIX
+from wiwa.config import (
+    UPLOAD_IMG_DIR,
+    UPLOAD_IMG_URL_PREFIX,
+    UPLOAD_FILE_DIR,
+    UPLOAD_FILE_URL_PREFIX,
+    MAX_UPLOAD_IMAGE_SIZE,
+    MAX_UPLOAD_FILE_SIZE,
+)
 from wiwa.core.i18n import t
 from wiwa.core.response import json_response
+
 
 # 許可する画像MIMEタイプと拡張子
 # Allowed image MIME types and extensions
@@ -37,7 +45,7 @@ ALLOWED_FILE_MIME_TYPES = {
 # 現在のユーザーを検証する
 # Validate current user
 def _validate_user(request):
-    current_user = request.current_user
+    current_user = getattr(request, "user", None)
 
     # ログインチェック
     # Authentication check
@@ -45,15 +53,19 @@ def _validate_user(request):
         return json_response({
             "success": 0,
             "message": t("upload.login_required"),
-        }, status=401)
+        }, status="401 Unauthorized")
+
+    # role取得（正規化）
+    # Normalize role value
+    role = (current_user.get("role") or "").strip().lower()
 
     # 権限チェック
     # Authorization check
-    if current_user.get("role") not in ("admin", "author"):
+    if role not in ("admin", "author"):
         return json_response({
             "success": 0,
             "message": t("upload.permission_denied"),
-        }, status=403)
+        }, status="403 Forbidden")
 
     return None
 
@@ -67,7 +79,7 @@ def _get_uploaded_file(request):
         return None, json_response({
             "success": 0,
             "message": t("upload.file_not_found"),
-        }, status=400)
+        }, status="400 Bad Request")
 
     return uploaded_file, None
 
@@ -109,7 +121,7 @@ def image(request, **kwargs):
         return json_response({
             "success": 0,
             "message": t("upload.image_too_large"),
-        }, status=400)
+        }, status="400 Bad Request")
 
     # MIMEタイプ判定
     # Detect MIME type
@@ -121,9 +133,10 @@ def image(request, **kwargs):
         return json_response({
             "success": 0,
             "message": t("upload.invalid_image_type"),
-        }, status=400)
+        }, status="400 Bad Request")
 
     ext = ALLOWED_IMAGE_MIME_TYPES[mime_type]
+
     file_url = _save_upload(
         file_bytes=file_bytes,
         upload_dir=UPLOAD_IMG_DIR,
@@ -162,7 +175,7 @@ def file(request, **kwargs):
         return json_response({
             "success": 0,
             "message": t("upload.file_too_large"),
-        }, status=400)
+        }, status="400 Bad Request")
 
     # MIMEタイプ判定
     # Detect MIME type
@@ -174,9 +187,10 @@ def file(request, **kwargs):
         return json_response({
             "success": 0,
             "message": t("upload.invalid_file_type"),
-        }, status=400)
+        }, status="400 Bad Request")
 
     ext = ALLOWED_FILE_MIME_TYPES[mime_type]
+
     file_url = _save_upload(
         file_bytes=file_bytes,
         upload_dir=UPLOAD_FILE_DIR,
