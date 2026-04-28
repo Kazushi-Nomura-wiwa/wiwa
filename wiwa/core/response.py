@@ -150,3 +150,19 @@ def internal_server_error(message: str = "500 Internal Server Error"):
     Create 500 response
     """
     return Response(body=message, status="500 Internal Server Error")
+
+
+def json_response(data, status: str = "200 OK"):
+    """
+    JSONレスポンス生成
+    Create JSON response
+    """
+    import json
+
+    return Response(
+        body=json.dumps(data, ensure_ascii=False),
+        status=status,
+        headers=[
+            ("Content-Type", "application/json; charset=utf-8"),
+        ],
+    )
