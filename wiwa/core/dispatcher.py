@@ -23,7 +23,7 @@
 import importlib
 
 from wiwa.core.response import forbidden
-from wiwa.i18n import t
+from wiwa.core.i18n import t
 from wiwa.utils.csrf import validate_csrf
 
 
