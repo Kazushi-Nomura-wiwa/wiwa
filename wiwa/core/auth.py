@@ -101,13 +101,9 @@ def authorize_path(request) -> bool:
     path = request.path or ""
 
     if path == "/admin" or path.startswith("/admin/"):
-        if not is_admin(request):
-            return "forbidden"
-        return None
+        return is_admin(request)
 
     if path == "/mypage" or path.startswith("/mypage/"):
-        if not is_authenticated(request):
-            return "login_required"
-        return None
+        return is_authenticated(request)
 
-    return None
+    return True
