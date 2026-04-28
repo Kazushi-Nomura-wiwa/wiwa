@@ -12,8 +12,7 @@ import magic
 
 from wiwa.config import UPLOAD_IMG_DIR, UPLOAD_IMG_URL_PREFIX
 from wiwa.core.i18n import t
-from wiwa.core.response import JsonResponse
-
+from wiwa.core.response import json_response
 
 # 許可する画像MIMEタイプと拡張子
 # Allowed image MIME types and extensions
@@ -43,7 +42,7 @@ def _validate_user(request):
     # ログインチェック
     # Authentication check
     if not current_user:
-        return JsonResponse({
+        return json_response({
             "success": 0,
             "message": t("upload.login_required"),
         }, status=401)
@@ -51,7 +50,7 @@ def _validate_user(request):
     # 権限チェック
     # Authorization check
     if current_user.get("role") not in ("admin", "author"):
-        return JsonResponse({
+        return json_response({
             "success": 0,
             "message": t("upload.permission_denied"),
         }, status=403)
@@ -65,7 +64,7 @@ def _get_uploaded_file(request):
     uploaded_file = request.files.get("file")
 
     if not uploaded_file:
-        return None, JsonResponse({
+        return None, json_response({
             "success": 0,
             "message": t("upload.file_not_found"),
         }, status=400)
@@ -107,7 +106,7 @@ def image(request, **kwargs):
     # サイズチェック
     # File size validation
     if len(file_bytes) > MAX_UPLOAD_IMAGE_SIZE:
-        return JsonResponse({
+        return json_response({
             "success": 0,
             "message": t("upload.image_too_large"),
         }, status=400)
@@ -119,7 +118,7 @@ def image(request, **kwargs):
     # 画像形式チェック
     # Image type validation
     if mime_type not in ALLOWED_IMAGE_MIME_TYPES:
-        return JsonResponse({
+        return json_response({
             "success": 0,
             "message": t("upload.invalid_image_type"),
         }, status=400)
@@ -134,7 +133,7 @@ def image(request, **kwargs):
 
     # Editor.js形式で返却
     # Return response for Editor.js
-    return JsonResponse({
+    return json_response({
         "success": 1,
         "file": {
             "url": file_url,
@@ -160,7 +159,7 @@ def file(request, **kwargs):
     # サイズチェック
     # File size validation
     if len(file_bytes) > MAX_UPLOAD_FILE_SIZE:
-        return JsonResponse({
+        return json_response({
             "success": 0,
             "message": t("upload.file_too_large"),
         }, status=400)
@@ -172,7 +171,7 @@ def file(request, **kwargs):
     # ファイル形式チェック
     # File type validation
     if mime_type not in ALLOWED_FILE_MIME_TYPES:
-        return JsonResponse({
+        return json_response({
             "success": 0,
             "message": t("upload.invalid_file_type"),
         }, status=400)
@@ -185,7 +184,7 @@ def file(request, **kwargs):
         ext=ext,
     )
 
-    return JsonResponse({
+    return json_response({
         "success": 1,
         "file": {
             "url": file_url,
