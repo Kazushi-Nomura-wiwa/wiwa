@@ -75,9 +75,12 @@ def _validate_user(request):
 def _get_uploaded_file(request):
     files = getattr(request, "files", {})
 
-    uploaded_file = files.get("file") or files.get("image")
+    uploaded_file = files.get("file")
 
-    if not uploaded_file:
+    if uploaded_file is None:
+        uploaded_file = files.get("image")
+
+    if uploaded_file is None:
         return None, json_response({
             "success": 0,
             "message": t("upload.file_not_found"),
