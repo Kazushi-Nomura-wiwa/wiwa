@@ -242,3 +242,33 @@ RESERVED_SLUGS = [
 # トップページに表示する投稿数
 # Number of posts shown on home page
 HOME_POSTS_LIMIT = 5
+
+
+# ------------------------------
+# ファイルアップロード設定
+# File upload settings
+# ------------------------------
+
+# 画像アップロード最大サイズ（バイト）
+# Max upload size for images (bytes)
+MAX_UPLOAD_IMAGE_SIZE = 5 * 1024 * 1024  # 5MB
+
+# ファイルアップロード最大サイズ（バイト）
+# Max upload size for files (bytes)
+MAX_UPLOAD_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+
+# 画像アップロード先ディレクトリ
+# Directory for uploaded images
+UPLOAD_IMG_DIR = UPLOAD_BASE / "image"
+
+# 画像アップロードURLプレフィックス
+# URL prefix for uploaded images
+UPLOAD_IMG_URL_PREFIX = "/uploads/image"
+
+# ファイルアップロード先ディレクトリ
+# Directory for uploaded files
+UPLOAD_FILE_DIR = UPLOAD_BASE / "file"
+
+# ファイルアップロードURLプレフィックス
+# URL prefix for uploaded files
+UPLOAD_FILE_URL_PREFIX = "/uploads/file"

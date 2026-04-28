@@ -73,4 +73,11 @@ TRANSLATIONS = {
     "error.page.not_found": "Page not found.",
     "error.post.title_required": "Title is required.",
     "error.post.body_required": "Body is required.",
+    "upload.login_required": "Login is required.",
+    "upload.permission_denied": "You do not have permission to upload files.",
+    "upload.file_not_found": "No file was uploaded.",
+    "upload.image_too_large": "The image file is too large.",
+    "upload.file_too_large": "The file is too large.",
+    "upload.invalid_image_type": "This image type is not allowed.",
+    "upload.invalid_file_type": "This file type is not allowed.",
 }

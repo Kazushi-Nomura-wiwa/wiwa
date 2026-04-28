@@ -39,8 +39,6 @@ from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.extensions.loader import ExtensionLoader
 from wiwa.services.access_control_service import check_access
 from wiwa.services.access_log_service import save_access_log
-from wiwa.services.static_files_service import serve_static
-from wiwa.services.theme_files_service import serve_theme_file
 
 
 # ------------------------------
@@ -165,20 +163,6 @@ def attach_request_user(request: Request):
         SessionsRepository().touch(session_id)
 
 
-def handle_static(request):
-    """
-    静的ファイルの処理
-    Handle static and theme files
-    """
-    if request.path.startswith("/static/"):
-        return serve_static(request)
-
-    if request.path.startswith("/themes/"):
-        return serve_theme_file(request)
-
-    return None
-
-
 def resolve_route(request):
     """
     ルーティング解決
@@ -224,12 +208,6 @@ def application(environ, start_response):
     )
 
     try:
-        # 静的ファイル処理
-        # Handle static
-        static_response = handle_static(request)
-        if static_response:
-            return static_response(environ, wrapped_start_response)
-
         # ルーティング
         # Routing
         resolved = resolve_route(request)

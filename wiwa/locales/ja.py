@@ -73,4 +73,11 @@ TRANSLATIONS = {
     "error.page.not_found": "ページが見つかりません。",
     "error.post.title_required": "title は必須です。",
     "error.post.body_required": "body は必須です。",
+    "upload.login_required": "ログインが必要です。",
+    "upload.permission_denied": "アップロード権限がありません。",
+    "upload.file_not_found": "ファイルがありません。",
+    "upload.image_too_large": "画像ファイルサイズが大きすぎます。",
+    "upload.file_too_large": "ファイルサイズが大きすぎます。",
+    "upload.invalid_image_type": "許可されていない画像形式です。",
+    "upload.invalid_file_type": "許可されていないファイル形式です。",
 }

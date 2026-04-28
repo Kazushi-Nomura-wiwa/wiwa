@@ -41,12 +41,11 @@ document.addEventListener("DOMContentLoaded", function(){
                 inlineToolbar: true
             },
 
-            image: {
+           image: {
                 class: ImageTool,
                 config: {
                     endpoints: {
-                        byFile: "/admin/upload/image",
-                        byUrl: "/admin/upload/image-by-url"
+                        byFile: "/upload/image"
                     }
                 }
             }
