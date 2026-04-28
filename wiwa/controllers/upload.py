@@ -11,12 +11,12 @@ import uuid
 import magic
 
 from wiwa.config import (
-    MAX_UPLOAD_FILE_SIZE,
-    MAX_UPLOAD_IMAGE_SIZE,
-    UPLOAD_FILE_DIR,
-    UPLOAD_FILE_URL_PREFIX,
     UPLOAD_IMG_DIR,
     UPLOAD_IMG_URL_PREFIX,
+    UPLOAD_FILE_DIR,
+    UPLOAD_FILE_URL_PREFIX,
+    MAX_UPLOAD_IMAGE_SIZE,
+    MAX_UPLOAD_FILE_SIZE,
 )
 from wiwa.core.i18n import t
 from wiwa.core.response import json_response
@@ -47,8 +47,6 @@ ALLOWED_FILE_MIME_TYPES = {
 def _validate_user(request):
     current_user = getattr(request, "user", None)
 
-    print("UPLOAD VALIDATE USER:", current_user, flush=True)
-
     # ログインチェック
     # Authentication check
     if not current_user:
@@ -60,8 +58,6 @@ def _validate_user(request):
     # role取得（正規化）
     # Normalize role value
     role = (current_user.get("role") or "").strip().lower()
-
-    print("UPLOAD VALIDATE ROLE:", role, flush=True)
 
     # 権限チェック
     # Authorization check
@@ -78,8 +74,6 @@ def _validate_user(request):
 # Get uploaded file
 def _get_uploaded_file(request):
     files = getattr(request, "files", {})
-
-    print("UPLOAD FILES:", files, flush=True)
 
     uploaded_file = files.get("file")
 
@@ -105,32 +99,23 @@ def _save_upload(file_bytes, upload_dir, url_prefix, ext):
 
     file_url = f"{url_prefix}/{filename}"
 
-    print("UPLOAD SAVED:", file_url, flush=True)
-
     return file_url
 
 
 # 画像アップロード処理
 # Image upload handler
 def image(request, **kwargs):
-    print("UPLOAD IMAGE HANDLER START", flush=True)
-    print("UPLOAD IMAGE USER:", getattr(request, "user", None), flush=True)
-
     user_error = _validate_user(request)
 
     if user_error:
-        print("UPLOAD IMAGE USER ERROR", flush=True)
         return user_error
 
     uploaded_file, file_error = _get_uploaded_file(request)
 
     if file_error:
-        print("UPLOAD IMAGE FILE ERROR", flush=True)
         return file_error
 
     file_bytes = uploaded_file.file.read()
-
-    print("UPLOAD IMAGE SIZE:", len(file_bytes), flush=True)
 
     # サイズチェック
     # File size validation
@@ -143,8 +128,6 @@ def image(request, **kwargs):
     # MIMEタイプ判定
     # Detect MIME type
     mime_type = magic.from_buffer(file_bytes, mime=True)
-
-    print("UPLOAD IMAGE MIME:", mime_type, flush=True)
 
     # 画像形式チェック
     # Image type validation
@@ -176,24 +159,17 @@ def image(request, **kwargs):
 # PDFアップロード処理
 # PDF upload handler
 def file(request, **kwargs):
-    print("UPLOAD FILE HANDLER START", flush=True)
-    print("UPLOAD FILE USER:", getattr(request, "user", None), flush=True)
-
     user_error = _validate_user(request)
 
     if user_error:
-        print("UPLOAD FILE USER ERROR", flush=True)
         return user_error
 
     uploaded_file, file_error = _get_uploaded_file(request)
 
     if file_error:
-        print("UPLOAD FILE FILE ERROR", flush=True)
         return file_error
 
     file_bytes = uploaded_file.file.read()
-
-    print("UPLOAD FILE SIZE:", len(file_bytes), flush=True)
 
     # サイズチェック
     # File size validation
@@ -206,8 +182,6 @@ def file(request, **kwargs):
     # MIMEタイプ判定
     # Detect MIME type
     mime_type = magic.from_buffer(file_bytes, mime=True)
-
-    print("UPLOAD FILE MIME:", mime_type, flush=True)
 
     # ファイル形式チェック
     # File type validation

@@ -29,6 +29,8 @@ from wiwa.utils.csrf import validate_csrf
 
 CSRF_EXEMPT_PATHS = {
     "/auth/login",
+    "/upload/image",
+    "/upload/file",
 }
 
 
