@@ -1,4 +1,4 @@
-MESSAGES = {
+TRANSLATIONS = {
     "create_admin_title": "WiWA 管理者ユーザー作成",
     "input_username": "ユーザー名",
     "input_email": "メールアドレス",
