@@ -144,10 +144,20 @@ article {
 
 .site-header__link {
     display: block;
+    width: 8.5rem;
+    height: 2.9rem;
+    overflow: hidden;
+    background-image: url("/static/img/wiwa_logo.svg");
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: contain;
+    color: transparent;
+    text-indent: 100%;
+    white-space: nowrap;
 }
 
-.site-header__link img {
-    width: 8.5rem;
+.site-header__link:hover {
+    opacity: 0.82;
 }
 
 .site-header__login-status {
