@@ -2,16 +2,17 @@
 
 :root {
     --white: hsl(0 0% 100%);
-    --paper: hsl(36 100% 98%);
+    --paper: hsl(36 38% 98%);
     --surface: hsl(0 0% 100%);
     --surface-strong: hsl(0 0% 100%);
-    --ink: hsl(228 20% 10%);
-    --muted: hsl(226 8% 40%);
-    --line: hsl(28 22% 82%);
+    --ink: hsl(225 18% 13%);
+    --muted: hsl(225 8% 45%);
+    --line: hsl(30 16% 86%);
+    --line-strong: hsl(225 12% 24%);
     --orange: hsl(28 100% 50%);
-    --orange-dark: hsl(22 92% 38%);
-    --orange-soft: hsl(30 100% 94%);
-    --orange-solid: hsl(25 100% 48%);
+    --orange-dark: hsl(22 88% 40%);
+    --orange-soft: hsl(30 100% 96%);
+    --orange-solid: hsl(25 96% 50%);
     --blue: hsl(218 72% 38%);
     --danger: hsl(4 76% 48%);
     --content-width: 72rem;
@@ -41,6 +42,7 @@ body {
     margin: 0;
     font-family: var(--font-sans);
     line-height: 1.75;
+    text-rendering: optimizeLegibility;
 }
 
 h1,
@@ -94,7 +96,7 @@ address {
 
 main {
     width: min(var(--content-width), calc(100% - 2rem));
-    margin: 4rem auto 7rem;
+    margin: 4.5rem auto 7rem;
 }
 
 section,
@@ -107,7 +109,7 @@ article {
     top: 0;
     z-index: 100;
     background: var(--surface-strong);
-    border-bottom: 2px solid var(--ink);
+    border-bottom: 1px solid var(--line);
 }
 
 .site-header__main {
@@ -116,7 +118,7 @@ article {
     gap: 1.5rem;
     width: min(var(--content-width), calc(100% - 2rem));
     margin: 0 auto;
-    padding: 1.35rem 0;
+    padding: 1.2rem 0;
 }
 
 .site-header__title {
@@ -145,7 +147,7 @@ article {
 .site-header__login-status {
     margin: 0 0 0 auto;
     color: var(--muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-align: right;
 }
 
@@ -170,7 +172,7 @@ article {
 .admin-nav__list,
 .mypage-nav__list {
     display: flex;
-    gap: 0.75rem;
+    gap: 1.2rem;
     min-width: max-content;
     padding: 0.85rem 0;
 }
@@ -179,12 +181,12 @@ article {
 .admin-nav__link,
 .mypage-nav__link {
     display: block;
-    border: 1px solid transparent;
+    border-bottom: 1px solid transparent;
     border-radius: 0;
-    padding: 0.55rem 0;
+    padding: 0.35rem 0;
     color: var(--ink);
     font-size: 0.9rem;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1.25;
     text-decoration: none;
 }
@@ -192,7 +194,7 @@ article {
 .global-nav__link:hover,
 .admin-nav__link:hover,
 .mypage-nav__link:hover {
-    border-color: transparent;
+    border-color: var(--orange);
     background: transparent;
     color: var(--orange-dark);
 }
@@ -201,17 +203,17 @@ article {
     position: relative;
     isolation: isolate;
     display: flex;
-    min-height: clamp(25rem, 56vw, 36rem);
+    min-height: clamp(24rem, 50vw, 33rem);
     flex-direction: column;
     justify-content: center;
-    margin-bottom: 6rem;
+    margin-bottom: 6.5rem;
     overflow: hidden;
-    border: 2px solid var(--ink);
-    border-left: 1rem solid var(--orange-solid);
+    border: 1px solid var(--line);
+    border-left: 0.35rem solid var(--orange-solid);
     border-radius: 0;
-    padding: clamp(2.5rem, 7vw, 6rem);
-    background: hsl(228 20% 10%);
-    color: var(--white);
+    padding: clamp(2.75rem, 7vw, 6.5rem);
+    background: var(--surface);
+    color: var(--ink);
 }
 
 .hero::after {
@@ -220,7 +222,7 @@ article {
     right: clamp(1.5rem, 5vw, 4rem);
     bottom: clamp(1.5rem, 5vw, 4rem);
     z-index: -1;
-    color: hsl(0 0% 100% / 7%);
+    color: hsl(28 100% 50% / 8%);
     font-family: var(--font-sans);
     font-size: clamp(5rem, 18vw, 13rem);
     font-weight: 900;
@@ -229,10 +231,10 @@ article {
 }
 
 .hero__title {
-    max-width: 15ch;
+    max-width: 16ch;
     margin-bottom: 1.5rem;
     font-family: var(--font-sans);
-    font-size: clamp(2.25rem, 7vw, 5.3rem);
+    font-size: clamp(2.4rem, 7vw, 5.6rem);
     font-weight: 900;
     letter-spacing: 0;
     line-height: 0.94;
@@ -240,9 +242,9 @@ article {
 
 .hero__text {
     max-width: 42rem;
-    color: hsl(0 0% 100% / 82%);
+    color: var(--muted);
     font-size: clamp(1rem, 2.2vw, 1.25rem);
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .latest-posts,
@@ -261,10 +263,10 @@ main > section > h1,
 main > section > h2,
 .post__title,
 .page h1 {
-    margin-bottom: 2rem;
+    margin-bottom: 2.25rem;
     color: var(--ink);
     font-size: clamp(1.65rem, 4vw, 2.65rem);
-    font-weight: 900;
+    font-weight: 800;
     letter-spacing: 0;
     line-height: 1.15;
 }
@@ -276,8 +278,8 @@ main > section > h1::after,
 main > section > h2::after {
     content: "";
     display: block;
-    width: 5rem;
-    height: 0.22rem;
+    width: 3rem;
+    height: 0.15rem;
     margin-top: 0.85rem;
     border-radius: 0;
     background: var(--orange);
@@ -286,7 +288,7 @@ main > section > h2::after {
 .post-list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
-    gap: 1.5rem;
+    gap: 1.25rem;
 }
 
 .post-list__item,
@@ -296,9 +298,9 @@ main > section > h2::after {
 
 .post-card {
     height: 100%;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line);
     border-radius: 0;
-    padding: 1.6rem;
+    padding: 1.5rem;
     background: var(--surface);
     transition:
         transform 0.2s ease,
@@ -306,8 +308,8 @@ main > section > h2::after {
 }
 
 .post-card:hover {
-    transform: translateY(-0.2rem);
-    border-color: var(--ink);
+    transform: translateY(-0.12rem);
+    border-color: var(--orange);
 }
 
 .post-list__link,
@@ -320,7 +322,7 @@ main > section > h2::after {
 .post-list__title {
     margin-bottom: 1rem;
     font-size: 1.2rem;
-    font-weight: 900;
+    font-weight: 800;
     line-height: 1.35;
 }
 
@@ -350,13 +352,13 @@ main > section > h2::after {
     display: inline-flex;
     align-items: center;
     min-height: 2rem;
-    border: 1px solid var(--orange-dark);
+    border: 1px solid hsl(28 82% 78%);
     border-radius: 0;
     padding: 0.25rem 0.7rem;
     background: var(--orange-soft);
     color: var(--orange-dark);
     font-size: 0.85rem;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.2;
     text-decoration: none;
 }
@@ -374,9 +376,9 @@ input[type="submit"] {
     align-items: center;
     justify-content: center;
     min-height: 2.65rem;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--orange);
     border-radius: 0;
-    padding: 0.65rem 1.15rem;
+    padding: 0.65rem 1.2rem;
     background: var(--orange);
     color: var(--white);
     font: inherit;
@@ -434,7 +436,7 @@ input[type="submit"]:hover {
 }
 
 .site-footer {
-    border-top: 2px solid var(--ink);
+    border-top: 1px solid var(--line);
     padding: 3rem 1rem;
     color: var(--muted);
     text-align: center;
@@ -447,7 +449,7 @@ input[type="submit"]:hover {
 .error {
     width: min(var(--content-width), calc(100% - 2rem));
     margin: 1rem auto 0;
-    border: 2px solid var(--danger);
+    border: 1px solid hsl(4 76% 72%);
     border-radius: 0;
     padding: 1rem 1.25rem;
     background: hsl(4 100% 97%);
@@ -459,7 +461,7 @@ form {
     display: grid;
     gap: 1.35rem;
     max-width: 48rem;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line);
     border-radius: 0;
     padding: clamp(1.25rem, 4vw, 2rem);
     background: var(--surface);
@@ -475,7 +477,7 @@ input,
 select,
 textarea {
     width: min(100%, 40rem) !important;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line);
     border-radius: 0;
     padding: 0.8rem 0.9rem;
     background: var(--surface-strong);
@@ -515,21 +517,21 @@ table {
     border-collapse: separate;
     border-spacing: 0;
     overflow: hidden;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line);
     border-radius: 0;
     background: var(--surface-strong);
 }
 
 th,
 td {
-    border-bottom: 1px solid var(--ink);
+    border-bottom: 1px solid var(--line);
     padding: 1rem;
     text-align: left;
     vertical-align: top;
 }
 
 th {
-    background: var(--orange-soft);
+    background: hsl(36 38% 97%);
     color: var(--ink);
     font-size: 0.85rem;
     font-weight: 900;
@@ -555,7 +557,7 @@ main > section > nav ul {
 
 main > section > nav a {
     display: inline-flex;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line);
     border-radius: 0;
     padding: 0.55rem 0.9rem;
     background: var(--orange-soft);
@@ -571,7 +573,7 @@ main > section > ul:not(.post-list):not(.pagination__list) {
 }
 
 main > section > ul:not(.post-list):not(.pagination__list) > li {
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line);
     border-radius: 0;
     padding: 1.35rem;
     background: var(--surface);
@@ -601,7 +603,7 @@ main > section > ul:not(.post-list):not(.pagination__list) > li h2 {
     justify-content: center;
     min-width: 2.3rem;
     min-height: 2.3rem;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--line);
     border-radius: 0;
     padding: 0.35rem 0.65rem;
     background: var(--surface-strong);
