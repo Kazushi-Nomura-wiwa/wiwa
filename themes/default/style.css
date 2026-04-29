@@ -14,7 +14,6 @@
     --orange-solid: hsl(25 100% 48%);
     --blue: hsl(218 72% 38%);
     --danger: hsl(4 76% 48%);
-    --shadow: 0.65rem 0.65rem 0 var(--orange);
     --content-width: 72rem;
     --font-sans: "Inter", "Noto Sans JP", sans-serif;
     --font-jp: "Noto Sans JP", sans-serif;
@@ -109,7 +108,6 @@ article {
     z-index: 100;
     background: var(--surface-strong);
     border-bottom: 2px solid var(--ink);
-    box-shadow: none;
 }
 
 .site-header__main {
@@ -213,7 +211,6 @@ article {
     border-radius: 0;
     padding: clamp(2.5rem, 7vw, 6rem);
     background: hsl(228 20% 10%);
-    box-shadow: var(--shadow);
     color: var(--white);
 }
 
@@ -303,17 +300,14 @@ main > section > h2::after {
     border-radius: 0;
     padding: 1.6rem;
     background: var(--surface);
-    box-shadow: 0.45rem 0.45rem 0 hsl(28 100% 50% / 28%);
     transition:
         transform 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        border-color 0.2s ease;
 }
 
 .post-card:hover {
     transform: translateY(-0.2rem);
     border-color: var(--ink);
-    box-shadow: 0.65rem 0.65rem 0 hsl(28 100% 50% / 42%);
 }
 
 .post-list__link,
@@ -384,7 +378,6 @@ input[type="submit"] {
     border-radius: 0;
     padding: 0.65rem 1.15rem;
     background: var(--orange);
-    box-shadow: 0.25rem 0.25rem 0 var(--ink);
     color: var(--white);
     font: inherit;
     font-weight: 800;
@@ -470,7 +463,6 @@ form {
     border-radius: 0;
     padding: clamp(1.25rem, 4vw, 2rem);
     background: var(--surface);
-    box-shadow: 0.45rem 0.45rem 0 hsl(28 100% 50% / 26%);
 }
 
 label {
@@ -503,7 +495,6 @@ form:has(table) {
     border: 0;
     padding: 0;
     background: transparent;
-    box-shadow: none;
 }
 
 textarea {
@@ -515,8 +506,8 @@ input:focus,
 select:focus,
 textarea:focus {
     border-color: var(--orange);
-    box-shadow: 0 0 0 0.2rem hsl(28 100% 50% / 16%);
-    outline: none;
+    outline: 0.2rem solid hsl(28 100% 50% / 35%);
+    outline-offset: 0.15rem;
 }
 
 table {
@@ -527,7 +518,6 @@ table {
     border: 2px solid var(--ink);
     border-radius: 0;
     background: var(--surface-strong);
-    box-shadow: 0.45rem 0.45rem 0 hsl(28 100% 50% / 22%);
 }
 
 th,
@@ -585,7 +575,6 @@ main > section > ul:not(.post-list):not(.pagination__list) > li {
     border-radius: 0;
     padding: 1.35rem;
     background: var(--surface);
-    box-shadow: 0.45rem 0.45rem 0 hsl(28 100% 50% / 22%);
 }
 
 main > section > ul:not(.post-list):not(.pagination__list) > li h2 {
