@@ -8,12 +8,13 @@
     --ink: hsl(225 18% 13%);
     --muted: hsl(225 8% 45%);
     --line: hsl(30 16% 86%);
-    --line-strong: hsl(225 12% 24%);
     --orange: hsl(28 100% 50%);
     --orange-dark: hsl(22 88% 40%);
     --orange-soft: hsl(30 100% 96%);
     --orange-solid: hsl(25 96% 50%);
     --blue: hsl(218 72% 38%);
+    --cyan: hsl(188 84% 48%);
+    --magenta: hsl(330 86% 60%);
     --danger: hsl(4 76% 48%);
     --content-width: 72rem;
     --font-sans: "Inter", "Noto Sans JP", sans-serif;
@@ -29,7 +30,9 @@
 html {
     font-size: 16px;
     scroll-behavior: smooth;
-    background: var(--paper);
+    background:
+        linear-gradient(165deg, hsl(28 100% 96%) 0 14rem, transparent 14rem),
+        linear-gradient(180deg, var(--paper), hsl(0 0% 100%));
     color: var(--ink);
     font-family: var(--font-jp);
     font-optical-sizing: auto;
@@ -108,7 +111,7 @@ article {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--surface-strong);
+    background: hsl(0 0% 100% / 92%);
     border-bottom: 1px solid var(--line);
 }
 
@@ -181,9 +184,9 @@ article {
 .admin-nav__link,
 .mypage-nav__link {
     display: block;
-    border-bottom: 1px solid transparent;
-    border-radius: 0;
-    padding: 0.35rem 0;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0.45rem 0.75rem;
     color: var(--ink);
     font-size: 0.9rem;
     font-weight: 800;
@@ -194,8 +197,8 @@ article {
 .global-nav__link:hover,
 .admin-nav__link:hover,
 .mypage-nav__link:hover {
-    border-color: var(--orange);
-    background: transparent;
+    border-color: hsl(28 100% 86%);
+    background: var(--orange-soft);
     color: var(--orange-dark);
 }
 
@@ -203,17 +206,30 @@ article {
     position: relative;
     isolation: isolate;
     display: flex;
-    min-height: clamp(24rem, 50vw, 33rem);
+    min-height: clamp(25rem, 50vw, 34rem);
     flex-direction: column;
     justify-content: center;
     margin-bottom: 6.5rem;
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-left: 0.35rem solid var(--orange-solid);
-    border-radius: 0;
+    border: 1px solid hsl(28 100% 88%);
+    border-radius: 8px;
     padding: clamp(2.75rem, 7vw, 6.5rem);
-    background: var(--surface);
+    background:
+        linear-gradient(115deg, hsl(0 0% 100% / 92%) 0 52%, hsl(0 0% 100% / 58%) 52%),
+        linear-gradient(135deg, hsl(28 100% 50%), hsl(330 86% 60%) 48%, hsl(188 84% 48%));
     color: var(--ink);
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: -18%;
+    right: -8%;
+    z-index: -1;
+    width: 48%;
+    height: 140%;
+    background: linear-gradient(160deg, hsl(28 100% 50% / 92%), hsl(188 84% 48% / 82%));
+    transform: skewX(-18deg);
 }
 
 .hero::after {
@@ -222,7 +238,7 @@ article {
     right: clamp(1.5rem, 5vw, 4rem);
     bottom: clamp(1.5rem, 5vw, 4rem);
     z-index: -1;
-    color: hsl(28 100% 50% / 8%);
+    color: hsl(225 18% 13% / 6%);
     font-family: var(--font-sans);
     font-size: clamp(5rem, 18vw, 13rem);
     font-weight: 900;
@@ -231,10 +247,10 @@ article {
 }
 
 .hero__title {
-    max-width: 16ch;
+    max-width: 14ch;
     margin-bottom: 1.5rem;
     font-family: var(--font-sans);
-    font-size: clamp(2.4rem, 7vw, 5.6rem);
+    font-size: clamp(2.6rem, 7vw, 5.9rem);
     font-weight: 900;
     letter-spacing: 0;
     line-height: 0.94;
@@ -278,11 +294,11 @@ main > section > h1::after,
 main > section > h2::after {
     content: "";
     display: block;
-    width: 3rem;
-    height: 0.15rem;
+    width: 3.5rem;
+    height: 0.18rem;
     margin-top: 0.85rem;
     border-radius: 0;
-    background: var(--orange);
+    background: linear-gradient(90deg, var(--orange), var(--magenta), var(--cyan));
 }
 
 .post-list {
@@ -299,7 +315,7 @@ main > section > h2::after {
 .post-card {
     height: 100%;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     padding: 1.5rem;
     background: var(--surface);
     transition:
@@ -309,7 +325,7 @@ main > section > h2::after {
 
 .post-card:hover {
     transform: translateY(-0.12rem);
-    border-color: var(--orange);
+    border-color: hsl(28 100% 72%);
 }
 
 .post-list__link,
@@ -353,7 +369,7 @@ main > section > h2::after {
     align-items: center;
     min-height: 2rem;
     border: 1px solid hsl(28 82% 78%);
-    border-radius: 0;
+    border-radius: 999px;
     padding: 0.25rem 0.7rem;
     background: var(--orange-soft);
     color: var(--orange-dark);
@@ -377,9 +393,9 @@ input[type="submit"] {
     justify-content: center;
     min-height: 2.65rem;
     border: 1px solid var(--orange);
-    border-radius: 0;
+    border-radius: 999px;
     padding: 0.65rem 1.2rem;
-    background: var(--orange);
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
     color: var(--white);
     font: inherit;
     font-weight: 800;
@@ -450,7 +466,7 @@ input[type="submit"]:hover {
     width: min(var(--content-width), calc(100% - 2rem));
     margin: 1rem auto 0;
     border: 1px solid hsl(4 76% 72%);
-    border-radius: 0;
+    border-radius: 8px;
     padding: 1rem 1.25rem;
     background: hsl(4 100% 97%);
     color: var(--danger);
@@ -462,7 +478,7 @@ form {
     gap: 1.35rem;
     max-width: 48rem;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     padding: clamp(1.25rem, 4vw, 2rem);
     background: var(--surface);
 }
@@ -478,7 +494,7 @@ select,
 textarea {
     width: min(100%, 40rem) !important;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 6px;
     padding: 0.8rem 0.9rem;
     background: var(--surface-strong);
     color: var(--ink);
@@ -518,7 +534,7 @@ table {
     border-spacing: 0;
     overflow: hidden;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     background: var(--surface-strong);
 }
 
@@ -558,7 +574,7 @@ main > section > nav ul {
 main > section > nav a {
     display: inline-flex;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 999px;
     padding: 0.55rem 0.9rem;
     background: var(--orange-soft);
     font-weight: 800;
@@ -574,7 +590,7 @@ main > section > ul:not(.post-list):not(.pagination__list) {
 
 main > section > ul:not(.post-list):not(.pagination__list) > li {
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 8px;
     padding: 1.35rem;
     background: var(--surface);
 }
@@ -604,7 +620,7 @@ main > section > ul:not(.post-list):not(.pagination__list) > li h2 {
     min-width: 2.3rem;
     min-height: 2.3rem;
     border: 1px solid var(--line);
-    border-radius: 0;
+    border-radius: 999px;
     padding: 0.35rem 0.65rem;
     background: var(--surface-strong);
     font-weight: 800;
