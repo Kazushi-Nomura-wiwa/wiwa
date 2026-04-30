@@ -28,10 +28,11 @@ import importlib
 
 from wiwa.config import RESERVED_SLUGS
 from wiwa.core.route_rules import DYNAMIC_NAMES
+from wiwa.types.route import Route
 
 
 class Resolver:
-    def resolve(self, path: str, method: str = "GET") -> dict | None:
+    def resolve(self, path: str, method: str = "GET") -> Route | None:
         """
         パスからルートを解決
         Resolve route from path
@@ -61,10 +62,10 @@ class Resolver:
 
     def _attach_meta(
         self,
-        result: dict,
+        result: Route,
         parts: list[str],
         method: str,
-    ) -> dict:
+    ) -> Route:
         """
         ルートにメタ情報を付与
         Attach metadata to route
@@ -81,7 +82,7 @@ class Resolver:
         """
         return "html/" + "/".join(parts) + ".html"
 
-    def _resolve_static(self, parts: list[str]) -> dict | None:
+    def _resolve_static(self, parts: list[str]) -> Route | None:
         """
         静的ルート解決
         Resolve static route
@@ -114,7 +115,7 @@ class Resolver:
 
         return None
 
-    def _resolve_dynamic(self, parts: list[str]) -> dict | None:
+    def _resolve_dynamic(self, parts: list[str]) -> Route | None:
         """
         動的ルート解決
         Resolve dynamic route
@@ -154,7 +155,7 @@ class Resolver:
 
         return None
 
-    def _resolve_page_fallback(self, parts: list[str]) -> dict | None:
+    def _resolve_page_fallback(self, parts: list[str]) -> Route | None:
         """
         固定ページフォールバック
         Resolve page fallback

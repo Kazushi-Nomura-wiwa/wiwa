@@ -26,6 +26,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from wiwa.config import ACTIVE_THEME, TEMPLATE_BASE
 from wiwa.core.i18n import t
+from wiwa.types.route import Route
 
 
 class TemplateRenderer:
@@ -72,7 +73,7 @@ class TemplateRenderer:
 
     def render_route(
         self,
-        route: dict | None,
+        route: Route | None,
         default_template: str,
         context: dict | None = None,
         request=None,
