@@ -25,6 +25,7 @@ import importlib
 from wiwa.core.response import forbidden
 from wiwa.core.i18n import t
 from wiwa.utils.csrf import validate_csrf
+from wiwa.types.route import Route
 
 
 CSRF_EXEMPT_PATHS = {
@@ -35,7 +36,7 @@ CSRF_EXEMPT_PATHS = {
 
 
 class Dispatcher:
-    def dispatch(self, resolved: dict, request):
+    def dispatch(self, resolved: Route, request):
         """
         解決済みルートから処理を呼び出す
         Dispatch the resolved route to the handler

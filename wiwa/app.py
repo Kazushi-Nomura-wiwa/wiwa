@@ -38,6 +38,7 @@ from wiwa.db.mongo import ensure_indexes
 from wiwa.db.sessions_repository import SessionsRepository
 from wiwa.extensions.loader import ExtensionLoader
 from wiwa.services.access_control_service import check_access
+from wiwa.types.route import Route
 from wiwa.services.access_log_service import save_access_log
 
 
@@ -125,7 +126,7 @@ def finish_response(response, environ, start_response, request, status_holder: d
     return result
 
 
-def resolve_extension_route(path: str, method: str) -> dict | None:
+def resolve_extension_route(path: str, method: str) -> Route | None:
     """
     拡張機能ルートの解決
     Resolve extension route
@@ -163,7 +164,7 @@ def attach_request_user(request: Request):
         SessionsRepository().touch(session_id)
 
 
-def resolve_route(request):
+def resolve_route(request) -> Route | None:
     """
     ルーティング解決
     Resolve route (extension → core)
