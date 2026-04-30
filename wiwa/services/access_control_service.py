@@ -24,9 +24,10 @@ from wiwa.config import LOGIN_URL
 from wiwa.core.auth import authorize_path
 from wiwa.core.request import Request
 from wiwa.core.response import forbidden, redirect
+from wiwa.types.route import Route
 
 
-def check_access(request: Request, route: dict):
+def check_access(request: Request, route: Route):
     """
     アクセス制御判定
     Check access control
