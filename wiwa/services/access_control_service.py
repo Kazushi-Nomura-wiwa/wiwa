@@ -44,10 +44,11 @@ def check_access(request: Request, route: dict):
     else:
         path_access = authorize_path(request)
 
-    if path_access == "login_required":
-        return redirect(LOGIN_URL)
-
-    if path_access == "forbidden":
+    # authorize_path() はboolを返す仕様。
+    # False の場合は、未ログインならログイン画面へ、ログイン済みなら403を返す。
+    if path_access is False:
+        if user is None:
+            return redirect(LOGIN_URL)
         return forbidden()
 
     # ルート単位の認証チェック
