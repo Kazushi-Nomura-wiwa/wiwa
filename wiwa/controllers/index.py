@@ -54,8 +54,6 @@ def index(request, route=None):
     # Convert posts into template-friendly view data
     posts = post_view_service.build_post_list(posts)
 
-    print(route)
-
     # トップページテンプレートを描画
     # Render home page template
     body = renderer.render_route(

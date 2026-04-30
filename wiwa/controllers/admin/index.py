@@ -31,6 +31,8 @@ def index(request, route=None, **params):
     Render admin dashboard
     """
 
+    print(route)
+
     # 管理画面トップテンプレートを描画
     # Render admin dashboard template
     body = renderer.render_route(
