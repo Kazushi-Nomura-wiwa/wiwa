@@ -2,9 +2,8 @@
 
 :root{
     /* ---------- カスタムプロパティ(カラー設定ほか) ---------- */
-    --white: hsl(0 0% 100%);
-    --black: hsl(0 0% 0%);
-    --text: hsl(0 0% 20%);
+    --black: hsl(0 0% 10%);
+    --text: hsl(0, 0%, 90%);
     --orange: hsl(35, 100%, 50%);
     --light-ash: hsl(0 0% 78%);
 
@@ -41,7 +40,7 @@ img {
 html{
     font-size: 16px;
     scroll-behavior: smooth;
-    background: var(--white);
+    background: var(--black);
     color: var(--text);
     font-family: "Noto Sans JP", sans-serif;
     font-optical-sizing: auto;
