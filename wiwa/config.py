@@ -173,6 +173,10 @@ TRASH_RETENTION_DAYS = 30
 # Used for sitemap.xml and absolute URL generation
 SITE_URL = "https://wiwa.jp"
 
+# サイト名
+# Site name
+SITE_NAME = "WiWA"
+
 
 # ------------------------------
 # 拡張機能設定

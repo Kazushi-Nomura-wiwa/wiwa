@@ -187,6 +187,51 @@ Replace `/path/to/wiwa/` with the actual path for your environment
 
 ---
 
+
+## ルーティング仕様 / Routing specification
+
+### 処理フロー / Request flow
+
+1. `application()` が Request を生成
+2. `resolve_route()` がルートを解決（extension → core）
+3. `check_access()` で認証・認可を判定
+4. `Dispatcher.dispatch()` がハンドラを実行
+5. コントローラで `renderer.render_route()` を呼び出し
+6. `route.template`（あれば）またはデフォルトテンプレートを描画
+
+---
+
+### ルート解決順 / Resolution order
+
+1. Extension route（`url` + `method` 一致）
+2. Static route（例: `/admin/post/list` → `admin.post.list`）
+3. Dynamic route（例: `/post/hello-world` → `post.slug`）
+4. Page fallback（例: `/about` → `page.slug`）
+
+---
+
+### Routeオブジェクト / Route object
+
+`route` は以下のキーを持つ辞書です（`template` は任意）。
+
+- `handler: str`
+- `params: dict[str, str]`
+- `method: str`
+- `auth_required: bool`
+- `roles: list[str]`
+- `template: str` (optional)
+
+---
+
+### テンプレート決定ルール / Template decision
+
+`render_route(route, default_template, ...)` は次の順でテンプレートを決定します。
+
+1. `route["template"]` があればそれを使用
+2. なければ `default_template` を使用
+
+---
+
 ## 設計思想 / Philosophy
 
 * No magic. Just code.()
