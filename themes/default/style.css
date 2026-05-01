@@ -3,7 +3,8 @@
 :root{
     /* ---------- カスタムプロパティ(カラー設定ほか) ---------- */
     --black: hsl(0 0% 10%);
-    --text: hsl(0, 0%, 90%);
+    --ash: hsl(0 0% 50%);
+    --white: hsl(0, 0%, 90%);
     --orange: hsl(35, 100%, 50%);
 
     /* --- テキスト --- */
@@ -40,7 +41,7 @@ html{
     font-size: 16px;
     scroll-behavior: smooth;
     background: var(--black);
-    color: var(--text);
+    color: var(--white);
     font-family: "Noto Sans JP", sans-serif;
     font-optical-sizing: auto;
     font-weight: 500;
@@ -71,7 +72,7 @@ th,
 td {
     border-collapse: collapse;
     width: 100%;
-    border: 1px solid var(--light-ash);
+    border: 1px solid var(--ash);
 }
 /* スマホ版 */
 /* ヘッダー */
