@@ -121,9 +121,8 @@ td {
 }
 
 .site-header__sub {
-    background: var(--dark-green);
-    border-top: 1px solid var(--light-ash);
-    border-bottom: 1px solid var(--light-ash);
+    border-top: 1px solid var(--ash);
+    border-bottom: 1px solid var(--ash);
 }
 
 /* グローバルナビゲーション */
@@ -134,11 +133,11 @@ td {
 .global-nav__list {
     display: flex;
     flex-wrap: wrap;
-    border-left:1px solid var(--light-ash);
+    border-left:1px solid var(--ash);
 }
 
 .global-nav__item {
-    border-right:1px solid var(--light-ash);
+    border-right:1px solid var(--ash);
 }
 
 .global-nav__link {
@@ -150,7 +149,7 @@ td {
 /* admin・author用ナビゲーション */
 .admin-nav, 
 .mypage-nav {
-    border-top: 1px solid var(--light-ash);
+    border-top: 1px solid var(--ash);
 }
 
 .admin-nav__list,
@@ -158,12 +157,12 @@ td {
     display: flex;
     margin-left: 2rem;
     padding: 0;
-    border-left:1px solid var(--light-ash);
+    border-left:1px solid var(--ash);
 }
 
 .admin-nav__item,
 .mypage-nav__item {
-    border-right:1px solid var(--light-ash);
+    border-right:1px solid var(--ash);
 }
 
 .admin-nav__link,
@@ -184,7 +183,7 @@ main {
     background:
         radial-gradient(
             circle at 100% 100%,
-            hsl(30, 100%, 50%),
+            hsl(35, 100%, 50%),
             transparent 60%
         ),
         linear-gradient(
