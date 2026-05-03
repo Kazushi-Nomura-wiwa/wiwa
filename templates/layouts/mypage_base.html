@@ -1,20 +1,15 @@
 <!-- パスとファイル名: templates/html/layouts/mypage_base.html -->
 <!-- Path and filename: templates/html/layouts/mypage_base.html -->
-{% extends "layouts/base.html" %}
-<!DOCTYPE html>
-<html lang="ja">
-    <head>
-        {% include "partials/head.html" %}
-    </head>
-    <body>
-        {% include "partials/mypage_header.html" %}
-        {% if error_message %}
-        <p class="error">{{ error_message }}</p>
-        {% endif %}
-        <main>
-            {% block content %}{% endblock %}
-        </main>
+{% include "partials/head.html" %}
+<body>
+    {% include "partials/mypage_header.html" %}
+    {% if error_message %}
+    <p class="error">{{ error_message }}</p>
+    {% endif %}
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 
-        {% include "partials/footer.html" %}
-    </body>
+    {% include "partials/footer.html" %}
+</body>
 </html>

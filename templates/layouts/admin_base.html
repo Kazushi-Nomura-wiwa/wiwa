@@ -1,10 +1,6 @@
 <!-- パスとファイル名: templates/html/layouts/admin_base.html -->
 <!-- path and filename: templates/html/layouts/admin_base.html -->
-<!DOCTYPE html>
-<html lang="ja">
-    <head>
-        {% include "partials/head.html" %}
-    </head>
+{% include "partials/head.html" %}
     <body>
         {% include "partials/admin_header.html" %}
         {% if error_message %}

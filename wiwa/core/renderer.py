@@ -24,7 +24,7 @@ from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from wiwa.config import ACTIVE_THEME, SITE_NAME, TEMPLATE_BASE
+from wiwa.config import ACTIVE_THEME, DEFAULT_LANG, SITE_NAME, TEMPLATE_BASE
 from wiwa.core.i18n import t
 from wiwa.types.route import Route
 
@@ -62,6 +62,7 @@ class TemplateRenderer:
         render_context["current_user"] = getattr(request, "user", None)
         render_context["active_theme"] = ACTIVE_THEME
         render_context["site_name"] = SITE_NAME
+        render_context["default_lang"] = DEFAULT_LANG
         render_context["csrf_token"] = None
 
         # CSRFトークン設定
