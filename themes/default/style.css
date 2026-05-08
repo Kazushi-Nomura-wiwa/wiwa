@@ -5,7 +5,7 @@
     --black: hsl(0 0% 0%);
     --ash: hsl(0 0% 50%);
     --white: hsl(0, 0%, 90%);
-    --orange: hsl(35, 100%, 50%);
+    --gold: hsl(44, 52%, 46%);
 
     /* --- テキスト --- */
     --regular: 400;
@@ -51,7 +51,7 @@ html{
 a,
 a:link,
 a:visited{
-    color: var(--orange);
+    color: var(--gold);
     transition: opacity 0.25s;
 }
 
