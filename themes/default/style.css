@@ -1,93 +1,117 @@
 @charset "utf-8";
 
-:root{
-    /* ---------- カスタムプロパティ(カラー設定ほか) ---------- */
+:root {
+    /* ---------- カラー ---------- */
     --black: hsl(0 0% 0%);
     --ash: hsl(0 0% 50%);
-    --white: hsl(0, 0%, 90%);
-    --gold: hsl(44, 52%, 46%);
+    --white: hsl(0 0% 90%);
+    --gold: hsl(44 52% 46%);
 
-    /* --- テキスト --- */
+    /* ---------- フォントウェイト ---------- */
     --regular: 400;
     --semibold: 600;
     --bold: 700;
     --exbold: 900;
 }
 
-/* ブラウザの余白除去 */
-body {
-    font-family: "Inter", "Noto Sans JP", sans-serif;
-    margin: 0;
-}
-h1, h2, h3, h4, h5, h6,
-p,
-ul, ol {
-    margin: 0;
-    padding: 0;
+/* ---------- ベースリセット ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-/* リストのデフォルトスタイル削除 */
-ul, ol {
-    list-style: none;
-}
-
-img {
-    max-width: 100%;
-    display: block;
-}
-
-/* 共通 */
-html{
+html {
     font-size: 16px;
     scroll-behavior: smooth;
     background: var(--black);
     color: var(--white);
-    font-family: "Noto Sans JP", sans-serif;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", "Noto Sans JP", sans-serif;
     font-optical-sizing: auto;
-    font-weight: 500;
+    font-weight: var(--regular);
     font-style: normal;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+address {
+    font-style: normal;
+}
+
+/* ---------- テキスト ---------- */
+p {
+    margin-bottom: 1rem;
+    font-weight: var(--regular);
+}
+
+em {
+    font-style: normal;
+    color: var(--gold);
 }
 
 a,
 a:link,
-a:visited{
+a:visited {
     color: var(--gold);
-    transition: opacity 0.25s;
     text-decoration: underline;
+    transition: opacity 0.25s;
 }
 
-a:hover{
+a:hover {
     opacity: 0.5;
 }
 
-p{
-    margin-bottom: 1rem;
-    font-weight: normal;
+/* ---------- テーブル ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-address{
-    font-style: normal;
-}
-table,
 th,
 td {
-    border-collapse: collapse;
-    width: 100%;
     border: 1px solid var(--ash);
 }
-em{
-    font-style: normal;
-    color: var(--gold);
+
+/* ---------- 共通レイアウト ---------- */
+main {
+    width: 90%;
+    margin: 2rem auto;
 }
-/* スマホ版 */
-/* ヘッダー */
+
+/* ---------- ヘッダー ---------- */
 .site-header {
-    position:sticky;
-    top:0;
+    position: sticky;
+    top: 0;
     z-index: 100;
     background: var(--black);
     box-shadow: 0 1px 4px rgba(0 0 0 / 8%);
 }
+
 .site-header__main {
     display: flex;
     align-items: center;
@@ -95,11 +119,7 @@ em{
     padding: 2rem;
 }
 
-.site-header__login-status {
-    margin: 0 0 0 auto;
-}
-
-.site-header__title{
+.site-header__title {
     width: 8rem;
 }
 
@@ -108,9 +128,11 @@ em{
     width: 8rem;
     height: 2.75rem;
     overflow: hidden;
+
     background-image: url("/static/img/wiwa_logo.svg");
     background-repeat: no-repeat;
     background-size: contain;
+
     text-indent: 100%;
     white-space: nowrap;
 }
@@ -128,46 +150,36 @@ em{
     border-bottom: 1px solid var(--ash);
 }
 
-/* グローバルナビゲーション */
+/* ---------- ナビゲーション共通 ---------- */
 .global-nav {
-    margin-left:2rem;
+    margin-left: 2rem;
 }
 
-.global-nav__list {
+.global-nav__list,
+.admin-nav__list,
+.mypage-nav__list {
     display: flex;
     flex-wrap: wrap;
-    border-left:1px solid var(--ash);
+    border-left: 1px solid var(--ash);
 }
 
-.global-nav__item {
-    border-right:1px solid var(--ash);
-}
-
-.global-nav__link {
-    display: block;
-    padding: 0.75rem 1rem;
-    text-decoration: none;
-}
-
-/* admin・author用ナビゲーション */
-.admin-nav, 
+.admin-nav,
 .mypage-nav {
     border-top: 1px solid var(--ash);
 }
 
 .admin-nav__list,
 .mypage-nav__list {
-    display: flex;
     margin-left: 2rem;
-    padding: 0;
-    border-left:1px solid var(--ash);
 }
 
+.global-nav__item,
 .admin-nav__item,
 .mypage-nav__item {
-    border-right:1px solid var(--ash);
+    border-right: 1px solid var(--ash);
 }
 
+.global-nav__link,
 .admin-nav__link,
 .mypage-nav__link {
     display: block;
@@ -175,63 +187,76 @@ em{
     text-decoration: none;
 }
 
-/* メインコンテンツ */
-main {
-    width: 90%;
-    margin: 2rem auto;
-}
-
-/* ヒーロー */
+/* ---------- ヒーロー ---------- */
 .hero {
-    width: 100%;
-    aspect-ratio: 16 / 9;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    box-sizing: border-box;
-    color: var(--white);
+
+    width: 100%;
+    aspect-ratio: 16 / 9;
     margin-bottom: 4rem;
-    background-image: url('/static/img/hero_bg.png');
-    background-size: cover;
+
+    color: var(--white);
+
+    background-image: url("/static/img/hero_bg.png");
     background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .hero__title {
-    font-family: "Inter", sans-serif;
+    margin-bottom: 1rem;
+
+    font-family: "Inter", "Noto Sans JP", sans-serif;
     font-size: 2.5rem;
     font-weight: var(--bold);
-    margin-bottom: 1rem;
 }
-.place,
-.about__subtitle,
-.about__feature-subtitle,
-.product__subtitle {
-    color: var(--gold);
-}
-.hero__features{
+
+.hero__features {
     display: flex;
     gap: 1rem;
 }
-.btn{
-    display: inline-block;
+
+/* ---------- アクセントテキスト ---------- */
+.place,
+.services__subtitle,
+.services__feature-subtitle,
+.product__subtitle {
+    color: var(--gold);
+}
+
+/* ---------- ボタン ---------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+
     padding: 0.75rem 1.5rem;
     border: 2px solid var(--gold);
-    background-color: var(--black);
-    color: var(--black);
-    text-decoration: none !important;
     border-radius: 4px;
+
+    background-color: var(--black);
+    color: var(--gold);
+
+    text-decoration: none !important;
+    transition:
+        background-color 0.25s,
+        color 0.25s,
+        opacity 0.25s;
 }
-.btn:hover{
-    background-color: var(--gold);
-    color: var(--black);
-    opacity: 1.0;
-}
+
 .btn::after {
     content: "→";
-    color: var(--gold);
     margin-left: 0.5rem;
+    color: currentColor;
+    transition: transform 0.25s;
+}
+
+.btn:hover {
+    background-color: var(--gold);
+    color: var(--black);
+    opacity: 1;
 }
 
 .btn:hover::after {
-    color: var(--black);
+    transform: translateX(0.25rem);
 }
