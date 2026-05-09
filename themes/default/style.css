@@ -122,14 +122,13 @@ main {
     z-index: 100;
     background: var(--black);
     box-shadow: 0 1px 4px rgba(0 0 0 / 8%);
-}
-
-.site-header__main {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 2rem;
+    gap: 2rem;
 }
+
 
 .site-header__title {
     width: 8rem;
@@ -159,7 +158,7 @@ main {
 
 /* ---------- ナビゲーション共通 ---------- */
 .global-nav {
-    margin-left: 2rem;
+    margin-left: auto;
 }
 
 .global-nav__list,
