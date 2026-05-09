@@ -223,3 +223,7 @@ main {
     font-weight: var(--semibold);
     border-radius: 4px;
 }
+.btn:hover{
+    background-color: var(--gold);
+    color: var(--black);
+}
