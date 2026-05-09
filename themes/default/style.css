@@ -227,3 +227,12 @@ main {
     color: var(--black);
     opacity: 1.0;
 }
+.btn::after {
+    content: "→";
+    color: hsl(44 52% 46%);
+    transition: transform 0.2s ease;
+}
+
+.btn:hover::after {
+    transform: translateX(4px);
+}
