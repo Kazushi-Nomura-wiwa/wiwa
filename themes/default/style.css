@@ -111,7 +111,7 @@ td {
 
 /* ---------- 共通レイアウト ---------- */
 main {
-    width: 90%;
+    width: 100%;
     margin: 2rem auto;
 }
 
@@ -211,7 +211,14 @@ main {
     display: flex;
     gap: 1rem;
 }
-
+/* ---------- サービス ---------- */
+.hero,
+.services,
+.product,
+.getting-started,
+.latest-posts {
+    padding: 0 5%;
+}
 /* ---------- アクセントテキスト ---------- */
 .place,
 .services__subtitle,
