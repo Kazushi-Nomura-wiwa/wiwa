@@ -188,7 +188,6 @@ main {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 3rem;
     box-sizing: border-box;
     color: var(--white);
     margin-bottom: 4rem;
