@@ -217,8 +217,9 @@ main {
     display: inline-block;
     padding: 0.75rem 1.5rem;
     border: 2px solid var(--gold);
+    background-color: var(--black);
     color: var(--black);
-    text-decoration: none;
+    text-decoration: none !important;
     font-weight: var(--semibold);
     border-radius: 4px;
 }
