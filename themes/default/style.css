@@ -172,12 +172,10 @@ main {
 .mypage-nav__list {
     display: flex;
     flex-wrap: wrap;
-    border-left: 1px solid var(--ash);
 }
 
 .admin-nav,
 .mypage-nav {
-    border-top: 1px solid var(--ash);
 }
 
 .admin-nav__list,
@@ -188,7 +186,6 @@ main {
 .global-nav__item,
 .admin-nav__item,
 .mypage-nav__item {
-    border-right: 1px solid var(--ash);
 }
 
 .global-nav__link,
