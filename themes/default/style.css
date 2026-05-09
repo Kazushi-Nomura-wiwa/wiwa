@@ -230,9 +230,5 @@ main {
 .btn::after {
     content: "→";
     color: hsl(44 52% 46%);
-    transition: transform 0.2s ease;
-}
-
-.btn:hover::after {
-    transform: translateX(4px);
+    margin-left: 0.5rem;
 }
