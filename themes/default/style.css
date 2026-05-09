@@ -226,4 +226,5 @@ main {
 .btn:hover{
     background-color: var(--gold);
     color: var(--black);
+    opacity: 1.0;
 }
