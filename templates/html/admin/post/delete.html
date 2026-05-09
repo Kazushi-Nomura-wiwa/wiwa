@@ -18,7 +18,7 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <button type="submit">ゴミ箱へ移動</button>
     </form>
-    <p><a href="/admin/post/list">一覧に戻る</a></p>
-    <p><a href="/admin/post/edit/{{ post._id }}">編集に戻る</a></p>
+    <p><a href="/admin/post/list" class="link">一覧に戻る</a></p>
+    <p><a href="/admin/post/edit/{{ post._id }}" class="link">編集に戻る</a></p>
 </section>
 {% endblock %}

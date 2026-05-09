@@ -8,7 +8,7 @@
 
     <nav>
         <ul>
-            <li><a href="/admin/post/new">新規作成</a></li>
+            <li><a href="/admin/post/new" class="link">新規作成</a></li>
             <li><a href="/admin/post/trash">ゴミ箱</a></li>
         </ul>
     </nav>
@@ -29,16 +29,16 @@
                 {% for post in posts %}
                     <tr>
                         <td>
-                            <a href="/post/{{ post.slug }}" target="_blank">{{ post.title }}</a>
+                            <a href="/post/{{ post.slug }}" class="link" target="_blank">{{ post.title }}</a>
                         </td>
                         <td>{{ post.slug }}</td>
                         <td>{{ post.status }}</td>
                         <td>{{ post.author_display_name }}</td>
                         <td>{{ post.published_at_display }}</td>
                         <td>
-                            <a href="/admin/post/edit/{{ post._id }}">編集</a>
+                            <a href="/admin/post/edit/{{ post._id }}" class="link">編集</a>
                             /
-                            <a href="/admin/post/delete/{{ post._id }}">削除</a>
+                            <a href="/admin/post/delete/{{ post._id }}" class="link">削除</a>
                         </td>
                     </tr>
                 {% endfor %}

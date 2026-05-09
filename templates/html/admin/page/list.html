@@ -25,11 +25,11 @@
             {% for page in pages %}
             <tr>
                 <td>{{ page.title }}</td>
-                <td><a href="/{{ page.slug }}" target="_blank">/{{ page.slug }}</a></td>
+                <td><a href="/{{ page.slug }}" class="link" target="_blank">/{{ page.slug }}</a></td>
                 <td>{{ page.status }}</td>
                 <td>
-                    <a href="/admin/page/edit/{{ page._id }}">編集</a>
-                    <a href="/admin/page/delete/{{ page._id }}">削除</a>
+                    <a href="/admin/page/edit/{{ page._id }}" class="link">編集</a>
+                    <a href="/admin/page/delete/{{ page._id }}" class="link">削除</a>
                 </td>
             </tr>
             {% endfor %}

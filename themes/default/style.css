@@ -169,10 +169,6 @@ main {
     gap: 0.5rem;
 }
 
-.admin-nav,
-.mypage-nav {
-}
-
 .admin-nav__list,
 .mypage-nav__list {
     margin-left: 2rem;
