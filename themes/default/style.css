@@ -199,7 +199,7 @@ main {
 
     color: var(--white);
 
-    background-image: url("/static/img/hero_bg.png");
+    background-image: url("/static/img/hero_bg.webp");
     background-repeat: no-repeat;
     background-size: cover;
 }
