@@ -202,3 +202,8 @@ main {
     font-weight: var(--bold);
     margin-bottom: 1rem;
 }
+.place,
+.about__subtitle,
+.about__feature-subtitle {
+    color: var(--gold);
+}
