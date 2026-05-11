@@ -106,6 +106,7 @@ def slug(request, route=None, slug=None):
     """
 
     post = post_repo.find_published_by_slug(slug)
+    print(post["body_html"])
 
     if not post:
         return not_found()
