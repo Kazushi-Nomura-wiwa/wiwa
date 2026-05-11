@@ -191,7 +191,7 @@ class EditorJSService:
 
         html_parts.append("</div>")
 
-    return "\n".join(html_parts)
+        return "\n".join(html_parts)
 
     def _build_table(self, data: dict) -> str:
         """
