@@ -114,6 +114,8 @@ def slug(request, route=None, slug=None):
         post.get("body_json", "")
     )
 
+    print(post["body_html"])
+    
     body = renderer.render_route(
         route,
         "html/post/slug.html",
