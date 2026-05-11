@@ -14,7 +14,7 @@
             {% for post in posts %}
                 <article class="post-list__item">
                     <h2 class="post-list__title">
-                        <a href="/post/{{ post.slug }}" class="post-list__link">{{ post.title }}</a>
+                        <a href="/post/{{ post.slug }}" class="link post-list__link">{{ post.title }}</a>
                     </h2>
 
                     <p class="post-card__meta">
@@ -26,7 +26,7 @@
                         <ul class="post-list__tags">
                             {% for tag in post.tags %}
                                 <li class="post-list__tag">
-                                    <a href="/tag/{{ tag | urlencode }}" class="post-list__tag-link">{{ tag }}</a>
+                                    <a href="/tag/{{ tag | urlencode }}" class="link post-list__tag-link">{{ tag }}</a>
                                 </li>
                             {% endfor %}
                         </ul>
