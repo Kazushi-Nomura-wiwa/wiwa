@@ -94,6 +94,7 @@ def new(request, route=None, **params):
 
         print("POST FORM:", form)
         print("POST ERROR:", error)
+        
 
         if error:
             body = renderer.render_route(
