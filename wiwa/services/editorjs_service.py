@@ -167,7 +167,7 @@ class EditorJSService:
         if not isinstance(items, list):
             return ""
 
-        html_parts = []
+        html_parts = ['<div class="checklist">']
 
         for item in items:
             if not isinstance(item, dict):
@@ -188,6 +188,8 @@ class EditorJSService:
                 f'<span class="checklist__text">{item_text}</span>'
                 '</label>'
             )
+
+        html_parts.append("</div>")
 
         return "\n".join(html_parts)
 
