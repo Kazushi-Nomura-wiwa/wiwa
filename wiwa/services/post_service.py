@@ -50,7 +50,7 @@ class PostService:
     def create_post(
         self,
         title: str,
-        body: str,
+        body_json: str,
         author_id: str,
         author_name: str,
         status: str = "published",
@@ -79,7 +79,7 @@ class PostService:
 
             post = {
                 "title": title,
-                "body": body,
+                "body_json": body_json,
                 "slug": final_slug,
                 "tags": tags or [],
                 "author_id": author_id,
@@ -110,7 +110,7 @@ class PostService:
         self,
         post_id: str,
         title: str,
-        body: str,
+        body_json: str,
         slug: str,
         author_id: str,
         author_name: str,
@@ -137,7 +137,7 @@ class PostService:
 
         update_data = {
             "title": title,
-            "body": body,
+            "body_json": body_json,
             "slug": final_slug,
             "tags": tags or [],
             "author_id": author_id,
