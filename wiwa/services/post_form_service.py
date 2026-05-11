@@ -52,7 +52,7 @@ def empty_post_form(status: str = "published") -> dict:
     return {
         "_id": "",
         "title": "",
-        "body": "",
+        "body_json": "{}",
         "tags": "",
         "status": status,
     }
@@ -66,7 +66,7 @@ def post_to_form(post: dict) -> dict:
     return {
         "_id": str(post.get("_id", "")),
         "title": post.get("title", ""),
-        "body": post.get("body", ""),
+        "body_json": post.get("body_json", ""),
         "tags": " ".join(post.get("tags", [])),
         "status": post.get("status", "published"),
     }
@@ -80,7 +80,7 @@ def submitted_post_form(request) -> dict:
     return {
         "_id": "",
         "title": request.get_form("title").strip(),
-        "body": request.get_form("body").strip(),
+        "body_json": request.get_form("body_json").strip(),
         "tags": request.get_form("tags").strip(),
         "status": request.get_form("status", "published").strip() or "published",
     }
@@ -94,7 +94,7 @@ def validate_post_form(form: dict) -> str:
     if not form.get("title"):
         return t("error.post.title_required")
 
-    if not form.get("body"):
+    if not form.get("body_json"):
         return t("error.post.body_required")
 
     return ""
