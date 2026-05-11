@@ -135,8 +135,12 @@ class EditorJSService:
         listブロック生成
         Build list block
         """
-        items = data.get("items", [])
         style = data.get("style", "unordered")
+
+        if style == "checklist":
+            return self._build_checklist(data)
+
+        items = data.get("items", [])
 
         tag = "ol" if style == "ordered" else "ul"
         html_parts = [f"<{tag}>"]
@@ -152,6 +156,42 @@ class EditorJSService:
 
         html_parts.append(f"</{tag}>")
         return "\n".join(html_parts)
+
+    def _build_checklist(self, data: dict) -> str:
+        """
+        checklistブロック生成
+        Build checklist block
+        """
+        items = data.get("items", [])
+
+        if not isinstance(items, list):
+            return ""
+
+        html_parts = ['<div class="checklist">']
+
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+
+            item_text = html.escape(item.get("content", ""))
+            meta = item.get("meta", {})
+
+            checked = False
+            if isinstance(meta, dict):
+                checked = meta.get("checked", False)
+
+            checked_attr = " checked" if checked else ""
+
+            html_parts.append(
+                '<label class="checklist__item">'
+                f'<input class="checklist__checkbox" type="checkbox"{checked_attr} disabled>'
+                f'<span class="checklist__text">{item_text}</span>'
+                '</label>'
+            )
+
+        html_parts.append("</div>")
+
+    return "\n".join(html_parts)
 
     def _build_table(self, data: dict) -> str:
         """
@@ -184,3 +224,4 @@ class EditorJSService:
 
         html_parts.append("</table>")
         return "\n".join(html_parts)
+    
