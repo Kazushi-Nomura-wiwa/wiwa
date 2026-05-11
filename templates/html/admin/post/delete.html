@@ -3,22 +3,22 @@
 {% extends "layouts/admin_base.html" %}
 
 {% block content %}
-<section>
-    <h2>{{ title }}</h2>
+            <section>
+                <h2>{{ title }}</h2>
 
-    <p>以下の投稿をゴミ箱へ移動しますか？</p>
+                <p>以下の投稿をゴミ箱へ移動しますか？</p>
 
-    <ul>
-        <li><strong>title:</strong> {{ post.title }}</li>
-        <li><strong>slug:</strong> {{ post.slug }}</li>
-        <li><strong>status:</strong> {{ post.status }}</li>
-    </ul>
+                <ul>
+                    <li><strong>title:</strong> {{ post.title }}</li>
+                    <li><strong>slug:</strong> {{ post.slug }}</li>
+                    <li><strong>status:</strong> {{ post.status }}</li>
+                </ul>
 
-    <form action="/admin/post/delete/{{ post._id }}" method="post" onsubmit="return confirm('本当にゴミ箱へ移動しますか？\nこの投稿は{{ retention_days }}日後に完全に削除されます。');">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <button type="submit">ゴミ箱へ移動</button>
-    </form>
-    <p><a href="/admin/post/list" class="link">一覧に戻る</a></p>
-    <p><a href="/admin/post/edit/{{ post._id }}" class="link">編集に戻る</a></p>
-</section>
+                <form action="/admin/post/delete/{{ post._id }}" method="post" onsubmit="return confirm('本当にゴミ箱へ移動しますか？\nこの投稿は{{ retention_days }}日後に完全に削除されます。');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit">ゴミ箱へ移動</button>
+                </form>
+                <p><a href="/admin/post/list" class="link">一覧に戻る</a></p>
+                <p><a href="/admin/post/edit/{{ post._id }}" class="link">編集に戻る</a></p>
+            </section>
 {% endblock %}

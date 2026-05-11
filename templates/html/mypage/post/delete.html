@@ -2,23 +2,23 @@
 {% extends "layouts/mypage_base.html" %}
 
 {% block content %}
-<section>
-    <h2>{{ title }}</h2>
+            <section>
+                <h2>{{ title }}</h2>
 
-    <p>以下の投稿をゴミ箱へ移動しますか？</p>
+                <p>以下の投稿をゴミ箱へ移動しますか？</p>
 
-    <ul>
-        <li><strong>title:</strong> {{ post.title }}</li>
-        <li><strong>slug:</strong> {{ post.slug }}</li>
-        <li><strong>status:</strong> {{ post.status }}</li>
-    </ul>
+                <ul>
+                    <li><strong>title:</strong> {{ post.title }}</li>
+                    <li><strong>slug:</strong> {{ post.slug }}</li>
+                    <li><strong>status:</strong> {{ post.status }}</li>
+                </ul>
 
-    <form action="/mypage/post/delete/{{ post._id }}" method="post" onsubmit="return confirm('本当にゴミ箱へ移動しますか？\nこの投稿は{{ retention_days }}日後に完全に削除されます。');">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-        <button type="submit">ゴミ箱へ移動</button>
-    </form>
+                <form action="/mypage/post/delete/{{ post._id }}" method="post" onsubmit="return confirm('本当にゴミ箱へ移動しますか？\nこの投稿は{{ retention_days }}日後に完全に削除されます。');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button type="submit">ゴミ箱へ移動</button>
+                </form>
 
-    <p><a href="/mypage/post/list">一覧に戻る</a></p>
-    <p><a href="/mypage/post/edit/{{ post._id }}">編集に戻る</a></p>
-</section>
+                <p><a href="/mypage/post/list">一覧に戻る</a></p>
+                <p><a href="/mypage/post/edit/{{ post._id }}">編集に戻る</a></p>
+            </section>
 {% endblock %}
