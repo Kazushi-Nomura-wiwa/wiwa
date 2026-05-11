@@ -214,11 +214,7 @@ main {
     gap: 1rem;
 }
 /* ---------- 間隔/余白 ---------- */
-.hero,
-.services,
-.product,
-.getting-started,
-.latest-posts {
+main > section {
     padding: 0 5%;
     margin-bottom: 4rem;
 }
