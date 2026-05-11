@@ -3,7 +3,7 @@
 {% block content %}
             <section>
                 <h2>{{ title }}</h2>
-                <form action="{{ action }}" method="post">
+                <form id="page-form" action="{{ action }}" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
 
                     <div>
