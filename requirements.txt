@@ -7,3 +7,4 @@ tzdata
 werkzeug
 argon2-cffi
 python-magic
+python-multipart
