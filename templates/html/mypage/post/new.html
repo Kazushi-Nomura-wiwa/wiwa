@@ -26,8 +26,9 @@
                     </div>
 
                     <div>
-                        <label for="body">body</label><br>
-                        <textarea id="body" name="body" rows="16" style="width: 40rem;">{{ form.body }}</textarea>
+                        <label for="body">本文</label><br>
+                        <div id="editorjs"></div>
+                        <input type="hidden" id="body_json" name="body_json" value="">
                     </div>
 
                     <div>
